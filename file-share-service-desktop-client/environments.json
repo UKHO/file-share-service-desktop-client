@@ -1,0 +1,26 @@
+[
+  {
+    "name": "QA",
+    "tenantId": "9134ca48-663d-4a05-968a-31a42f0aed3e",
+    "clientId": "805be024-a208-40fb-ab6f-399c2647d334",
+    "baseUrl": "https://fss-qa-webapp.azurewebsites.net"
+  },
+  {
+    "name": "Production",
+    "tenantId": "9134ca48-663d-4a05-968a-31a42f0aed3e",
+    "clientId": "30cc156d-765f-43ea-8c84-a97d5b8ce852",
+    "baseUrl": "https://fss-prod-webapp.azurewebsites.net"
+  },
+  {
+    "name": "DistDev",
+    "tenantId": "9134ca48-663d-4a05-968a-31a42f0aed3e",
+    "clientId": "fd5fa30c-e359-4c0c-a4fc-df2077982361",
+    "baseUrl": "https://fss-distdev-webapp.azurewebsites.net"
+  },
+  {
+    "name": "Dev",
+    "tenantId": "9134ca48-663d-4a05-968a-31a42f0aed3e",
+    "clientId": "3ec9403b-8299-4a90-8ecc-07ee6642109f",
+    "baseUrl": "https://fss-dev-webapp.azurewebsites.net"
+  }
+]

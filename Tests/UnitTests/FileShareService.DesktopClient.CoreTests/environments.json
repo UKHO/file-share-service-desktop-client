@@ -1,0 +1,14 @@
+[
+  {
+    "name": "TestEnv1",
+    "tenantId": "tenantId1",
+    "clientId": "clientId1",
+    "baseUrl": "https://fss-base-url1.net"
+  },
+  {
+    "name": "TestEnv2",
+    "tenantId": "tenantId2",
+    "clientId": "clientId2",
+    "baseUrl": "https://fss-base-url2.net"
+  }
+]

@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>UKHO.FileShareService.DesktopClient</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Fonts\JOHNSTONITCSTD_BOLD.OTF" />
+    <None Remove="Fonts\JOHNSTONITCSTD_BOLDITA.OTF" />
+    <None Remove="Fonts\JOHNSTONITCSTD_LIGHT.OTF" />
+    <None Remove="Fonts\JOHNSTONITCSTD_LIGHTITA.OTF" />
+    <None Remove="Fonts\JOHNSTONITCSTD_MEDIUM.OTF" />
+    <None Remove="Fonts\JOHNSTONITCSTD_MEDIUMITA.OTF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro" Version="2.4.5" />
+    <PackageReference Include="Prism.Unity" Version="8.0.0.1909" />
+    <PackageReference Include="Prism.Wpf" Version="8.0.0.1909" />
+    <PackageReference Include="UKHO.FileShareClient" Version="0.1.10504.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileShareService.DesktopClient.Core\FileShareService.DesktopClient.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\JOHNSTONITCSTD_BOLD.OTF" />
+    <Resource Include="Fonts\JOHNSTONITCSTD_BOLDITA.OTF" />
+    <Resource Include="Fonts\JOHNSTONITCSTD_LIGHT.OTF" />
+    <Resource Include="Fonts\JOHNSTONITCSTD_LIGHTITA.OTF" />
+    <Resource Include="Fonts\JOHNSTONITCSTD_MEDIUM.OTF" />
+    <Resource Include="Fonts\JOHNSTONITCSTD_MEDIUMITA.OTF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="environments.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
