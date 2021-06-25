@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:UKHO.FileShareService.DesktopClient.Modules.Admin"
              xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
              xmlns:jobViewModels="clr-namespace:UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels"
+             xmlns:views="clr-namespace:UKHO.FileShareService.DesktopClient.Views"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=local:AdminViewModel, IsDesignTimeCreatable=False}">
@@ -123,7 +124,9 @@
                                                   AutoGenerateColumns="False">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Search Path" Binding="{Binding SearchPath}" />
-                                                <DataGridTextColumn Header="Expected" Width="100" Binding="{Binding ExpectedFileCount}" />
+                                                <DataGridTextColumn Header="Expected" Width="100" 
+                                                                    Binding="{Binding ExpectedFileCount}" 
+                                                                    />
                                                 <DataGridTemplateColumn Header="Files" Width="600">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
@@ -160,6 +163,14 @@
                                             Content="Execute Job"
                                             HorizontalAlignment="Left" 
                                             Command="{Binding ExcecuteJobCommand}"/>
+                                        <views:Spinner
+                                            Grid.Row="0" 
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="2"
+                                            Grid.RowSpan="9"
+                                            Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+
+                                            ></views:Spinner>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

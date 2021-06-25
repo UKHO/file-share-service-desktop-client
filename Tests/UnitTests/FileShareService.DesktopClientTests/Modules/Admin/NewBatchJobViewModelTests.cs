@@ -187,7 +187,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
             var expiry = vm.ExpiryDate;
             Assert.IsNotNull(expiry);
-            Assert.AreEqual(DateTime.UtcNow.AddDays(dayOffsetFromNow).Date, expiry.Value.Date);
+            Assert.AreEqual(DateTime.UtcNow.AddDays(dayOffsetFromNow).Date, expiry!.Value.Date);
         }
 
         [Test]
@@ -229,6 +229,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.AreEqual(2, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] {file1FullFileName, file2FullFileName},
                 vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
+
+            Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
         }
 
         [TestCase("abc", "abc")]
@@ -317,11 +319,50 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] {file1FullFileName},
                 vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+        }
+
+        [Test]
+        public void TestCannotExecuteCommandIfFoundFilesDontMatchExpectedFileCount()
+        {
+            var file1FullFileName = @"c:\data\files\f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+                {
+                    DisplayName = "Create new Batch 123",
+                    ActionParams = new NewBatchJobParams
+                    {
+                        BusinessUnit = "TestBU1",
+                        Attributes = new Dictionary<string, string> {{"BatchAttribute1", "Value1"}},
+                        Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+        }
+                        }
+                    }
+                },
+                fileSystem,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider);
+
+            Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
+            CollectionAssert.AreEqual(new[] {file1FullFileName},
+                vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
+
+
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
         }
 
 
+
+
         [Test]
-        public void TestWibble()
+        public async Task TestWibble()
         {
             var file1FullFileName = @"c:/data/files/f1.txt";
             fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
@@ -349,17 +390,37 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 fakeCurrentDateTimeProvider);
 
             Assert.AreEqual("Create new Batch 123", vm.DisplayName);
-            var batchModelToSendToFss = vm.BuildBatchModel();
-            Assert.IsNotNull(batchModelToSendToFss);
 
+            var batchHandle = A.Fake<IBatchHandle>();
 
             var createBatchTcs = new TaskCompletionSource<IBatchHandle>();
+            var addFileToBatchTcs = new TaskCompletionSource();
+            var commitBatchTcs = new TaskCompletionSource();
+            
+
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored))
                 .Returns(createBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
 
+
+            var executeTask = vm.OnExecuteCommand();
             vm.ExcecuteJobCommand.Execute();
+            Assert.IsTrue(vm.IsExecuting);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
 
-            createBatchTcs.SetResult(A.Fake<IBatchHandle>());
+            createBatchTcs.SetResult(batchHandle);
+            addFileToBatchTcs.SetResult();
+            commitBatchTcs.SetResult();
+
+            
+
+            await executeTask;
+            Assert.IsFalse(vm.IsExecuting);
+            Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
+
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(batchHandle)).MustHaveHappened();
 
             Assert.Inconclusive();
         }

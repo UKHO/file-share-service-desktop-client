@@ -58,7 +58,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         public void LoadBatchJobsFile(string? fileName)
         {
             using var fs = fileSystem.File.OpenText(fileName);
-            BatchJobs = jobsParser.Parse(fs.ReadToEnd()).jobs.Select(BuildJobViewModel);
+            BatchJobs = jobsParser.Parse(fs.ReadToEnd()).jobs.Select(BuildJobViewModel).ToList();
         }
 
         private IBatchJobViewModel BuildJobViewModel(IJob job)

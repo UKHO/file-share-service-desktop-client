@@ -5,7 +5,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Prism.Commands;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -14,7 +13,7 @@ using UKHO.WeekNumberUtils;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 {
-    public class NewBatchJobViewModel : IBatchJobViewModel
+    public class NewBatchJobViewModel : BaseBatchJobViewModel
     {
         private readonly NewBatchJob job;
         private readonly IFileSystem fileSystem;
@@ -23,7 +22,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
             Func<IFileShareApiAdminClient> fileShareClientFactory,
-            ICurrentDateTimeProvider currentDateTimeProvider)
+            ICurrentDateTimeProvider currentDateTimeProvider) : base(job)
         {
             this.job = job;
             this.fileSystem = fileSystem;
@@ -31,11 +30,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             this.currentDateTimeProvider = currentDateTimeProvider;
             Files = job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, ExpandMacros))
                 .ToList();
-            ExcecuteJobCommand = new DelegateCommand(async () => await OnExecuteCommand());
         }
-
-
-        public string DisplayName => job.DisplayName;
 
         public string BusinessUnit => job.ActionParams.BusinessUnit;
 
@@ -127,38 +122,48 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 });
         }
 
+        protected override bool CanExecute()
+        {
+            return Files.All(f => f.CorrectNumberOfFilesFound);
+        }
+
         public List<NewBatchFilesViewModel> Files { get; }
 
         public List<string> ReadUsers => job.ActionParams.Acl.ReadUsers;
         public List<string> ReadGroups => job.ActionParams.Acl.ReadGroups;
 
-        public DelegateCommand ExcecuteJobCommand { get; }
 
-
-        private async Task OnExecuteCommand()
+        protected internal override async Task OnExecuteCommand()
         {
-            var fileShareClient = fileShareClientFactory();
-            var buildBatchModel = BuildBatchModel();
-            var batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel);
+            IsExecuting = true;
             try
             {
-                await Task.WhenAll(
-                    Files.SelectMany(f => f.Files.Select(file => (f, file)))
-                        .Select(f =>
-                        {
-                            var (newBatchFilesViewModel, file) = f;
-                            var openRead = fileSystem.File.OpenRead(file.FullName);
-                            return fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name,
-                                newBatchFilesViewModel.MimeType).ContinueWith(t => openRead.Dispose());
-                        }).ToArray());
+                var fileShareClient = fileShareClientFactory();
+                var buildBatchModel = BuildBatchModel();
+                var batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel);
+                try
+                {
+                    await Task.WhenAll(
+                        Files.SelectMany(f => f.Files.Select(file => (f, file)))
+                            .Select(f =>
+                            {
+                                var (newBatchFilesViewModel, file) = f;
+                                var openRead = fileSystem.File.OpenRead(file.FullName);
+                                return fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name,
+                                    newBatchFilesViewModel.MimeType).ContinueWith(t => openRead.Dispose());
+                            }).ToArray());
 
-                await fileShareClient.RollBackBatchAsync(batchHandle);
-                //await fileShareClient.CommitBatch(batchHandle);
+                    await fileShareClient.CommitBatch(batchHandle);
+                }
+                catch
+                {
+                    await fileShareClient.RollBackBatchAsync(batchHandle);
+                    throw;
+                }
             }
-            catch
+            finally
             {
-                await fileShareClient.RollBackBatchAsync(batchHandle);
-                throw;
+                IsExecuting = false;
             }
         }
 
@@ -201,5 +206,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public IEnumerable<IFileSystemInfo> Files { get; }
         public int ExpectedFileCount => newBatchFile.ExpectedFileCount;
         public string MimeType => newBatchFile.MimeType;
+
+        public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
     }
 }
