@@ -3,6 +3,7 @@ using System.Linq;
 using FakeItEasy;
 using NUnit.Framework;
 using UKHO.FileShareClient.Models;
+using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Modules.Search;
@@ -12,18 +13,18 @@ namespace FileShareService.DesktopClientTests.Modules.Search
     public class SearchViewModelTests
     {
         private SearchViewModel searchViewModel = null!;
-        private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private IAuthProvider fakeAuthProvider = null!;
         private IFssSearchStringBuilder fakeFssSearchStringBuilder = null!;
+        private IFileShareApiAdminClientFactory fakeFileShareApiAdminClientFactory = null!;
 
         [SetUp]
         public void Setup()
         {
-            fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeAuthProvider = A.Fake<IAuthProvider>();
             fakeFssSearchStringBuilder = A.Fake<IFssSearchStringBuilder>();
+            fakeFileShareApiAdminClientFactory = A.Fake<IFileShareApiAdminClientFactory>();
             searchViewModel =
-                new SearchViewModel(fakeEnvironmentsManager, fakeAuthProvider, fakeFssSearchStringBuilder);
+                new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory);
         }
 
         [Test]

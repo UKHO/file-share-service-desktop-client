@@ -25,6 +25,7 @@
                        Margin="0 15">
                 The ADMIRALTY File Share Service allows you to search and download files.
             </TextBlock>
+            <Image Source="../../Views/resized_0005_Web.jpg"></Image>
             <Label FontSize="36"
                    FontWeight="Medium"
                    Margin="0 15">Sign in to access your files</Label>

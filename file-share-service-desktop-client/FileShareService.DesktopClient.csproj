@@ -21,7 +21,10 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.5" />
     <PackageReference Include="Prism.Unity" Version="8.0.0.1909" />
     <PackageReference Include="Prism.Wpf" Version="8.0.0.1909" />
-    <PackageReference Include="UKHO.FileShareClient" Version="0.1.10504.4" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
+    <PackageReference Include="UKHO.FileShareAdminClient" Version="0.1.10610.5" />
+    <PackageReference Include="UKHO.FileShareClient" Version="0.1.10610.5" />
+    <PackageReference Include="UKHO.WeekNumberUtils" Version="1.5.21167.4" />
   </ItemGroup>
 
   <ItemGroup>

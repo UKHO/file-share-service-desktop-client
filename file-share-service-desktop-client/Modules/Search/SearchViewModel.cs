@@ -14,8 +14,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
     public class SearchViewModel : BindableBase, ISearchViewModel
     {
-        private readonly IEnvironmentsManager environmentsManager;
-        private readonly IAuthProvider authProvider;
+        private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private string searchText = string.Empty;
         private string searchResultAsJson = string.Empty;
         private bool searchInProgress;
@@ -23,11 +22,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private int pageOffset = 0;
         private const int pageSize = 25;
 
-        public SearchViewModel(IEnvironmentsManager environmentsManager, IAuthProvider authProvider,
-            IFssSearchStringBuilder fssSearchStringBuilder)
+        public SearchViewModel(IAuthProvider authProvider,
+            IFssSearchStringBuilder fssSearchStringBuilder, IFileShareApiAdminClientFactory fileShareApiAdminClientFactory)
         {
-            this.environmentsManager = environmentsManager;
-            this.authProvider = authProvider;
+            this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
+
             SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder);
             SearchCommand = new DelegateCommand(async () => await OnSearch(),
                 () => authProvider.IsLoggedIn && !SearchInProgress);
@@ -73,8 +72,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             SearchInProgress = true;
             try
             {
-                var fssClient = new FileShareClient.FileShareApiClient(environmentsManager.CurrentEnvironment.BaseUrl,
-                    authProvider.CurrentAccessToken);
+                var fssClient = fileShareApiAdminClientFactory.Build();
                 var result = await fssClient.Search(searchText, pageSize, pageOffset);
 
                 SearchResultAsJson = result.ToJson();

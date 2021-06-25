@@ -66,9 +66,10 @@
             </Style>
             <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}" />
 
-            <Style TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock}">
+            <Style TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock}" x:Key="BaseTextBlockStyle">
                 <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />
             </Style>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}" />
 
             <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
                 <Setter Property="FontFamily" Value="{StaticResource DefaultFont}" />

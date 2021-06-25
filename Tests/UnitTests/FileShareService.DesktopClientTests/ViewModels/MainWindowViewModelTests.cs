@@ -3,8 +3,10 @@ using System.ComponentModel;
 using System.Linq;
 using FakeItEasy;
 using NUnit.Framework;
+using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.ViewModels;
+using Unity;
 
 namespace FileShareService.DesktopClientTests.ViewModels
 {
@@ -13,12 +15,21 @@ namespace FileShareService.DesktopClientTests.ViewModels
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private MainWindowViewModel vm = null!;
         private IList<EnvironmentConfig> environments = null!;
+        private List<IPageButton> pageButtons = null!;
+        private IAuthProvider fakeAuthProvider = null!;
+        private IUnityContainer fakeContainerRegistry = null!;
+        private INavigation fakeNavigation = null!;
 
         [SetUp]
         public void Setup()
         {
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
-            vm = new MainWindowViewModel(fakeEnvironmentsManager);
+            pageButtons = new List<IPageButton>();
+            fakeAuthProvider = A.Fake<IAuthProvider>();
+            fakeContainerRegistry = A.Fake<IUnityContainer>();
+            fakeNavigation = A.Fake<INavigation>();
+            vm = new MainWindowViewModel(fakeEnvironmentsManager, fakeContainerRegistry, fakeAuthProvider,
+                fakeNavigation);
 
             environments = new List<EnvironmentConfig>();
 
@@ -66,10 +77,43 @@ namespace FileShareService.DesktopClientTests.ViewModels
                 {
                     fakeEnvironmentsManager.PropertyChanged +=
                         Raise.FreeForm<PropertyChangedEventHandler>.With(fakeEnvironmentsManager,
-                            new PropertyChangedEventArgs("Aspects"));
+                            new PropertyChangedEventArgs(nameof(fakeEnvironmentsManager.CurrentEnvironment)));
                 });
 
             Assert.AreSame(fakeEnvironmentsManager.CurrentEnvironment, vm.CurrentEnvironment);
+        }
+
+        [Test]
+        public void TestPageButtons()
+        {
+            CollectionAssert.IsEmpty(vm.PageButtons);
+
+
+            pageButtons.Add(A.Fake<IPageButton>());
+            pageButtons.Add(A.Fake<IPageButton>());
+            pageButtons.Add(A.Fake<IPageButton>());
+
+            A.CallTo(() => fakeContainerRegistry.Resolve(typeof(IPageButton).MakeArrayType(), null))
+                .Returns(pageButtons);
+
+            vm.AssertPropertyChanged(nameof(vm.PageButtons),
+                () =>
+                {
+                    fakeAuthProvider.PropertyChanged +=
+                        Raise.FreeForm<PropertyChangedEventHandler>.With(fakeAuthProvider,
+                            new PropertyChangedEventArgs(nameof(fakeAuthProvider.IsLoggedIn)));
+                });
+
+            CollectionAssert.AreEqual(pageButtons, vm.PageButtons);
+        }
+
+        [Test]
+        public void TestPageButtonCommand()
+        {
+            var fakePageButton = A.Fake<IPageButton>();
+            A.CallTo(() => fakePageButton.NavigationTarget).Returns("NavTarget1");
+            vm.PageButtonCommand.Execute(fakePageButton);
+            A.CallTo(() => fakeNavigation.RequestNavigate("NavTarget1")).MustHaveHappened();
         }
     }
 }

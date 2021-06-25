@@ -7,11 +7,12 @@
                  xmlns:regions="http://prismlibrary.com/"
                  xmlns:viewModels="clr-namespace:UKHO.FileShareService.DesktopClient.ViewModels"
                  xmlns:views="clr-namespace:UKHO.FileShareService.DesktopClient.Views"
+                 xmlns:desktopClient="clr-namespace:UKHO.FileShareService.DesktopClient"
                  mc:Ignorable="d"
                  TitleCharacterCasing="Normal"
                  Title="File Share Service"
                  Width="1600"
-                 Height="1200"
+                 Height="1000"
                  MinWidth="1000"
                  MinHeight="600"
                  BorderBrush="{StaticResource AccentColorBrush}"
@@ -28,7 +29,26 @@
                 BorderBrush="{StaticResource AccentColorBrush}"
                 BorderThickness="2">
                 <StackPanel Orientation="Horizontal">
-                    <Label FontSize="21" 
+                    <ItemsControl ItemsSource="{Binding PageButtons}"
+                                  >
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="desktopClient:IPageButton">
+                                <Button 
+                                    Foreground="Black"
+                                    FontSize="16"
+                                    Content="{Binding DisplayName}"
+                                        Visibility="{Binding Enabled, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                                        Command="{Binding Path=DataContext.PageButtonCommand , RelativeSource={RelativeSource Mode=FindAncestor , AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding .}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Label FontSize="21"
                            Foreground="{StaticResource AccentColorBrush}">
                         Environment
                     </Label>
