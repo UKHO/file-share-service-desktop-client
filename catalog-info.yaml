@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: File-Share-Service-Desktop-Client
+  description: The File Share Service Desktop Client provides a desktop UI for searching for and downloading files from the File Share Service, as well as uploading and managing batches in FSS.
+  annotations:
+    github.com/project-slug: ukho/file-share-service-desktop-client
+spec:
+  type: service
+  lifecycle: alpha
+  owner: rockydevnet
+  system: ADDS
+  consumesApis:
+    - File-Share-Service
