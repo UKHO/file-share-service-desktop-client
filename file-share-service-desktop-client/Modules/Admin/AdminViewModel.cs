@@ -20,9 +20,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
 
-        public AdminViewModel(IFileSystem fileSystem, IKeyValueStore keyValueStore, IJobsParser jobsParser,
+        public AdminViewModel(IFileSystem fileSystem,
+            IKeyValueStore keyValueStore,
+            IJobsParser jobsParser,
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
-            ICurrentDateTimeProvider currentDateTimeProvider)
+            ICurrentDateTimeProvider currentDateTimeProvider,
+            IEnvironmentsManager environmentsManager)
         {
             this.fileSystem = fileSystem;
             this.keyValueStore = keyValueStore;
@@ -30,6 +33,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.currentDateTimeProvider = currentDateTimeProvider;
             OpenFileCommand = new DelegateCommand(OnOpenFile);
+
+            environmentsManager.PropertyChanged += OnEnvironmentsManagerPropertyChanged;
+        }
+
+        private void OnEnvironmentsManagerPropertyChanged(object? sender,
+            System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            BatchJobs = Enumerable.Empty<IBatchJobViewModel>();
         }
 
         public DelegateCommand OpenFileCommand { get; }
