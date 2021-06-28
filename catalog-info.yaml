@@ -8,7 +8,7 @@ metadata:
 spec:
   type: service
   lifecycle: alpha
-  owner: rockydevnet
+  owner: user/rockydevnet
   system: ADDS
   consumesApis:
     - File-Share-Service
