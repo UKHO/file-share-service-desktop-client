@@ -151,10 +151,10 @@
                                         </DataGrid>
 
                                         <Label Grid.Row="5" Content="ACL:" />
-                                        <Label Grid.Row="6" Content="Read Users:" />
+                                        <Label Grid.Row="6" Content="Read Users:" Margin="15 0"/>
                                         <ItemsControl Grid.Row="6" Grid.Column="1" ItemsSource="{Binding ReadUsers}" />
 
-                                        <Label Grid.Row="7" Content="Read Groups:" />
+                                        <Label Grid.Row="7" Content="Read Groups:" Margin="15 0" />
                                         <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />
 
                                         <Button
