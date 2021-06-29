@@ -124,7 +124,7 @@ stages:
               projects: |
                 **/FileShareService.DesktopClient.csproj
               publishWebProjects: false
-              arguments:  '--configuration $(BuildConfiguration)'
+              arguments:  '--configuration $(BuildConfiguration) /p:PublishSingleFile=true -r win-x64'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Pipeline Atrifact
