@@ -52,7 +52,7 @@ stages:
               arguments: '-buildNumber "$(Build.BuildNumber)" -solutionDirectory "$(Build.SourcesDirectory)\" -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" -UKHOAssemblyCopyright "$env:UKHOAssemblyCopyright" -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"'
           
           - task: UseDotNet@2
-            displayName: 'Use .NET Core 3.1.x sdk'
+            displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
               useGlobalJson: true
@@ -74,7 +74,7 @@ stages:
             displayName: "Run OWASP Dependency Checker"
             inputs:
               filename: 'dependency-check.bat'
-              arguments: '--project "File-Share-Service-.Net-Client - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
+              arguments: '--project "File-Share-Service-Desktop-Client - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
 
           - task: PublishBuildArtifacts@1
             displayName: "Publish Artifact: OWASP Dependency Checker Report"
