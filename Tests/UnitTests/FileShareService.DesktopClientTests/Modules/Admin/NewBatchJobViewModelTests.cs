@@ -362,7 +362,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
 
         [Test]
-        public async Task TestWibble()
+        public async Task TestSimpleExceuteNewBatchJob()
         {
             var file1FullFileName = @"c:/data/files/f1.txt";
             fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
@@ -421,8 +421,6 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
 
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(batchHandle)).MustHaveHappened();
-
-            Assert.Inconclusive();
         }
     }
 }
