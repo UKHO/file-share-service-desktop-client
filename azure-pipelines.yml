@@ -122,7 +122,8 @@ stages:
             inputs:
               command: publish
               projects: |
-                **/file-share-service-desktop-client.csproj
+                **/FileShareService.DesktopClient.csproj
+              publishWebProjects: false
               arguments:  '--configuration $(BuildConfiguration)'
 
           - task: PublishPipelineArtifact@1
