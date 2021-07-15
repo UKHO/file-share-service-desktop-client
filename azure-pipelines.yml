@@ -124,10 +124,10 @@ stages:
               projects: |
                 **/FileShareService.DesktopClient.csproj
               publishWebProjects: false
-              arguments:  '--configuration $(BuildConfiguration) /p:PublishSingleFile=true -r win-x64'
+              arguments:  '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish /p:PublishSingleFile=true -r win-x64 '
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Pipeline Atrifact
             inputs:
-              path: $(Build.ArtifactStagingDirectory)
+              path: $(Build.ArtifactStagingDirectory)/publish
               artifact: $(Build.DefinitionName)
