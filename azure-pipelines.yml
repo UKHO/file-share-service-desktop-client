@@ -131,3 +131,16 @@ stages:
             inputs:
               path: $(Build.ArtifactStagingDirectory)/publish
               artifact: $(Build.DefinitionName)
+
+          - task: VSBuild@1
+            displayName: 'Build the Installer'
+            inputs:
+              solution: file-share-service-desktop-client.sln
+              platform: '$(BuildPlatform)'
+              configuration: '$(BuildConfiguration)_Installer'
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Installer
+            inputs:
+              path: $(Build.SourcesDirectory)/Installer/FileShareService.DesktopClient.Installer/bin/$(BuildConfiguration)
+              artifact: $(Build.DefinitionName)_installer
