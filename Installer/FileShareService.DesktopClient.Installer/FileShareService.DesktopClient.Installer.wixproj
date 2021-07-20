@@ -2,13 +2,14 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release_Installer</Configuration>
+    <FSSPublishDir Condition=" '$(FSSPublishDir)' == ''">$(SolutionDir)file-share-service-desktop-client\bin\$(Configuration)\net5.0-windows\win-x64\publish\</FSSPublishDir>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>9b69def5-2ae8-4f4c-96e4-cb5c1e533d27</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>FileShareService.DesktopClient.Installer</OutputName>
     <OutputType>Package</OutputType>
-    <DefineConstants>FileShareService.DesktopClient.TargetDir=$(SolutionDir)file-share-service-desktop-client\bin\$(Configuration)\net5.0-windows\win-x64\publish\</DefineConstants>
+    <DefineConstants>FileShareService.DesktopClient.TargetDir=$(FSSPublishDir)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>

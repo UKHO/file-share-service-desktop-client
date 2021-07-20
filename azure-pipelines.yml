@@ -124,6 +124,7 @@ stages:
               projects: |
                 **/FileShareService.DesktopClient.csproj
               publishWebProjects: false
+              zipAfterPublish: false
               arguments:  '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish /p:PublishSingleFile=true -r win-x64 '
 
           - task: PublishPipelineArtifact@1
@@ -136,6 +137,7 @@ stages:
             displayName: 'Build the Installer'
             inputs:
               solution: file-share-service-desktop-client.sln
+              msbuildArgs: '/p:FSSPublishDir=$(Build.ArtifactStagingDirectory)/publish/file-share-service-desktop-client'
               platform: '$(BuildPlatform)'
               configuration: '$(BuildConfiguration)_Installer'
 
