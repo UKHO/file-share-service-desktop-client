@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*"
+	  Name="FileShareService.DesktopClient.Installer"
+	  Language="1033" 
+	  Version="!(bind.FileVersion.fileFSSDesktopClientExe)"
+	  Manufacturer="UK Hydrographic Office"
+	  UpgradeCode="1787d586-b360-4423-8368-2223ee97e75e">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes"/>
+
+    <Condition Message="The File Share Service Desktop Client only supports Windows 8 and above, or Windows Server 2012 and above.">
+      <![CDATA[Installed OR VersionNT >= 602]]>
+    </Condition>
+    <Feature Id="ProductFeature" Title="FileShareService.DesktopClient" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="ApplicationFilesComponentGroup" />
+      <ComponentGroupRef Id="StartMenuComponents" />
+    </Feature>
+  </Product>
+
+	<Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="UKHOProgramsFolder" Name="UKHO" >
+          <Directory Id="INSTALLFOLDER" Name="FileShareService.DesktopClient.Installer" />
+        </Directory>
+      </Directory>
+
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="FSSStartMenuFolder" Name="File Share Service" />
+      </Directory>
+    </Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<!-- <Component Id="ProductComponent"> -->
+				<!-- TODO: Insert files, registry keys, and other resources here. -->
+			<!-- </Component> -->
+		</ComponentGroup>
+	</Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="StartMenuComponents" Directory="FSSStartMenuFolder">
+      <Component Id="ApplicationStartMenuShortcut" Guid="{3F155F32-EE9A-4C0C-AF62-354CA3816E1D}">
+        <Shortcut Id="ApplicationShortcut"
+                  Name="File Share Service Desktop Client"
+                  Description="Starts the UKHO File Share Service Desktop Client"
+                  Directory="FSSStartMenuFolder"
+                  Target="[INSTALLFOLDER]FileShareService.DesktopClient.exe"
+                  WorkingDirectory="INSTALLLOCATION"
+                  >
+        </Shortcut>
+        <RemoveFolder Id="RemoveFSSStartMenuFolder"
+                      On="uninstall"
+                      Directory="FSSStartMenuFolder"/>
+        <RegistryValue Root="HKCU"
+                       Key="Software\UKHO\FSS\FileShareService"
+                       Name="installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes"
+                       />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
