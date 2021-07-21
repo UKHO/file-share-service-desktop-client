@@ -10,4 +10,12 @@
     </notes>
     <cve>CVE-2020-22475</cve>
   </suppress>
+
+  <suppress>
+   <notes><![CDATA[
+   file name: pyro.exe
+   This is a vunerability in Pryo which is part of the WiX toolset. Although the vunerability is real, Pryo is a tool in the WiX toolset and is not deployed, it is simply used as part of building the .msi installer.
+   ]]></notes>
+   <cve>CVE-2011-2765</cve>
+</suppress>
 </suppressions>
