@@ -6,6 +6,7 @@
     <RootNamespace>UKHO.FileShareService.DesktopClient</RootNamespace>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
