@@ -53,7 +53,7 @@
                   Description="Starts the UKHO File Share Service Desktop Client"
                   Directory="FSSStartMenuFolder"
                   Target="[INSTALLFOLDER]FileShareService.DesktopClient.exe"
-                  WorkingDirectory="INSTALLLOCATION"
+                  WorkingDirectory="INSTALLFOLDER"
                   >
         </Shortcut>
         <RemoveFolder Id="RemoveFSSStartMenuFolder"
