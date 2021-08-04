@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
+using Microsoft.Extensions.Logging;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
@@ -28,12 +30,31 @@ namespace UKHO.FileShareService.DesktopClient
 
         protected override IContainerExtension CreateContainerExtension()
         {
-            var containerExtension = base.CreateContainerExtension() as UnityContainerExtension;
+            var containerExtension = (UnityContainerExtension) base.CreateContainerExtension();
 #if DEBUG
             containerExtension.Instance.AddExtension(new Diagnostic());
 #endif
+
+            var loggerFactory = LoggerFactory.Create(logging =>
+            {
+                logging.AddEventLog(eventLogSettings => { eventLogSettings.SourceName = "FSS"; });
+            });
+            containerExtension.Instance.RegisterInstance(loggerFactory);
+
+
+            var loggerFactoryMethod = typeof(LoggerFactoryExtensions)
+                .GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                .First(x => x.ContainsGenericParameters);
+
+            containerExtension.Instance.RegisterFactory(typeof(ILogger<>),
+                (c, t, s) =>
+                {
+                    var genFactoryMethod = loggerFactoryMethod.MakeGenericMethod(t.GetGenericArguments()[0]);
+                    return genFactoryMethod.Invoke(null, new object[] {loggerFactory});
+                });
             return containerExtension;
         }
+
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {

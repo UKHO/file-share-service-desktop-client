@@ -1,0 +1,458 @@
+{
+  "jobs": [
+    {
+      "action": "newBatch",
+      "displayName": "Upload Sample Files for Current Week",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "Samples"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          }
+        ],
+        "acl": {
+          "readUsers": [
+            "525563d6-8133-4c7d-8bd3-28a8d0bee4db" // MRE
+          ],
+          "readGroups": []
+        },
+        "expiryDate": "$(now.AddDays(1))",
+        "files": [
+          {
+            "searchPath": "D:\\temp\\readme.txt",
+            "expectedFileCount": 1,
+            "mimeType": "text/plain"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload Sample Files for Next Week",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "Samples"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.WeekNumber +1)" // Need to be careful here because files being uploaded are probably for "next" week.
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": []
+        },
+        "expiryDate": "$(now.AddDays(8))",
+        "files": [
+          {
+            "searchPath": "D:\\temp\\readme.txt",
+            "expectedFileCount": 1,
+            "mimeType": "text/plain"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload next week's weekly AVCS DVDs",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.AddDays(7).Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.AddDays(7).WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Base"
+          },
+          {
+            "key": "Media Type",
+            "value": "DVD"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(28))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\AVCS_DVDs\\Week $(now.AddDays(7).Year)_$(now.AddDays(7).WeekNumber)\\AVCS_S631-1_REISSUE_DVD*.iso",
+            "expectedFileCount": 2,
+            "mimeType": "application/x-raw-disk-image"
+          },
+          {
+            "searchPath": "D:\\Data\\AVCS_DVDs\\Week $(now.AddDays(7).Year)_$(now.AddDays(7).WeekNumber)\\AVCS_S631-1_REISSUE_DVD*.SHA1",
+            "expectedFileCount": 2,
+            "mimeType": "text/plain"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload next week's weekly Update CD",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.AddDays(7).Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.AddDays(7).WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Update"
+          },
+          {
+            "key": "Media Type",
+            "value": "CD"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(28))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\Update CD\\Week $(now.AddDays(7).Year)_$(now.AddDays(7).WeekNumber)\\AVCS_S631-1_UPDATE_CD_*.ZIP",
+            "expectedFileCount": 1,
+            "mimeType": "application/zip"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload next week's weekly changes Zip",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.AddDays(7).Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.AddDays(7).WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Update"
+          },
+          {
+            "key": "Media Type",
+            "value": "Zip"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(28))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\AVCS Weekly Exchange Set\\AVCS_S631-1_Update_Wk$(now.AddDays(7).WeekNumber)_21_Only.zip",
+            "expectedFileCount": 1,
+            "mimeType": "application/zip"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload next week's Base CDs",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.AddDays(7).Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.AddDays(7).WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Base"
+          },
+          {
+            "key": "Media Type",
+            "value": "CD"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(280))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\AVCS_Base_CDs\\Week $(now.AddDays(7).Year)_$(now.AddDays(7).WeekNumber)\\AVCS_S631-1_BASE_CD*.ZIP",
+            "expectedFileCount": 9,
+            "mimeType": "application/zip"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload this week's weekly AVCS DVDs",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Base"
+          },
+          {
+            "key": "Media Type",
+            "value": "DVD"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(28))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\AVCS_DVDs\\Week $(now.Year)_$(now.WeekNumber)\\AVCS_S631-1_REISSUE_DVD*.iso",
+            "expectedFileCount": 2,
+            "mimeType": "application/x-raw-disk-image"
+          },
+          {
+            "searchPath": "D:\\Data\\AVCS_DVDs\\Week $(now.Year)_$(now.WeekNumber)\\AVCS_S631-1_REISSUE_DVD*.SHA1",
+            "expectedFileCount": 2,
+            "mimeType": "text/plain"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload this week's weekly Update CD",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Update"
+          },
+          {
+            "key": "Media Type",
+            "value": "CD"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(28))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\Update CD\\Week $(now.Year)_$(now.WeekNumber)\\AVCS_S631-1_UPDATE_CD_*.ZIP",
+            "expectedFileCount": 1,
+            "mimeType": "application/zip"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload this week's weekly changes Zip",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Update"
+          },
+          {
+            "key": "Media Type",
+            "value": "Zip"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(28))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\AVCS Weekly Exchange Set\\AVCS_S631-1_Update_Wk$(now.WeekNumber)_21_Only.zip",
+            "expectedFileCount": 1,
+            "mimeType": "application/zip"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Upload this week's Base CDs",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "$(now.WeekNumber)" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Base"
+          },
+          {
+            "key": "Media Type",
+            "value": "CD"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "public"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(280))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\AVCS_Base_CDs\\Week $(now.Year)_$(now.WeekNumber)\\AVCS_S631-1_BASE_CD*.ZIP",
+            "expectedFileCount": 9,
+            "mimeType": "application/zip"
+          }
+        ]
+      }
+    }
+  ]
+}
