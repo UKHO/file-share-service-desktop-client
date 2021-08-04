@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Prism.Commands;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -19,11 +20,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly IFileSystem fileSystem;
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
+        private bool isExecutingComplete;
+        private string executionResult = string.Empty;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
             Func<IFileShareApiAdminClient> fileShareClientFactory,
             ICurrentDateTimeProvider currentDateTimeProvider) : base(job)
         {
+            CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;
             this.fileSystem = fileSystem;
             this.fileShareClientFactory = fileShareClientFactory;
@@ -104,7 +108,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             if (string.IsNullOrEmpty(value))
                 return value;
 
-            return replacementExpressions.Aggregate<KeyValuePair<string, Func<Match, string>>, string>(value,
+            return replacementExpressions.Aggregate(value,
                 (input, kv) =>
                 {
                     var match = Regex.Match(input, kv.Key);
@@ -132,6 +136,39 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public List<string> ReadUsers => job.ActionParams.Acl.ReadUsers;
         public List<string> ReadGroups => job.ActionParams.Acl.ReadGroups;
 
+        public bool IsExecutingComplete
+        {
+            get => isExecutingComplete;
+            set
+            {
+                if (isExecutingComplete != value)
+                {
+                    isExecutingComplete = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string ExecutionResult
+        {
+            get => executionResult;
+            set
+            {
+                if (executionResult != value)
+                {
+                    executionResult = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public DelegateCommand CloseExecutionCommand { get; }
+
+        private void OnCloseExecutionCommand()
+        {
+            ExecutionResult = string.Empty;
+            IsExecutingComplete = false;
+        }
 
         protected internal override async Task OnExecuteCommand()
         {
@@ -150,20 +187,23 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                 var (newBatchFilesViewModel, file) = f;
                                 var openRead = fileSystem.File.OpenRead(file.FullName);
                                 return fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name,
-                                    newBatchFilesViewModel.MimeType).ContinueWith(t => openRead.Dispose());
+                                    newBatchFilesViewModel.MimeType).ContinueWith(_ => openRead.Dispose());
                             }).ToArray());
 
                     await fileShareClient.CommitBatch(batchHandle);
+                    ExecutionResult = $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
                 }
-                catch
+                catch (Exception e)
                 {
                     await fileShareClient.RollBackBatchAsync(batchHandle);
+                    ExecutionResult = e.ToString();
                     throw;
                 }
             }
             finally
             {
                 IsExecuting = false;
+                IsExecutingComplete = true;
             }
         }
 

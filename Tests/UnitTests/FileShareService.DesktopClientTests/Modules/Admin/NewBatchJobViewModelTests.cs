@@ -413,14 +413,17 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             createBatchTcs.SetResult(batchHandle);
             addFileToBatchTcs.SetResult();
             commitBatchTcs.SetResult();
-
             
 
             await executeTask;
             Assert.IsFalse(vm.IsExecuting);
             Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
+            Assert.IsTrue(vm.IsExecutingComplete);
 
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(batchHandle)).MustHaveHappened();
+
+            vm.CloseExecutionCommand.Execute();
+            Assert.IsFalse(vm.IsExecutingComplete);
         }
     }
 }
