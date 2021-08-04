@@ -115,8 +115,13 @@ stages:
             inputs:
               command: "test"
               projects: "**/*Tests.csproj"
-              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-          
+              arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+              
+          - task: PublishTestResults@2
+            inputs:
+              testRunner: VSTest
+              testResultsFiles: '**/*.trx'
+
           - task: DotNetCoreCLI@2
             displayName: Publish Project
             inputs:

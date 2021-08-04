@@ -23,6 +23,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                                          throw new ArgumentNullException(
                                              $"{nameof(AppendAclTemplate)} property has not been set",
                                              nameof(AppendAclTemplate)),
+                ErrorDeserializingJobsJobViewModel => ErrorTemplate ??
+                                                      throw new ArgumentNullException(
+                                                          $"{nameof(ErrorTemplate)} property has not been set",
+                                                          nameof(ErrorTemplate)),
                 _ => throw new ArgumentException("Unsupported item:" + item, nameof(item))
             };
         }
@@ -32,5 +36,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         public DataTemplate? SetExpiryDateTemplate { get; set; }
 
         public DataTemplate? NewBatchTemplate { get; set; }
+        public DataTemplate? ErrorTemplate { get; set; }
     }
 }
