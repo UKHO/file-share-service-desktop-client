@@ -81,6 +81,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                     currentDateTimeProvider),
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl),
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate),
+                ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
+                    errorDeserializingJobs),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())
             };
         }

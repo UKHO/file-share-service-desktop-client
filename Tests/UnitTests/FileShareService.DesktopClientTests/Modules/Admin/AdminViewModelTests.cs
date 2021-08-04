@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
@@ -49,6 +50,27 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsInstanceOf<NewBatchJobViewModel>(batchJobViewModels[0]);
             Assert.IsInstanceOf<AppendAclJobViewModel>(batchJobViewModels[1]);
             Assert.IsInstanceOf<SetExpiryDateJobViewModel>(batchJobViewModels[2]);
+        }
+
+        [Test]
+        public void TestLoadBadJobsFileCreatesErrorJobViewModel()
+        {
+            var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
+                A.Fake<IFileShareApiAdminClientFactory>(),
+                A.Fake<ICurrentDateTimeProvider>(),
+                fakeEnvironmentsManager);
+            var jobsFilePath = @"c:\jobs.json";
+            mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
+
+            A.CallTo(() => fakeJobsParser.Parse("JsonContent"))
+                .Returns(new Jobs
+                    {jobs = new List<IJob> {new ErrorDeserializingJobsJob(new Exception("An error"))}});
+
+            vm.LoadBatchJobsFile(jobsFilePath);
+
+
+            var batchJobViewModels = vm.BatchJobs.ToList();
+            Assert.IsInstanceOf<ErrorDeserializingJobsJobViewModel>(batchJobViewModels.Single());
         }
 
         [Test]

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
@@ -64,6 +65,15 @@ namespace FileShareService.DesktopClient.CoreTests
             Assert.AreEqual("Sample 3, change the Expiry Date later.", setExpiryDateJob.DisplayName);
             Assert.AreEqual("64c954fe-cb20-46e1-b990-51dfb9711fdc", setExpiryDateJob.ActionParams.BatchId);
             Assert.AreEqual("2021-04-01T00:00:00Z", setExpiryDateJob.ActionParams.ExpiryDate);
+        }
+
+        [Test]
+        public void TestErrorDeserializingJobs()
+        {
+            var result = new JobsParser().Parse("BadJson");
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
+            StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().DisplayName);
+            Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
         }
     }
 }
