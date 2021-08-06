@@ -70,7 +70,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40" SharedSizeGroup="Buttons" />
-                <ColumnDefinition Width="90" SharedSizeGroup="AndOr" />
+                <ColumnDefinition Width="0" SharedSizeGroup="AndOr" />
                 <ColumnDefinition Width="250" SharedSizeGroup="Field" />
                 <ColumnDefinition Width="140" SharedSizeGroup="Operator" />
                 <ColumnDefinition Width="450" SharedSizeGroup="Value" />
