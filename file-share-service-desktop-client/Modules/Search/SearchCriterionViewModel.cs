@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core.Models;
@@ -16,6 +17,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         public SearchCriterionViewModel(ISearchCriteriaViewModel searchCriteriaViewModel)
         {
             this.searchCriteriaViewModel = searchCriteriaViewModel;
+            searchCriteriaViewModel.PropertyChanged += SearchCriteriaViewModelOnPropertyChanged;
+        }
+
+        private void SearchCriteriaViewModelOnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(searchCriteriaViewModel.AvailableAttributes))
+            {
+                RaisePropertyChanged(nameof(AvailableAttributes));
+            }
         }
 
         public IEnumerable<Attribute> AvailableAttributes => searchCriteriaViewModel.AvailableAttributes;

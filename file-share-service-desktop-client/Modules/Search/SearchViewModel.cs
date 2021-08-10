@@ -23,11 +23,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private const int pageSize = 25;
 
         public SearchViewModel(IAuthProvider authProvider,
-            IFssSearchStringBuilder fssSearchStringBuilder, IFileShareApiAdminClientFactory fileShareApiAdminClientFactory)
+            IFssSearchStringBuilder fssSearchStringBuilder,
+            IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
+            IFssUserAttributeListProvider fssUserAttributeListProvider,
+            IEnvironmentsManager environmentsManager)
         {
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
 
-            SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder);
+            SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder, fssUserAttributeListProvider, environmentsManager);
             SearchCommand = new DelegateCommand(async () => await OnSearch(),
                 () => authProvider.IsLoggedIn && !SearchInProgress);
             PreviousPageCommand = new DelegateCommand(async () => await OnPreviousPage(),
