@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -11,7 +12,7 @@ using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Search
 {
-    public interface ISearchCriteriaViewModel
+    public interface ISearchCriteriaViewModel : INotifyPropertyChanged
     {
         IEnumerable<Attribute> AvailableAttributes { get; }
     }
@@ -19,14 +20,20 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
     public class SearchCriteriaViewModel : BindableBase, ISearchCriteriaViewModel
     {
         private readonly IFssSearchStringBuilder fssSearchStringBuilder;
+        private readonly IFssUserAttributeListProvider fssUserAttributeListProvider;
+        private readonly Attribute[] systemAttributes;
+        private IEnumerable<Attribute> availableAttributes;
 
-        public SearchCriteriaViewModel(IFssSearchStringBuilder fssSearchStringBuilder)
+        public SearchCriteriaViewModel(IFssSearchStringBuilder fssSearchStringBuilder,
+            IFssUserAttributeListProvider fssUserAttributeListProvider,
+            IEnvironmentsManager environmentsManager)
         {
             this.fssSearchStringBuilder = fssSearchStringBuilder;
+            this.fssUserAttributeListProvider = fssUserAttributeListProvider;
             AddNewCriterionCommand = new DelegateCommand(OnAddNewSearchCriterion);
             DeleteRowCommand = new DelegateCommand<SearchCriterionViewModel>(OnDeleteRow);
             AddRowCommand = new DelegateCommand<SearchCriterionViewModel>(OnAddRow);
-            AvailableAttributes = new Attribute[]
+            systemAttributes = new Attribute[]
             {
                 new("Filename", "filename", AttributeType.String),
                 new("File Size", "fileSize", AttributeType.Number),
@@ -34,25 +41,34 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 new("Batch Published Date", "batchPublishedDate", AttributeType.Date),
                 new("Batch Expiry Date", "expiryDate", AttributeType.NullableDate),
                 new("Business Unit", "businessUnit", AttributeType.String)
-            }.Concat(new[]
-            {
-                "CellName",
-                "EditionNumber",
-                "UpdateNumber",
-                "ProductCode",
-                "Agency",
-                "Product Type",
-                "Media Type",
-                "Year",
-                "Week Number",
-                "S63 Version",
-                "Exchange Set Type"
-            }.Select(s => new Attribute(s, AttributeType.UserAttributeString))).ToImmutableList();
+            };
+            availableAttributes = systemAttributes.ToImmutableList();
 
+            environmentsManager.PropertyChanged += EnvironmentsManagerOnPropertyChanged;
+            EnvironmentsManagerOnPropertyChanged(this, new PropertyChangedEventArgs(nameof(environmentsManager.CurrentEnvironment)));
+            
             SearchCriteria.CollectionChanged += OnSearchCriteriaCollectionChanged;
 
             OnAddNewSearchCriterion();
         }
+
+        private void EnvironmentsManagerOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (InitTask == null || InitTask.IsCompleted)
+            {
+                AvailableAttributes = systemAttributes.ToImmutableList();
+
+                InitTask = fssUserAttributeListProvider.GetAttributesAsync().ContinueWith(t =>
+                {
+                    if (t.IsCompleted)
+                        AvailableAttributes = systemAttributes
+                            .Concat(t.Result.Select(s => new Attribute(s, AttributeType.UserAttributeString)))
+                            .ToImmutableList();
+                }, TaskScheduler.Current);
+            }
+        }
+
+        public Task? InitTask { get; private set; }
 
         private void OnSearchCriteriaCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
@@ -90,7 +106,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
         public ObservableCollection<SearchCriterionViewModel> SearchCriteria { get; } = new();
 
-        public IEnumerable<Attribute> AvailableAttributes { get; }
+        public IEnumerable<Attribute> AvailableAttributes
+        {
+            get => availableAttributes;
+            private set
+            {
+                if (availableAttributes != value)
+                {
+                    availableAttributes = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         public DelegateCommand AddNewCriterionCommand { get; }
 

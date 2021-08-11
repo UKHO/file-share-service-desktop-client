@@ -18,6 +18,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         {
             containerRegistry.RegisterForNavigation<SearchView>(NavigationTargets.Search);
             containerRegistry.Register<IPageButton, SearchPageButton>(NavigationTargets.Search);
+            containerRegistry.Register<IFssUserAttributeListProvider, FssUserAttributeListProvider>();
         }
 
         public void OnInitialized(IContainerProvider containerProvider)

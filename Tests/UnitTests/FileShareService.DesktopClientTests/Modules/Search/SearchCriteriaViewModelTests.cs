@@ -17,7 +17,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         public void Setup()
         {
             fakeFssSearchStringBuilder = A.Fake<IFssSearchStringBuilder>();
-            searchCriteriaViewModel = new SearchCriteriaViewModel(fakeFssSearchStringBuilder);
+            searchCriteriaViewModel = new SearchCriteriaViewModel(fakeFssSearchStringBuilder, A.Fake<IFssUserAttributeListProvider>(), A.Fake<IEnvironmentsManager>());
         }
 
         [Test]
