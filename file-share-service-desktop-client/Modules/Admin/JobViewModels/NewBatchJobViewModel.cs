@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using Prism.Commands;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
@@ -170,6 +172,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsExecutingComplete = false;
         }
 
+        public ObservableCollection<FileUploadProgressViewModel> FileUploadProgress { get; } = new();
+
         protected internal override async Task OnExecuteCommand()
         {
             IsExecuting = true;
@@ -178,16 +182,28 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
                 var batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel);
+                FileUploadProgress.Clear();
                 try
                 {
                     await Task.WhenAll(
                         Files.SelectMany(f => f.Files.Select(file => (f, file)))
                             .Select(f =>
                             {
+                                var fileUploadProgressViewModel = new FileUploadProgressViewModel(f.file.Name);
+                                FileUploadProgress.Add(fileUploadProgressViewModel);
+
                                 var (newBatchFilesViewModel, file) = f;
                                 var openRead = fileSystem.File.OpenRead(file.FullName);
                                 return fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name,
-                                    newBatchFilesViewModel.MimeType).ContinueWith(_ => openRead.Dispose());
+                                    newBatchFilesViewModel.MimeType,
+                                    progress =>
+                                    {
+                                        Application.Current.Dispatcher.Invoke(() =>
+                                        {
+                                            fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
+                                            fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
+                                        });
+                                    }).ContinueWith(_ => openRead.Dispose());
                             }).ToArray());
 
                     await fileShareClient.CommitBatch(batchHandle);

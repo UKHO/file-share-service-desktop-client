@@ -171,6 +171,42 @@
                                             Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
 
                                             ></views:Spinner>
+                                        <ItemsControl  Grid.Row="0" 
+                                               Grid.Column="0"
+                                               Grid.ColumnSpan="2"
+                                               Grid.RowSpan="9"
+                                               Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               ItemsSource="{Binding FileUploadProgress}"
+                                               VerticalContentAlignment="Center"
+                                               VerticalAlignment="Bottom"
+                                        >
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="jobViewModels:FileUploadProgressViewModel">
+                                                    <Grid Margin="8" HorizontalAlignment="Center">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="250"/>
+                                                            <ColumnDefinition Width="450"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Label Content="{Binding Filename}"
+                                                               Foreground="White"
+                                                               Width="250"
+                                                        />
+                                                        <ProgressBar Maximum="{Binding TotalBlocks}"
+                                                                     Value="{Binding CompleteBlocks}" 
+                                                                     IsIndeterminate ="{Binding IsIndeterminate }"
+                                                                     Width="450"
+                                                                     Grid.Column="1"
+                                                                     />
+                                                        <Label Grid.Column="1" 
+                                                               HorizontalAlignment="Center"
+                                                               Content="{Binding DisplayString}" 
+                                                               Foreground="White"
+                                                               />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+
+                                        </ItemsControl>
                                         <Border Grid.Row="1" Grid.RowSpan="8" 
                                                 Grid.Column="0" Grid.ColumnSpan="2"
                                                 Background="Gray"
@@ -180,26 +216,27 @@
                                                 >
 
                                             <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition />
-                                                        <ColumnDefinition />
-                                                        <ColumnDefinition />
-                                                    </Grid.ColumnDefinitions>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="*"/>
-                                                        <RowDefinition  Height="Auto"/>
-                                                    </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition  Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
-                                                    <TextBlock Text="{Binding ExecutionResult}" 
+                                                <TextBox Text="{Binding ExecutionResult}" 
                                                                FontSize="22"
                                                                Grid.ColumnSpan="3"
+                                                               IsReadOnly="true"
                                                                VerticalAlignment="Center"
                                                                HorizontalAlignment="Center"/>
-                                                    <Button Command="{Binding CloseExecutionCommand}" 
+                                                <Button Command="{Binding CloseExecutionCommand}" 
                                                             Grid.Row="1"
                                                             Grid.Column="1"
                                                             Content="Close"/>
-                                                </Grid>
+                                            </Grid>
 
                                         </Border>
                                     </Grid>
