@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -64,5 +65,8 @@ namespace UKHO.FileShareService.DesktopClient.ViewModels
         {
             navigation.RequestNavigate(pageButton.NavigationTarget);
         }
+
+        public string Version => Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>()
+            .Single().Version;
     }
 }

@@ -127,12 +127,24 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <views:UKHOLogo Grid.Column="0" HorizontalAlignment="Left" Margin="24 0" />
-                <Label Grid.Column="2" HorizontalAlignment="Right"
-                       VerticalAlignment="Bottom"
-                       FontSize="16"
-                       Margin="30 13"
-                       FontWeight="Light"
-                       Foreground="#333333">
+                <Label            
+                     Grid.Column="2" 
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="top"
+                     FontSize="14"
+                     Margin="30 8"
+                     FontWeight="Light"
+                     Foreground="#333333"
+                     ContentStringFormat="Version {0}"
+                     Content="{Binding Version}"></Label>
+                <Label 
+                    Grid.Column="2" 
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    FontSize="16"
+                    Margin="30 13"
+                    FontWeight="Light"
+                    Foreground="#333333">
                     © Crown copyright 2021 UK Hydrographic Office
                 </Label>
             </Grid>
