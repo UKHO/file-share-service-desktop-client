@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Globalization;
+using System.Threading.Tasks;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -20,7 +22,30 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         }
         protected override bool CanExecute()
         {
-            throw new System.NotImplementedException();
+            return Validate();
+        }
+
+        private bool Validate()
+        {
+            if(string.IsNullOrWhiteSpace(BatchId))
+            {
+                ValidationErrors.Add("Invalid batch id attribute or value.");
+            }
+
+            if(string.IsNullOrWhiteSpace(ExpiryDate))
+            {
+                ValidationErrors.Add("Expiry date is not specified.");
+            }
+            else
+            {
+                if(!DateTime.TryParse(ExpiryDate, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal,
+                    out var result))
+                {
+                    ValidationErrors.Add("Invalid expiry date.");
+                }
+            }
+
+            return ValidationErrors.Count == 0;
         }
     }
 }

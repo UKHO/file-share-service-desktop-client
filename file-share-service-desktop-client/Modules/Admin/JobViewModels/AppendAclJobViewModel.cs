@@ -23,7 +23,22 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            throw new System.NotImplementedException();
+            return Validate();
+        }
+
+        private bool Validate()
+        {
+            if(string.IsNullOrWhiteSpace(BatchId))
+            {
+                ValidationErrors.Add("Batch id is missing.");
+            }
+
+            if(ReadGroups.Count == 0 && ReadUsers.Count == 0)
+            {
+                ValidationErrors.Add("ReadGroups/ReadUsers are not specified.");
+            }
+
+            return ValidationErrors.Count == 0;
         }
     }
 }

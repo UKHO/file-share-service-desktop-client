@@ -155,14 +155,23 @@
                                         <ItemsControl Grid.Row="6" Grid.Column="1" ItemsSource="{Binding ReadUsers}" />
 
                                         <Label Grid.Row="7" Content="Read Groups:" Margin="15 0" />
-                                        <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />
+                                        <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />     
 
-                                        <Button
-                                            Grid.Row="8"
-                                            Grid.Column="1"
+                                        <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
+                                            <Button                                            
                                             Content="Execute Job"
                                             HorizontalAlignment="Left" 
-                                            Command="{Binding ExcecuteJobCommand}"/>
+                                            Command="{Binding ExcecuteJobCommand}" Margin="0 10"    />
+
+                                            <Label  HorizontalAlignment="Left" Content="Validation errors:" Margin="20 0" 
+                                                    Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
+                                                          FontStyle="Normal" Foreground="Red" 
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>                                                                               
+                                            
+                                        </StackPanel>
+
                                         <views:Spinner
                                             Grid.Row="0" 
                                             Grid.Column="0"
@@ -281,11 +290,20 @@
                                         <Label Grid.Row="3" Content="Additional Groups:" />
                                         <ItemsControl Grid.Row="3" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />
 
-                                        <Button
-                                            Grid.Row="4"
-                                            Grid.Column="1"
+                                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                                            <Button                                            
                                             Content="Execute Job"
-                                            HorizontalAlignment="Left" />
+                                            HorizontalAlignment="Left" 
+                                            Command="{Binding ExcecuteJobCommand}"/>
+
+                                            <Label HorizontalAlignment="Left" 
+                                                   Content="Validation errors:" Margin="20 0" 
+                                                   Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
+                                                          FontStyle="Normal" Foreground="Red" 
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        </StackPanel>                                        
                                     </Grid>
                                 </Border>
 
@@ -323,12 +341,25 @@
 
                                         <Label Grid.Row="2" Grid.Column="0" Content="Expiry Date:" />
                                         <Label Grid.Row="2" Grid.Column="1" Content="{Binding ExpiryDate}" />
-
-                                        <Button
-                                            Grid.Row="3"
-                                            Grid.Column="1"
+                                    
+                                        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                                            <Button                                            
                                             Content="Execute Job"
-                                            HorizontalAlignment="Left" />
+                                            HorizontalAlignment="Left" 
+                                            Command="{Binding ExcecuteJobCommand}" />
+
+                                            <Label  HorizontalAlignment="Left" 
+                                                    Content="Validation errors:" 
+                                                    Margin="20 0" 
+                                                    Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
+                                                          FontStyle="Normal" 
+                                                          Foreground="Red" 
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+
+                                        </StackPanel>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

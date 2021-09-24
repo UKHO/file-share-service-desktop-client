@@ -130,7 +130,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            return Files.All(f => f.CorrectNumberOfFilesFound);
+            return Validate();
         }
 
         public List<NewBatchFilesViewModel> Files { get; }
@@ -237,7 +237,32 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 ExpiryDate = ExpiryDate
             };
         }
+
+        private bool Validate()
+        {
+            if(string.IsNullOrWhiteSpace(BusinessUnit))
+            {
+                ValidationErrors.Add("Business unit is missing or not specified.");
+            }
+
+            if(ExpiryDate.HasValue && ExpiryDate.Value <= DateTime.UtcNow)
+            {
+                ValidationErrors.Add("Batch expiry date is past date.");
+            }
+
+            foreach(var file in Files)
+            {
+                if(!file.CorrectNumberOfFilesFound)
+                {
+                    ValidationErrors.Add($"Expected file count is {file.ExpectedFileCount}, but actual existing file count is {file.Files.Count()} in file path '{file.RawSearchPath}'");
+                }
+            }
+
+            return ValidationErrors.Count == 0;
+        }
     }
+
+    
 
     public class NewBatchFilesViewModel
     {

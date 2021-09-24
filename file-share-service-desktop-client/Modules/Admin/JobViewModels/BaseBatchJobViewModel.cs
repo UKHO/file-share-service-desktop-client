@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
@@ -36,5 +37,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         }
 
         public string DisplayName => job.DisplayName;
+
+        public List<string> ValidationErrors { get; set; } = new List<string>();
+
+        public bool IsVisibleValidationErrorsArea
+        {
+            get
+            {
+                return ValidationErrors.Count > 0;
+            }
+        }
     }
 }
