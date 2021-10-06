@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -16,16 +17,33 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         
         public string BatchId => job.ActionParams.BatchId;
         public string ExpiryDate => job.ActionParams.ExpiryDate;
+        public string JobId
+        {
+            get
+            {
+                return $"setExpiryDate-{DisplayName.Replace(" ", string.Empty)}";
+            }
+        }
         protected internal override Task OnExecuteCommand()
         {
             throw new System.NotImplementedException();
         }
         protected override bool CanExecute()
         {
-            return Validate();
+            ValidationErrors.Clear();
+
+            if (JobValidationErrors.ValidationErrors.ContainsKey(JobId))
+            {
+                ValidationErrors.AddRange(
+                    JobValidationErrors.ValidationErrors[JobId]);
+            }
+
+            ValidateViewModel();
+
+            return ValidationErrors.Count == 0;
         }
 
-        private bool Validate()
+        private void ValidateViewModel()
         {
             if(string.IsNullOrWhiteSpace(BatchId))
             {
@@ -44,8 +62,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ValidationErrors.Add("Invalid expiry date.");
                 }
             }
-
-            return ValidationErrors.Count == 0;
         }
     }
 }

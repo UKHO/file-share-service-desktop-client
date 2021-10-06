@@ -69,7 +69,39 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         public void LoadBatchJobsFile(string? fileName)
         {
             using var fs = fileSystem.File.OpenText(fileName);
-            BatchJobs = jobsParser.Parse(fs.ReadToEnd()).jobs.Select(BuildJobViewModel).ToList();
+
+            var parsedData = jobsParser.Parse(fs.ReadToEnd());
+
+            List<IJob> jobs = new List<IJob>();
+
+            if (parsedData.jobs.Any(job => job == null))
+            {
+                ErrorDeserializingJobsJob errorJob =
+                    new ErrorDeserializingJobsJob(new Exception("There are some errors in configuration file."));
+
+                if (JobValidationErrors.ValidationErrors.ContainsKey("-1"))
+                {
+                    errorJob.ErrorMessages =
+                        JobValidationErrors.ValidationErrors["-1"];
+                }
+
+                jobs.Add(errorJob);
+            }
+
+
+            List<IJob> validJobs = parsedData.jobs.Where(job => job != null).ToList();
+
+            if(validJobs.Any())
+            {
+                jobs.AddRange(validJobs);
+            }
+
+
+            BatchJobs = jobs.Select(BuildJobViewModel).ToList();
+
+
+            //BatchJobs = jobsParser.Parse(fs.ReadToEnd()).jobs.Where(job => job != null).Select(BuildJobViewModel).ToList();
+
         }
 
         private IBatchJobViewModel BuildJobViewModel(IJob job)
@@ -83,7 +115,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate),
                 ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
                     errorDeserializingJobs),
-                _ => throw new ArgumentException("Not implemented for job " + job.GetType())
+              _ => throw new ArgumentException("Not implemented for job " + job.GetType())
             };
         }
 

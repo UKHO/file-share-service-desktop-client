@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -16,6 +18,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string BatchId => job.ActionParams.BatchId;
         public List<string> ReadUsers => job.ActionParams.ReadUsers;
         public List<string> ReadGroups => job.ActionParams.ReadGroups;
+        public string JobId
+        {
+            get
+            {
+                return $"appendAcl-{DisplayName.Replace(" ", string.Empty).ToLower()}";
+            }
+        }
         protected internal override Task OnExecuteCommand()
         {
             throw new System.NotImplementedException();
@@ -23,22 +32,30 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            return Validate();
+            ValidationErrors.Clear();
+
+            if (JobValidationErrors.ValidationErrors.ContainsKey(JobId))
+            {
+                ValidationErrors.AddRange(
+                    JobValidationErrors.ValidationErrors[JobId]);
+            }
+
+            ValidateViewModel();
+
+            return !ValidationErrors.Any();
         }
 
-        private bool Validate()
+        private void ValidateViewModel()
         {
             if(string.IsNullOrWhiteSpace(BatchId))
             {
                 ValidationErrors.Add("Batch id is missing.");
             }
 
-            if(ReadGroups.Count == 0 && ReadUsers.Count == 0)
+            if(!ReadGroups.Any() && !ReadUsers.Any())
             {
                 ValidationErrors.Add("ReadGroups/ReadUsers are not specified.");
-            }
-
-            return ValidationErrors.Count == 0;
+            }  
         }
     }
 }

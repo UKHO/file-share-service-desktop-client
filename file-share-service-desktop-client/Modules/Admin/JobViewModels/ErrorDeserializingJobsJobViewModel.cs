@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -20,7 +21,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            return false;
+            ValidationErrors.Clear();
+
+            if (JobValidationErrors.ValidationErrors.ContainsKey("-1"))
+            {
+                ValidationErrors.AddRange(
+                    JobValidationErrors.ValidationErrors["-1"]);
+            }
+
+            return ValidationErrors.Count == 0;
         }
 
         public string ErrorDetails => job.Exception.ToString();

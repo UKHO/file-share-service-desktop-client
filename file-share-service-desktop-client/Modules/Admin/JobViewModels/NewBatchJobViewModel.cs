@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -51,6 +52,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     out var result))
                     return result;
                 return null;
+            }
+        }
+
+        public string JobId
+        {
+            get
+            {
+                return $"newBatch-{DisplayName.Replace(" ", string.Empty).ToLower()}";
             }
         }
 
@@ -130,7 +139,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            return Validate();
+            ValidationErrors.Clear();
+
+            if (JobValidationErrors.ValidationErrors.ContainsKey(JobId))
+            {
+                ValidationErrors.AddRange(
+                    JobValidationErrors.ValidationErrors[JobId]);
+            }
+
+            ValidateViewModel();
+            
+            return ValidationErrors.Count == 0;
         }
 
         public List<NewBatchFilesViewModel> Files { get; }
@@ -238,7 +257,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             };
         }
 
-        private bool Validate()
+        private void ValidateViewModel()
         {
             if(string.IsNullOrWhiteSpace(BusinessUnit))
             {
@@ -250,19 +269,40 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 ValidationErrors.Add("Batch expiry date is past date.");
             }
 
-            foreach(var file in Files)
+            if(Files.Count == 0)
             {
-                if(!file.CorrectNumberOfFilesFound)
-                {
-                    ValidationErrors.Add($"Expected file count is {file.ExpectedFileCount}, but actual existing file count is {file.Files.Count()} in file path '{file.RawSearchPath}'");
-                }
+                ValidationErrors.Add("File is not specified for upload.");
             }
 
-            return ValidationErrors.Count == 0;
-        }
-    }
+            foreach (var file in Files.Where(f => !f.CorrectNumberOfFilesFound))
+            {
+                string directory = file.RawSearchPath.Substring(0, file.RawSearchPath.LastIndexOf('\\'));
 
-    
+                if(Directory.Exists(directory))
+                {
+                    if(file.Files.Count() == 0)
+                    {
+                        ValidationErrors.Add($"Either file '{file.RawSearchPath}' doesn't exist or user does not have permission.");
+                    }
+                    else
+                    {
+                        string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, but actual existing file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
+
+                        if (file.Files?.Count() > 0)
+                        {
+                            string existingFileNames = string.Join(", ", file.Files.Select(f => f.Name).ToArray());
+                            fileCountMismatchErrorMessage += $"\n\tThe existing files are: {existingFileNames}";
+                        }
+                        ValidationErrors.Add($"{fileCountMismatchErrorMessage}");
+                    }                    
+                }
+                else
+                {
+                    ValidationErrors.Add($"Directory '{directory}' does not exist.");
+                }
+            }
+        }            
+    }
 
     public class NewBatchFilesViewModel
     {
@@ -276,9 +316,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var searchFileInfo = fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
 
-            Files =
-                directory.Exists
-                    ? directory.EnumerateFileSystemInfos(searchFileInfo.Name)
+            Files = directory.Exists
+                    ? GetFiles(directory, searchFileInfo.Name)
                     : Enumerable.Empty<IFileSystemInfo>();
         }
 
@@ -289,5 +328,22 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string MimeType => newBatchFile.MimeType;
 
         public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
+        
+        private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
+        {
+            try
+            {
+                return directory.EnumerateFileSystemInfos(filePathName);
+
+            }
+            catch(DirectoryNotFoundException ex)
+            {
+                //throw ex;
+                return Enumerable.Empty<IFileSystemInfo>();
+            }
+        }
+
     }
+
+    
 }
