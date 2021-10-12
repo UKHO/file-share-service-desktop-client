@@ -28,7 +28,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
         private readonly IJwtTokenParser jwtTokenParser;
         private bool isLoggedIn;
         protected AuthenticationResult? authenticationResult;
-
+       
         public AuthProvider(IEnvironmentsManager environmentsManager, INavigation navigation,
             IJwtTokenParser jwtTokenParser)
         {
@@ -78,11 +78,11 @@ namespace UKHO.FileShareService.DesktopClient.Core
             var authority = $"{microsoftOnlineLoginUrl}{tenantId}";
             var scopes = new[] {$"{environmentsManager.CurrentEnvironment.ClientId}/.default" };
 
-            var publicClientApplication = PublicClientApplicationBuilder
-                .Create(environmentsManager.CurrentEnvironment.ClientId)
-                .WithAuthority(authority)
-                .WithRedirectUri("http://localhost")
-                .Build();
+             var publicClientApplication = PublicClientApplicationBuilder
+               .Create(environmentsManager.CurrentEnvironment.ClientId)
+               .WithAuthority(AzureCloudInstance.AzurePublic, tenantId)
+               .WithDefaultRedirectUri()
+               .Build();
 
             var cancellationSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
             TokenCacheHelper.EnableSerialization(publicClientApplication.UserTokenCache);         
@@ -97,8 +97,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
             catch (MsalUiRequiredException)
             {
                 authenticationResult = await publicClientApplication.AcquireTokenInteractive(scopes).ExecuteAsync(cancellationSource.Token);
-            }
-            RaisePropertyChanged(nameof(CurrentAccessToken));          
+            }        
+            RaisePropertyChanged(nameof(CurrentAccessToken));
             return authenticationResult.AccessToken;
 
         }
