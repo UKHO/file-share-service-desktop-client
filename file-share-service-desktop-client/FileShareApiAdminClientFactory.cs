@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using UKHO.FileShareAdminClient;
+using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
 
 namespace UKHO.FileShareService.DesktopClient
@@ -15,14 +16,15 @@ namespace UKHO.FileShareService.DesktopClient
     public class FileShareApiAdminClientFactory : IFileShareApiAdminClientFactory
     {
         private readonly IEnvironmentsManager environmentsManager;
-        private readonly IAuthProvider authProvider;
+        private readonly IAuthTokenProvider authTokenProvider;
         private readonly IVersionProvider versionProvider;
+        
 
-        public FileShareApiAdminClientFactory(IEnvironmentsManager environmentsManager, IAuthProvider authProvider,
+        public FileShareApiAdminClientFactory(IEnvironmentsManager environmentsManager, IAuthTokenProvider authTokenProvider,
             IVersionProvider versionProvider)
         {
             this.environmentsManager = environmentsManager;
-            this.authProvider = authProvider;
+            this.authTokenProvider = authTokenProvider;
             this.versionProvider = versionProvider;
         }
 
@@ -30,7 +32,7 @@ namespace UKHO.FileShareService.DesktopClient
         {
             return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider),
                 environmentsManager.CurrentEnvironment.BaseUrl,
-                authProvider.CurrentAccessToken);
+                authTokenProvider);
         }
     }
 
