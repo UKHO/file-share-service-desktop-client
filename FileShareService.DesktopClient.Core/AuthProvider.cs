@@ -74,8 +74,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
         public async  Task<string> GetToken()
         {
             var tenantId = environmentsManager.CurrentEnvironment.TenantId;
-            var microsoftOnlineLoginUrl = @$"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize";
-            var authority = $"{microsoftOnlineLoginUrl}{tenantId}";
             var scopes = new[] {$"{environmentsManager.CurrentEnvironment.ClientId}/.default" };
 
              var publicClientApplication = PublicClientApplicationBuilder
