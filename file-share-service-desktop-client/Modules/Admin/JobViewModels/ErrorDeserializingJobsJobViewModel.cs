@@ -29,10 +29,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             ValidationErrors.Clear();
 
-            if (JobValidationErrors.ValidationErrors.ContainsKey("-1"))
+            if (JobValidationErrors.ValidationErrors.ContainsKey(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE))
             {
                 ValidationErrors.AddRange(
-                    JobValidationErrors.ValidationErrors["-1"]);
+                    JobValidationErrors.ValidationErrors[JobValidationErrors.UNKNOWN_JOB_ERROR_CODE]);
             }
         }
 

@@ -74,15 +74,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
 
             List<IJob> jobs = new List<IJob>();
 
-            if (parsedData.jobs.Count() == 0 || parsedData.jobs.Any(job => job == null))
+            //Create ErrorDeserializingJob, if no jobs or any null job found after parsing.
+            if (!parsedData.jobs.Any() || parsedData.jobs.Any(job => job == null))
             {
                 ErrorDeserializingJobsJob errorJob =
                     new ErrorDeserializingJobsJob(new Exception("There are some errors in configuration file."));
 
-                if (JobValidationErrors.ValidationErrors.ContainsKey("-1"))
+                if (JobValidationErrors.ValidationErrors.ContainsKey(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE))
                 {
                     errorJob.ErrorMessages =
-                        JobValidationErrors.ValidationErrors["-1"];
+                        JobValidationErrors.ValidationErrors[JobValidationErrors.UNKNOWN_JOB_ERROR_CODE];
                 }
 
                 jobs.Add(errorJob);
@@ -95,7 +96,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             {
                 jobs.AddRange(validJobs);
             }
-
 
             BatchJobs = jobs.Select(BuildJobViewModel).ToList();
 

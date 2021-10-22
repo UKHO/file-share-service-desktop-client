@@ -5,6 +5,9 @@ namespace UKHO.FileShareService.DesktopClient.Core
 {
     public static class JobValidationErrors
     {
+        public const string CONFLICT_ERROR_CODE = "409";
+        public const string UNKNOWN_JOB_ERROR_CODE = "-1";
+
         public static Dictionary<string, List<string>> ValidationErrors { get; set; } 
             = new Dictionary<string, List<string>>();
 

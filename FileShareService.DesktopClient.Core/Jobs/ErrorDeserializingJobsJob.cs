@@ -8,16 +8,11 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     {
         public Exception Exception { get; }
 
-        public List<string> ErrorMessages { get; set; }
+        public List<string> ErrorMessages { get; set; } = new List<string>();
 
         public ErrorDeserializingJobsJob(Exception exception)
         {
             Exception = exception;
-        }
-
-        public ErrorDeserializingJobsJob(List<string> errors)
-        {
-            ErrorMessages = errors;
         }
 
         public string DisplayName
