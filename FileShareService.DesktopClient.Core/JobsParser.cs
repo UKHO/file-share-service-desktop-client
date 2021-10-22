@@ -53,6 +53,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             }
             catch (Exception e)
             {
+                JobValidationErrors.AddValidationErrors("-1", new List<string>() { e.Message + e.InnerException });
                 return new Jobs.Jobs() {jobs = new[] {new ErrorDeserializingJobsJob(e)}};
             }
         }
@@ -69,7 +70,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             
             if (batchJobs == null)
             {
-                JobValidationErrors.AddValidationErrors("-1", new List<string>() { "Invalid format of configuration file.Unable to get a job for process."});
+                JobValidationErrors.AddValidationErrors("-1", new List<string>() { "Invalid format of configuration file. Unable to get a job for process."});
             }
             else
             {
@@ -106,8 +107,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     //Check whether job action specified in config is valid or not
                     if (!ValidJobActions.Contains(jobAction))
                     {
-                        errorMessages.Add($"Specified job action '{jobAction}' is invalid.");
-                        JobValidationErrors.AddValidationErrors($"-1", errorMessages);
+                        //errorMessages.Add($"Specified job action '{jobAction}' is invalid.");
+                        //JobValidationErrors.AddValidationErrors($"-1", errorMessages);
                         continue;
                     }
 
@@ -115,7 +116,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     //Check whether the job id already exists
                     if(JobValidationErrors.ValidationErrors.ContainsKey(jobId))
                     {
-                        errorMessages.Add($"Specified job '{jobAction} - {displayName}' already exists.");
+                        errorMessages.Add($"Duplicate job '{jobAction} - {displayName}'");
                         JobValidationErrors.AddValidationErrors($"-1", errorMessages);
                         continue;
                     }

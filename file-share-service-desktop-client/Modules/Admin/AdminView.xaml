@@ -381,14 +381,12 @@
                                         </Grid.ColumnDefinitions>
 
                                         <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="Error deserializing jobs from file:" />
-                                        <TextBlock Grid.Row="0" Grid.Column="1" FontWeight="Normal"
-                                                   Text="{Binding DisplayName}" />
 
-                                        <TextBlock Grid.Column="0"
-                                                   Grid.ColumnSpan="2"
-                                                   Grid.Row="1"
-                                                   Text="{Binding Path=ErrorDetails}" 
-                                        />                  Foreground="Red" />
+                                        <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Path= ValidationErrors}" 
+                                                          FontStyle="Normal" Foreground="Red" 
+                                                          />
+
+
                                     </Grid>
                                 </Border>
                             </DataTemplate>

@@ -74,7 +74,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
 
             List<IJob> jobs = new List<IJob>();
 
-            if (parsedData.jobs.Any(job => job == null))
+            if (parsedData.jobs.Count() == 0 || parsedData.jobs.Any(job => job == null))
             {
                 ErrorDeserializingJobsJob errorJob =
                     new ErrorDeserializingJobsJob(new Exception("There are some errors in configuration file."));

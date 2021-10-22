@@ -12,6 +12,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public ErrorDeserializingJobsJobViewModel(ErrorDeserializingJobsJob job) : base(job)
         {
             this.job = job;
+            PopulateErrors();
         }
 
         protected internal override Task OnExecuteCommand()
@@ -21,6 +22,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
+            return false;
+        }
+
+        private void PopulateErrors()
+        {
             ValidationErrors.Clear();
 
             if (JobValidationErrors.ValidationErrors.ContainsKey("-1"))
@@ -28,10 +34,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 ValidationErrors.AddRange(
                     JobValidationErrors.ValidationErrors["-1"]);
             }
-
-            return ValidationErrors.Count == 0;
         }
 
-        public string ErrorDetails => job.Exception.ToString();
     }
 }
