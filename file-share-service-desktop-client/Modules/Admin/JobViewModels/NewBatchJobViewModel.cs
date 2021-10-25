@@ -265,34 +265,74 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 ValidationErrors.Add("File is not specified for upload.");
             }
 
-            foreach (var file in Files.Where(f => !f.CorrectNumberOfFilesFound))
+            foreach (var file in Files)
             {
-                string directory = file.RawSearchPath.Substring(0, file.RawSearchPath.LastIndexOf('\\'));
+                string directory = Path.GetDirectoryName(file.RawSearchPath);
 
-                if(Directory.Exists(directory))
+                if(string.IsNullOrWhiteSpace(directory))
                 {
-                    if(file?.Files?.Count() == 0)
-                    {
-                        ValidationErrors.Add($"Either file '{file.RawSearchPath}' doesn't exist or user does not have permission.");
-                    }
-                    else
-                    {
-                        string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, but actual existing file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
+                    ValidationErrors.Add($"Invalid directory specified - {file.RawSearchPath}");
+                    continue;
+                }
 
-                        if (file.Files?.Count() > 0)
-                        {
-                            string existingFileNames = string.Join(", ", file.Files.Select(f => f.Name).ToArray());
-                            fileCountMismatchErrorMessage += $"\n\tThe existing files are: {existingFileNames}";
-                        }
-                        ValidationErrors.Add($"{fileCountMismatchErrorMessage}");
-                    }                    
+                if(!IsDirectoryExist(directory))
+                {
+                    string directoryNotFoundMessage = $"Either directory '{directory}' doesn't exist or user does not have permission to access it.";
+                    string accessibleDirectory = GetAccessibleDirectoryName(directory);
+
+                    ValidationErrors.Add(string.IsNullOrWhiteSpace(accessibleDirectory) ? directoryNotFoundMessage : $"{directoryNotFoundMessage}.\n\tThe accessible level is: '{accessibleDirectory}'");
+                    continue;
+                }
+
+                if(!file.CorrectNumberOfFilesFound)
+                {
+                    string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, but actual existing file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
+
+                    if (file.Files?.Count() > 0)
+                    {
+                        string existingFileNames = string.Join(", ", file.Files.Select(f => f.Name).ToArray());
+                        fileCountMismatchErrorMessage += $"\n\tThe existing files are: {existingFileNames}";
+                    }
+                    ValidationErrors.Add($"{fileCountMismatchErrorMessage}");
+                }
+            }
+        }
+
+        private bool IsDirectoryExist(string directory)
+        {
+            try
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+                _ = directoryInfo.GetDirectories();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        private string GetAccessibleDirectoryName(string directory)
+        {
+           if(!string.IsNullOrWhiteSpace(directory))
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+
+                if (IsDirectoryExist(directory))
+                {
+                    return directory;
                 }
                 else
                 {
-                    ValidationErrors.Add($"Directory '{directory}' does not exist.");
+                    if (directoryInfo.Parent != null)
+                    {
+                        return GetAccessibleDirectoryName(Convert.ToString(directoryInfo.Parent));
+                    }                    
                 }
             }
-        }            
+            return string.Empty;
+        }
     }
 
     public class NewBatchFilesViewModel
@@ -329,7 +369,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
             catch(DirectoryNotFoundException ex)
             {
-                //throw ex;
                 return Enumerable.Empty<IFileSystemInfo>();
             }
         }
