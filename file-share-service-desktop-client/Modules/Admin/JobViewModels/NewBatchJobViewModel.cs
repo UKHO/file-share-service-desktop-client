@@ -74,9 +74,26 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         return "" + currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).Year;
                     }
                 },
+                {@"\$\(\s*now\.Year2\s*\)", (_) => "" + currentDateTimeProvider.CurrentDateTime.Year.ToString().Substring(2,2)},
+                {
+                    @"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year2\s*\)", (match) =>
+                    {
+                        var capturedNumber = match.Groups[1].Value;
+                        var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                        return "" + currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).Year.ToString().Substring(2,2);
+                    }
+                },
                 {
                     @"\$\(\s*now\.WeekNumber\s*\)",
                     (_) => "" + WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Week
+                },
+                {
+                    @"\$\(\s*now\.WeekNumber\.Year\s*\)",
+                    (_) => "" + WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Year
+                },
+                {
+                    @"\$\(\s*now\.WeekNumber\.Year2\s*\)",
+                    (_) => "" + WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Year.ToString().Substring(2,2)
                 },
                 {
                     @"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\)",
@@ -90,6 +107,26 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     }
                 },
                 {
+                    @"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year\)",
+                    (match) =>
+                    {
+                        var capturedNumber = match.Groups[1].Value;
+                        var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                        return "" + WeekNumber
+                            .GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset * 7)).Year;
+                    }
+                },
+                {
+                    @"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year2\)",
+                    (match) =>
+                    {
+                        var capturedNumber = match.Groups[1].Value;
+                        var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                        return "" + WeekNumber
+                            .GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset * 7)).Year.ToString().Substring(2,2);
+                    }
+                },
+                {
                     @"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\s*\)",
                     (match) =>
                     {
@@ -97,6 +134,26 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
                         return "" + WeekNumber
                             .GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)).Week;
+                    }
+                },
+                {
+                    @"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year\s*\)",
+                    (match) =>
+                    {
+                        var capturedNumber = match.Groups[1].Value;
+                        var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                        return "" + WeekNumber
+                            .GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)).Year;
+                    }
+                },
+                {
+                    @"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year2\s*\)",
+                    (match) =>
+                    {
+                        var capturedNumber = match.Groups[1].Value;
+                        var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                        return "" + WeekNumber
+                            .GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)).Year.ToString().Substring(2,2);
                     }
                 },
                 {
