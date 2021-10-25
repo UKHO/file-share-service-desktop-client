@@ -39,7 +39,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     Error = (se, ev) =>
                     {
                         ev.ErrorContext.Handled = true;
-                        //JobValidationErrors.AddValidationErrors(UNKNOWN_JOB_ERROR_CODE, new List<string>() { ev.ErrorContext.Error.Message });
                     }
                 };
 
@@ -69,82 +68,85 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
             JToken jobsToken = JToken.Parse(jobs);
 
-            JArray? batchJobs = (JArray?)jobsToken?.SelectToken("jobs");
+            var batchJobs = jobsToken.SelectToken("jobs");
 
-            if (batchJobs == null || !batchJobs.HasValues)
+            if(batchJobs == null || batchJobs.Type != JTokenType.Array || !batchJobs.HasValues)
             {
-                JobValidationErrors.AddValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE, new List<string>() { "Invalid format of configuration file. Unable to get a job for process."});
+               JobValidationErrors.AddValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE, new List<string>() { "Invalid format of configuration file. Unable to find a job for process." });
+                return;
             }
-            else
+
+            foreach (JToken job in batchJobs)
             {
-                foreach (JToken job in batchJobs)
+                errorMessages = new List<string>();
+
+                //Retrieve job action
+                JToken? jobActionToken = job.SelectToken("action");
+
+                if (jobActionToken == null ||
+                    string.IsNullOrWhiteSpace(Convert.ToString(jobActionToken)))
                 {
-                    errorMessages = new List<string>();
+                    AddValidationMessage(job, "Job action is not specified or invalid.");
+                    continue;
+                }
 
-                    //Retrieve job action
-                    JToken? jobActionToken = job.SelectToken("action");
+                string jobAction = $"{Convert.ToString(jobActionToken)}";
 
-                    if (jobActionToken == null ||
-                        string.IsNullOrWhiteSpace(Convert.ToString(jobActionToken)))
-                    {
-                        AddValidationMessage(job, "Job action is not specified or invalid.");
-                        continue;
-                    }
+                //Check whether job action specified in config is valid or not
+                if (!ValidJobActions.Contains(jobAction))
+                {
+                    AddValidationMessage(job, $"Specified job action '{jobAction}' is invalid.");
+                    continue;
+                }
 
-                    string jobAction = $"{Convert.ToString(jobActionToken)}";
+                string displayName = string.Empty;
+                //Retrieve display name
+                JToken? displayNameTokne = job.SelectToken("displayName");
+                if (displayNameTokne == null || string.IsNullOrWhiteSpace(Convert.ToString(displayNameTokne)))
+                {
+                    AddValidationMessage(job, "Job display name is not specified or invalid.");
+                    continue;
+                }
 
-                    //Check whether job action specified in config is valid or not
-                    if (!ValidJobActions.Contains(jobAction))
-                    {
-                        AddValidationMessage(job, $"Specified job action '{jobAction}' is invalid.");
-                        continue;
-                    }
+                displayName = displayNameTokne.ToString();
 
-                    string displayName = string.Empty;
-                    //Retrieve display name
-                    JToken? displayNameTokne = job.SelectToken("displayName");
-                    if (displayNameTokne == null || string.IsNullOrWhiteSpace(Convert.ToString(displayNameTokne)))
-                    {
-                        AddValidationMessage(job, "Job display name is not specified or invalid.");
-                        continue;
-                    }
+                string jobId = $"{jobAction}-{displayName.Replace(" ",string.Empty).ToLower()}";
 
-                    displayName = displayNameTokne.ToString();
+                //Check whether the job id already exists
+                if(jobIdCollection.Any(s => s.Equals(jobId)))
+                {
+                    AddValidationMessage(job, $"Duplicate job '{jobAction} - {displayName}' found in config file.", JobValidationErrors.CONFLICT_ERROR_CODE);
+                    continue;
+                }
 
-                    string jobId = $"{jobAction}-{displayName.Replace(" ",string.Empty).ToLower()}";
-
-                    //Check whether the job id already exists
-                    if(jobIdCollection.Any(s => s.Equals(jobId)))
-                    {
-                        AddValidationMessage(job, $"Duplicate job '{jobAction} - {displayName}' found in config file.", JobValidationErrors.CONFLICT_ERROR_CODE);
-                        continue;
-                    }
-
-                    //Add job-id in the collection
-                    jobIdCollection.Add(jobId);
+                //Add job-id in the collection
+                jobIdCollection.Add(jobId);
                     
-                    //Check whether job actionParams is exist or not
-                    if (job.SelectToken("actionParams") == null)
-                    {
-                        errorMessages.Add($"ActionParams attribute is invalid  or not specified for job '{jobAction} - {displayName}'.");
-                        JobValidationErrors.AddValidationErrors(jobId, errorMessages);
-                        continue;
-                    }
-                   
-                    if (jobAction == "newBatch")
-                    {
+                //Check whether job actionParams is exist or not
+                if (job.SelectToken("actionParams") == null)
+                {
+                    errorMessages.Add($"ActionParams attribute is invalid  or not specified for job '{jobAction} - {displayName}'.");
+                    JobValidationErrors.AddValidationErrors(jobId, errorMessages);
+                    continue;
+                }
+
+                switch (jobAction) 
+                {
+                    case "newBatch":
+                        //Check for batch attributes
                         JToken? batchAttributeToken = job.SelectToken("actionParams.attributes");
 
                         if (batchAttributeToken?.Type != JTokenType.Array)
                         {
                             errorMessages.Add("Invalid batch attributes.");
                         }
-                        else if(batchAttributeToken.HasValues)
+                        else if (batchAttributeToken.HasValues)
                         {
                             int counter = 1;
-                            foreach(var batchAttribute in batchAttributeToken)
+                            //Check for batch attribute key and value
+                            foreach (var batchAttribute in batchAttributeToken)
                             {
-                                if(batchAttribute.SelectToken("key")?.Type != JTokenType.String)
+                                if (batchAttribute.SelectToken("key")?.Type != JTokenType.String)
                                 {
                                     errorMessages.Add($"Either batch attribute key is missing or invalid for batch attribute - {counter}.");
                                 }
@@ -156,25 +158,29 @@ namespace UKHO.FileShareService.DesktopClient.Core
                             }
                         }
 
+                        //Check for read users
                         if (job.SelectToken("actionParams.acl.readUsers")?.Type != JTokenType.Array)
                         {
                             errorMessages.Add($"Invalid user groups.");
                         }
 
+                        //Check for read groups
                         if (job.SelectToken("actionParams.acl.readGroups")?.Type != JTokenType.Array)
                         {
                             errorMessages.Add($"Invalid read groups.");
                         }
 
+                        //Check for files
                         if (job.SelectToken("actionParams.files")?.Type != JTokenType.Array)
                         {
                             errorMessages.Add($"Invalid files object.");
-                        }                 
-                    }
+                        }
 
-                    else if(jobAction == "appendAcl")
-                    {
-                        if(job.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
+                        break;
+
+                    case "appendAcl":
+
+                        if (job.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
                         {
                             errorMessages.Add($"Invalid user group.");
                         }
@@ -183,15 +189,9 @@ namespace UKHO.FileShareService.DesktopClient.Core
                         {
                             errorMessages.Add($"Invalid read groups.");
                         }
-                    }
-
-                    else if (jobAction == "setExpiryDate")
-                    {
-                        //Do validations
-                    }
-
-                    JobValidationErrors.AddValidationErrors(jobId, errorMessages);
+                        break;
                 }
+                JobValidationErrors.AddValidationErrors(jobId, errorMessages);
             }
         }
 

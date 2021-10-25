@@ -12,7 +12,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public ErrorDeserializingJobsJobViewModel(ErrorDeserializingJobsJob job) : base(job)
         {
             this.job = job;
-            PopulateErrors();
+            PopulateValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE);
         }
 
         protected internal override Task OnExecuteCommand()
@@ -24,17 +24,5 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             return false;
         }
-
-        private void PopulateErrors()
-        {
-            ValidationErrors.Clear();
-
-            if (JobValidationErrors.ValidationErrors.ContainsKey(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE))
-            {
-                ValidationErrors.AddRange(
-                    JobValidationErrors.ValidationErrors[JobValidationErrors.UNKNOWN_JOB_ERROR_CODE]);
-            }
-        }
-
     }
 }

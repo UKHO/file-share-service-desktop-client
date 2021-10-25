@@ -139,17 +139,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            ValidationErrors.Clear();
-
-            if (JobValidationErrors.ValidationErrors.ContainsKey(JobId))
-            {
-                ValidationErrors.AddRange(
-                    JobValidationErrors.ValidationErrors[JobId]);
-            }
-
-            ValidateViewModel();
-            
-            return ValidationErrors.Count == 0;
+            PopulateValidationErrors(JobId);
+            return !ValidationErrors.Any();
         }
 
         public List<NewBatchFilesViewModel> Files { get; }
@@ -257,7 +248,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             };
         }
 
-        private void ValidateViewModel()
+        protected override void ValidateViewModel()
         {
             if(string.IsNullOrWhiteSpace(BusinessUnit))
             {
@@ -280,7 +271,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                 if(Directory.Exists(directory))
                 {
-                    if(file.Files.Count() == 0)
+                    if(file?.Files?.Count() == 0)
                     {
                         ValidationErrors.Add($"Either file '{file.RawSearchPath}' doesn't exist or user does not have permission.");
                     }

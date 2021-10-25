@@ -32,20 +32,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            ValidationErrors.Clear();
-
-            if (JobValidationErrors.ValidationErrors.ContainsKey(JobId))
-            {
-                ValidationErrors.AddRange(
-                    JobValidationErrors.ValidationErrors[JobId]);
-            }
-
-            ValidateViewModel();
-
+            PopulateValidationErrors(JobId);
             return !ValidationErrors.Any();
         }
 
-        private void ValidateViewModel()
+        protected override void ValidateViewModel()
         {
             if(string.IsNullOrWhiteSpace(BatchId))
             {

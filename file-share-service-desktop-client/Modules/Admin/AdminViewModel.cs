@@ -98,10 +98,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             }
 
             BatchJobs = jobs.Select(BuildJobViewModel).ToList();
-
-
-            //BatchJobs = jobsParser.Parse(fs.ReadToEnd()).jobs.Where(job => job != null).Select(BuildJobViewModel).ToList();
-
         }
 
         private IBatchJobViewModel BuildJobViewModel(IJob job)
