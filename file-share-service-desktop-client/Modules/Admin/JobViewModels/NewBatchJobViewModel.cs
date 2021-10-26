@@ -6,11 +6,13 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Prism.Commands;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
+using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 using UKHO.WeekNumberUtils;
@@ -19,12 +21,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 {
     public class NewBatchJobViewModel : BaseBatchJobViewModel
     {
+        private const double MaxBatchCommitWaitTime = 60;
         private readonly NewBatchJob job;
         private readonly IFileSystem fileSystem;
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
         private bool isExecutingComplete;
         private string executionResult = string.Empty;
+        private bool isCommitting;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
             Func<IFileShareApiAdminClient> fileShareClientFactory,
@@ -161,6 +165,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
+        public bool IsCommitting
+        {
+            get => isCommitting;
+            set
+            {
+                if (isCommitting != value)
+                {
+                    isCommitting = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         public string ExecutionResult
         {
             get => executionResult;
@@ -215,9 +232,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         });
                                     }).ContinueWith(_ => openRead.Dispose());
                             }).ToArray());
-
+                    //cleaning up file progress as all uploaded
+                    FileUploadProgress.Clear();
+                    
+                    ExecutionResult = $"Files uploaded, batch commit in progress. New batch ID: {batchHandle.BatchId}";
+                    IsCommitting = true;
                     await fileShareClient.CommitBatch(batchHandle);
-                    ExecutionResult = $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
+                    
+                    ExecutionResult = !await CheckBatchIsCommitted(fileShareClient,batchHandle, MaxBatchCommitWaitTime)
+                        ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
+                        : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
                 }
                 catch (Exception e)
                 {
@@ -228,9 +252,26 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
             finally
             {
+                IsCommitting = false;
                 IsExecuting = false;
                 IsExecutingComplete = true;
             }
+        }
+
+        public async Task<bool> CheckBatchIsCommitted(IFileShareApiAdminClient fileShareClient,IBatchHandle batchHandle, double waitTimeInMinutes)
+        {
+            var startTime = DateTime.UtcNow;
+            while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(waitTimeInMinutes))
+            {
+                BatchStatusResponse status = await fileShareClient.GetBatchStatusAsync(batchHandle);
+                if (status?.Status == BatchStatusResponse.StatusEnum.Committed)
+                {
+                    return true;
+                }
+
+                await Task.Delay(10000);
+            }
+            return false;
         }
 
         public BatchModel BuildBatchModel()

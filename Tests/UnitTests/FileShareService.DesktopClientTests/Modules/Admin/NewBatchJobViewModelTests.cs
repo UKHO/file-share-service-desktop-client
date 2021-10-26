@@ -8,6 +8,7 @@ using FakeItEasy;
 using NUnit.Framework;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
+using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
@@ -393,13 +394,13 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var createBatchTcs = new TaskCompletionSource<IBatchHandle>();
             var addFileToBatchTcs = new TaskCompletionSource();
             var commitBatchTcs = new TaskCompletionSource();
-            
 
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored))
                 .Returns(createBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
                 A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed});
 
             var executeTask = vm.OnExecuteCommand();
             vm.ExcecuteJobCommand.Execute();
@@ -415,11 +416,49 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(vm.IsExecuting);
             Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
             Assert.IsTrue(vm.IsExecutingComplete);
-
+            Assert.IsFalse(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(batchHandle)).MustHaveHappened();
-
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(batchHandle)).MustHaveHappened();
             vm.CloseExecutionCommand.Execute();
             Assert.IsFalse(vm.IsExecutingComplete);
+        }
+
+        [Test]
+        public async Task TestCheckIsbatchCommittedResults()
+        {
+            var batchHandle = A.Fake<IBatchHandle>();
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new Dictionary<string, string>()
+                        ,
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 1,
+                                MimeType = "text/plain",
+                                SearchPath = "c:/abc/test1.txt"
+                            }
+                        }
+                }
+            },
+            fileSystem,
+            () => fakeFileShareApiAdminClient,
+            fakeCurrentDateTimeProvider);
+            
+            // Testing method returns true when committed
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
+            var result = await vm.CheckBatchIsCommitted(fakeFileShareApiAdminClient,batchHandle,1);
+            Assert.IsTrue(result);
+
+            // Testing method returns false when response is not committed within wait time
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.CommitInProgress });
+            result = await vm.CheckBatchIsCommitted(fakeFileShareApiAdminClient, batchHandle, 0.1);
+            Assert.IsFalse(result);
         }
 
         [Test]

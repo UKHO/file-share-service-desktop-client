@@ -6,6 +6,7 @@ using System.Windows.Markup;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
+using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Modules.Admin;
 using UKHO.FileShareService.DesktopClient.Modules.Auth;
@@ -39,6 +40,7 @@ namespace UKHO.FileShareService.DesktopClient
         {
             containerRegistry.RegisterSingleton<IEnvironmentsManager, EnvironmentLoader>();
             containerRegistry.RegisterSingleton<IAuthProvider, AuthProvider>();
+            containerRegistry.RegisterSingleton<IAuthTokenProvider, AuthProvider>();
             containerRegistry.Register<INavigation, NavigationManager>();
             containerRegistry.Register<IFssSearchStringBuilder, FssSearchStringBuilder>();
             containerRegistry.Register<IJwtTokenParser, JwtTokenParser>();
