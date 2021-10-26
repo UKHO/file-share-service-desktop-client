@@ -252,12 +252,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             if(string.IsNullOrWhiteSpace(BusinessUnit))
             {
-                ValidationErrors.Add("Business unit is missing or not specified.");
+                ValidationErrors.Add("Business Unit is missing or is not specified.");
             }
 
             if(ExpiryDate.HasValue && ExpiryDate.Value <= DateTime.UtcNow)
             {
-                ValidationErrors.Add("Batch expiry date is past date.");
+                ValidationErrors.Add("Batch expiry date is in the past.");
             }
 
             if(Files.Count == 0)
@@ -277,16 +277,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                 if(!IsDirectoryExist(directory))
                 {
-                    string directoryNotFoundMessage = $"Either directory '{directory}' doesn't exist or user does not have permission to access it.";
+                    string directoryNotFoundMessage = $"Directory '{directory}' does not exist or you do not have permission to access the directory selected.";
                     string accessibleDirectory = GetAccessibleDirectoryName(directory);
 
-                    ValidationErrors.Add(string.IsNullOrWhiteSpace(accessibleDirectory) ? directoryNotFoundMessage : $"{directoryNotFoundMessage}.\n\tThe accessible level is: '{accessibleDirectory}'");
+                    ValidationErrors.Add(string.IsNullOrWhiteSpace(accessibleDirectory) ? directoryNotFoundMessage : $"{directoryNotFoundMessage}\n\tThe level you can access is: '{accessibleDirectory}'");
                     continue;
                 }
 
                 if(!file.CorrectNumberOfFilesFound)
                 {
-                    string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, but actual existing file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
+                    string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
 
                     if (file.Files?.Count() > 0)
                     {
@@ -298,40 +298,37 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        private bool IsDirectoryExist(string directory)
-        {
-            try
-            {
-                DirectoryInfo directoryInfo = new DirectoryInfo(directory);
-                _ = directoryInfo.GetDirectories();
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
-
-        private string GetAccessibleDirectoryName(string directory)
+        private string GetAccessibleDirectoryName(string? directory)
         {
            if(!string.IsNullOrWhiteSpace(directory))
             {
-                DirectoryInfo directoryInfo = new DirectoryInfo(directory);
-
                 if (IsDirectoryExist(directory))
                 {
                     return directory;
                 }
                 else
                 {
-                    if (directoryInfo.Parent != null)
+                    if (fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent != null)
                     {
-                        return GetAccessibleDirectoryName(Convert.ToString(directoryInfo.Parent));
+                        return GetAccessibleDirectoryName(Convert.ToString(fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent));
                     }                    
                 }
             }
             return string.Empty;
+        }
+
+
+        private bool IsDirectoryExist(string directory)
+        {
+            try
+            {
+                _= fileSystem.DirectoryInfo.FromDirectoryName(directory).GetDirectories();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
     }
 

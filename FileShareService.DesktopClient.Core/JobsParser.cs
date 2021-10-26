@@ -72,7 +72,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
             if(batchJobs == null || batchJobs.Type != JTokenType.Array || !batchJobs.HasValues)
             {
-               JobValidationErrors.AddValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE, new List<string>() { "Invalid format of configuration file. Unable to find a job for process." });
+               JobValidationErrors.AddValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE, 
+                   new List<string>() { "Configuration file formatted incorrectly. Unable to find a job to process." });
                 return;
             }
 
@@ -86,7 +87,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 if (jobActionToken == null ||
                     string.IsNullOrWhiteSpace(Convert.ToString(jobActionToken)))
                 {
-                    AddValidationMessage(job, "Job action is not specified or invalid.");
+                    AddValidationMessage(job, "Job action is not specified or is invalid.");
                     continue;
                 }
 
@@ -104,7 +105,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 JToken? displayNameTokne = job.SelectToken("displayName");
                 if (displayNameTokne == null || string.IsNullOrWhiteSpace(Convert.ToString(displayNameTokne)))
                 {
-                    AddValidationMessage(job, "Job display name is not specified or invalid.");
+                    AddValidationMessage(job, "Job display name is not specified or is invalid.");
                     continue;
                 }
 
@@ -138,22 +139,21 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
                         if (batchAttributeToken?.Type != JTokenType.Array)
                         {
-                            errorMessages.Add("Invalid batch attributes.");
+                            errorMessages.Add("Invalid batch attribute.");
                         }
                         else if (batchAttributeToken.HasValues)
                         {
-                            int counter = 1;
                             //Check for batch attribute key and value
                             foreach (var batchAttribute in batchAttributeToken)
                             {
                                 if (batchAttribute.SelectToken("key")?.Type != JTokenType.String)
                                 {
-                                    errorMessages.Add($"Either batch attribute key is missing or invalid for batch attribute - {counter}.");
+                                    errorMessages.Add($"Batch attribute key is missing or is invalid for the batch.");
                                 }
 
                                 if (batchAttribute.SelectToken("value")?.Type != JTokenType.String)
                                 {
-                                    errorMessages.Add($"Either batch attribute value is missing or invalid for batch attribute - {counter}.");
+                                    errorMessages.Add($"Batch attribute value is missing or is invalid for the batch.");
                                 }
                             }
                         }
@@ -173,7 +173,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                         //Check for files
                         if (job.SelectToken("actionParams.files")?.Type != JTokenType.Array)
                         {
-                            errorMessages.Add($"Invalid files object.");
+                            errorMessages.Add($"Invalid file object.");
                         }
 
                         break;
@@ -182,7 +182,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
                         if (job.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
                         {
-                            errorMessages.Add($"Invalid user group.");
+                            errorMessages.Add($"Invalid user groups.");
                         }
 
                         if (job.SelectToken("actionParams.readGroups")?.Type != JTokenType.Array)

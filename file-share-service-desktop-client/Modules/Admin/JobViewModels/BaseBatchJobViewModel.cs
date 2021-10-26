@@ -53,7 +53,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        public void PopulateValidationErrors(string jobId)
+        protected virtual void PopulateValidationErrors(string jobId)
         {
             ValidationErrors.Clear();
 
