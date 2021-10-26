@@ -358,9 +358,6 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
         }
 
-
-
-
         [Test]
         public async Task TestSimpleExceuteNewBatchJob()
         {
@@ -404,7 +401,6 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
 
-
             var executeTask = vm.OnExecuteCommand();
             vm.ExcecuteJobCommand.Execute();
             Assert.IsTrue(vm.IsExecuting);
@@ -424,6 +420,66 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
             vm.CloseExecutionCommand.Execute();
             Assert.IsFalse(vm.IsExecutingComplete);
+        }
+
+        [Test]
+        public async Task TestExceuteNewBatchJobHasValidationErrors()
+        {
+            var file1FullFileName = @"c:/data/files/f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = " ",
+                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 1,
+                                MimeType = "text/plain",
+                                SearchPath = file1FullFileName
+                            }
+                        }
+                }
+            },
+                fileSystem,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider);
+
+            Assert.AreEqual("Create new Batch", vm.DisplayName);
+
+            var batchHandle = A.Fake<IBatchHandle>();
+
+            var createBatchTcs = new TaskCompletionSource<IBatchHandle>();
+            var addFileToBatchTcs = new TaskCompletionSource();
+            var commitBatchTcs = new TaskCompletionSource();
+
+
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored))
+                .Returns(createBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
+
+            var executeTask = vm.OnExecuteCommand();
+            vm.ExcecuteJobCommand.Execute();
+            Assert.IsTrue(vm.IsExecuting);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+
+            createBatchTcs.SetResult(batchHandle);
+            addFileToBatchTcs.SetResult();
+            commitBatchTcs.SetResult();
+
+            await executeTask;
+            Assert.IsFalse(vm.IsExecuting);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+
+            Assert.AreEqual(1, vm.ValidationErrors.Count);
+            Assert.AreEqual("Business Unit is missing or is not specified.", vm.ValidationErrors[0]);
         }
     }
 }

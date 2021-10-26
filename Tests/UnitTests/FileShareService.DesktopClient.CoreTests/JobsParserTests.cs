@@ -75,5 +75,28 @@ namespace FileShareService.DesktopClient.CoreTests
             StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().DisplayName);
             Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
         }
+
+        [Test]
+        public void TestErrorDeserializingJobsWhenParseInvalidFormatFile()
+        {
+            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithInvalidFormat.json")!;
+            using var sr = new StreamReader(s);
+            var result = new JobsParser().Parse(sr.ReadToEnd());
+
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
+            Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+        }
+
+        [Test]
+        public void TestErrorDeserializingJobsWhenParseInvalidActions()
+        {
+            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithDuplicateJobs.json")!;
+            using var sr = new StreamReader(s);
+            var result = new JobsParser().Parse(sr.ReadToEnd());
+
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
+            StringAssert.StartsWith("Duplicate job 'appendAcl - Sample 2' found in config file", result.jobs.Single().DisplayName);
+            Assert.IsInstanceOf<JsonException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+        }
     }
 }
