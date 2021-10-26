@@ -503,6 +503,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
                 A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored))
+                .Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
 
             var executeTask = vm.OnExecuteCommand();
             vm.ExcecuteJobCommand.Execute();
