@@ -319,9 +319,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 if(!IsDirectoryExist(directory))
                 {
                     string directoryNotFoundMessage = $"Directory '{directory}' does not exist or you do not have permission to access the directory selected.";
-                    string accessibleDirectory = GetAccessibleDirectoryName(directory);
+                    string accessibleDirectory = GetAccessibleDirectoryName(Convert.ToString(fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent));
 
-                    ValidationErrors.Add(string.IsNullOrWhiteSpace(accessibleDirectory) ? directoryNotFoundMessage : $"{directoryNotFoundMessage}\n\tThe level you can access is: '{accessibleDirectory}'");
+                    if(!string.IsNullOrWhiteSpace(accessibleDirectory))
+                    {
+                        directoryNotFoundMessage = $"{directoryNotFoundMessage}\n\tThe level you can access is: '{accessibleDirectory}'";
+                    }
+                    
+
+                    ValidationErrors.Add(directoryNotFoundMessage);
                     continue;
                 }
 
