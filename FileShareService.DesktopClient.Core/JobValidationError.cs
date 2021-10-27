@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace UKHO.FileShareService.DesktopClient.Core
 {
-    public static class JobValidationErrors
+    [ExcludeFromCodeCoverage]
+    public class JobValidationErrors
     {
         public const string CONFLICT_ERROR_CODE = "409";
         public const string UNKNOWN_JOB_ERROR_CODE = "-1";
