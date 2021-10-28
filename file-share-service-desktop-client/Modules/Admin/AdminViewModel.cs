@@ -75,7 +75,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             List<IJob> jobs = new List<IJob>();
 
             //Create ErrorDeserializingJob, if no jobs or any null job found after parsing.
-            if (!parsedData.jobs.Any() || parsedData.jobs.Any(job => job == null))
+            if (parsedData == null || !parsedData.jobs.Any() || parsedData.jobs.Any(job => job == null))
             {
                 ErrorDeserializingJobsJob errorJob =
                     new ErrorDeserializingJobsJob(new Exception("There are some errors in configuration file."));
@@ -90,9 +90,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             }
 
 
-            List<IJob> validJobs = parsedData.jobs.Where(job => job != null).ToList();
+            List<IJob> validJobs = parsedData?.jobs?.Where(job => job != null).ToList();
 
-            if(validJobs.Any())
+            if(validJobs != null && validJobs.Any())
             {
                 jobs.AddRange(validJobs);
             }

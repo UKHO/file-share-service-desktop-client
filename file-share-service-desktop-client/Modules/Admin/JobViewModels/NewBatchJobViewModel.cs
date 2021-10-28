@@ -6,7 +6,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Prism.Commands;
@@ -388,10 +387,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             this.newBatchFile = newBatchFile;
             SearchPath = expandMacros(newBatchFile.SearchPath);
-            var searchFileInfo = fileSystem.FileInfo.FromFileName(SearchPath);
-            var directory = fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
+            var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
+            var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
 
-            Files = directory.Exists
+            Files = (directory != null && directory.Exists)
                     ? GetFiles(directory, searchFileInfo.Name)
                     : Enumerable.Empty<IFileSystemInfo>();
         }
