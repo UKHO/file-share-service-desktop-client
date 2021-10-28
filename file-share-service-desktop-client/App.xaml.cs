@@ -1,20 +1,26 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.IO.Abstractions;
 using System.Windows;
 using System.Windows.Markup;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
+using Serilog;
+using Microsoft.Extensions.Logging;
 using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Modules.Admin;
 using UKHO.FileShareService.DesktopClient.Modules.Auth;
 using UKHO.FileShareService.DesktopClient.Modules.Search;
 using Unity;
+using Microsoft.Extensions.DependencyInjection;
+using Unity.Microsoft.DependencyInjection;
 
 namespace UKHO.FileShareService.DesktopClient
-{
+{  
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -29,11 +35,22 @@ namespace UKHO.FileShareService.DesktopClient
 
         protected override IContainerExtension CreateContainerExtension()
         {
-            var containerExtension = base.CreateContainerExtension() as UnityContainerExtension;
-#if DEBUG
-            containerExtension.Instance.AddExtension(new Diagnostic());
-#endif
-            return containerExtension;
+            var serviceCollection = new ServiceCollection();         
+            serviceCollection.AddLogging(loggingBuilder =>
+            loggingBuilder.AddFile(GetFilePath(), outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}"));
+
+            var container = new UnityContainer();
+            container.BuildServiceProvider(serviceCollection);
+
+            return new UnityContainerExtension(container);
+        }
+
+        public string GetFilePath()
+        {
+            string filePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\FssToolingAppLog\\";
+            Directory.CreateDirectory(filePath);
+            filePath = filePath + "UKHO.FileShareService.DesktopClient-Logs.txt";
+            return filePath;
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
@@ -51,11 +68,12 @@ namespace UKHO.FileShareService.DesktopClient
             containerRegistry.Register<IFileShareApiAdminClientFactory, FileShareApiAdminClientFactory>();
             containerRegistry.Register<IVersionProvider, VersionProvider>();
             containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+            containerRegistry.Register<Microsoft.Extensions.Logging.ILogger>();
         }
 
         protected override Window CreateShell()
         {
-            return Container.Resolve<MainWindow>();
+            return Container.Resolve<MainWindow>();           
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

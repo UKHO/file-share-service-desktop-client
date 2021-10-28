@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Prism.Mvvm;
 using UKHO.FileShareClient;
@@ -28,13 +29,17 @@ namespace UKHO.FileShareService.DesktopClient.Core
         private readonly IJwtTokenParser jwtTokenParser;
         private bool isLoggedIn;
         protected AuthenticationResult? authenticationResult;
-       
+        public static string TempToken;
+        private readonly ILogger<AuthProvider> logger;
+
         public AuthProvider(IEnvironmentsManager environmentsManager, INavigation navigation,
-            IJwtTokenParser jwtTokenParser)
+            IJwtTokenParser jwtTokenParser,
+            ILogger<AuthProvider> logger)
         {
             this.environmentsManager = environmentsManager;
             this.navigation = navigation;
             this.jwtTokenParser = jwtTokenParser;
+            this.logger = logger;
             environmentsManager.PropertyChanged += (sender, args) => IsLoggedIn = false;
         }
 
@@ -58,10 +63,11 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
         [ExcludeFromCodeCoverage] // Can't unit test the login process as it is calling out to real AAD
         public async Task<string?> Login()
-        {
+        {           
             await GetToken();
             IsLoggedIn = true;
-            return CurrentAccessToken;
+            logger.LogInformation("User has signed into the application ");
+            return CurrentAccessToken;           
         }
 
         public string? CurrentAccessToken => authenticationResult?.AccessToken;
@@ -97,6 +103,16 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 authenticationResult = await publicClientApplication.AcquireTokenInteractive(scopes).ExecuteAsync(cancellationSource.Token);
             }        
             RaisePropertyChanged(nameof(CurrentAccessToken));
+
+            if (AuthProvider.TempToken != CurrentAccessToken )
+            {
+                if (AuthProvider.TempToken != null)
+                {
+                    logger.LogInformation("Token renewed silently");
+                }
+                AuthProvider.TempToken = CurrentAccessToken;
+            }
+           
             return authenticationResult.AccessToken;
 
         }
