@@ -105,7 +105,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 JToken? displayNameTokne = job.SelectToken("displayName");
                 if (displayNameTokne == null || string.IsNullOrWhiteSpace(Convert.ToString(displayNameTokne)))
                 {
-                    AddValidationMessage(job, "Job display name is not specified or is invalid.");
+                    AddValidationMessage(job, "Job display name is not specified or is invalid.", JobValidationErrors.CONFLICT_ERROR_CODE);
                     continue;
                 }
 
