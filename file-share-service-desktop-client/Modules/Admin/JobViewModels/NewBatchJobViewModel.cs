@@ -228,8 +228,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         {
                                             fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
                                             fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
-                                        });
-                                        Debug.WriteLine("file upload Completed", progress.blocksComplete, progress.totalBlockCount);
+                                        });          
                                     }).ContinueWith(_ => openRead.Dispose());                            
                             }).ToArray());
                     //cleaning up file progress as all uploaded

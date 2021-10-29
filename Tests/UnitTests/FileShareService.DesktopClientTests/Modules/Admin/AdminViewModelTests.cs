@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -19,6 +20,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private IKeyValueStore fakeKeyValueStore = null!;
         private IJobsParser fakeJobsParser = null!;
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
+        private readonly ILogger<AdminViewModel> logger;
+        private readonly ILogger<NewBatchJobViewModel> Nlogger;
 
         [SetUp]
         public void Setup()
@@ -35,7 +38,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
                 A.Fake<ICurrentDateTimeProvider>(),
-                fakeEnvironmentsManager);
+                fakeEnvironmentsManager,logger,Nlogger);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
@@ -58,7 +61,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
                 A.Fake<ICurrentDateTimeProvider>(),
-                fakeEnvironmentsManager);
+                fakeEnvironmentsManager,logger,Nlogger);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
@@ -79,7 +82,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
                 A.Fake<ICurrentDateTimeProvider>(),
-                fakeEnvironmentsManager);
+                fakeEnvironmentsManager, logger, Nlogger);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 

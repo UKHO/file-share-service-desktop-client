@@ -5,6 +5,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
@@ -22,6 +23,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private MockFileSystem fileSystem = null!;
         private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
         private ICurrentDateTimeProvider fakeCurrentDateTimeProvider = null!;
+        private readonly ILogger<NewBatchJobViewModel> logger;
 
 
         [SetUp]
@@ -68,7 +70,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,
+                fileSystem,logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -126,7 +128,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,
+                fileSystem,logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -179,7 +181,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         ExpiryDate = input
                     }
                 },
-                fileSystem,
+                fileSystem, logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -223,7 +225,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,
+                fileSystem, logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -273,7 +275,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,
+                fileSystem, logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -313,7 +315,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,
+                fileSystem, logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -347,7 +349,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,
+                fileSystem, logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -386,7 +388,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,
+                fileSystem, logger,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -449,7 +451,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                 }
             },
-            fileSystem,
+            fileSystem, logger,
             () => fakeFileShareApiAdminClient,
             fakeCurrentDateTimeProvider);
             
