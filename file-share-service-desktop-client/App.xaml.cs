@@ -3,24 +3,24 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
+using Microsoft.Extensions.DependencyInjection;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
 using Serilog;
-using Microsoft.Extensions.Logging;
 using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Modules.Admin;
 using UKHO.FileShareService.DesktopClient.Modules.Auth;
 using UKHO.FileShareService.DesktopClient.Modules.Search;
 using Unity;
-using Microsoft.Extensions.DependencyInjection;
 using Unity.Microsoft.DependencyInjection;
 
 namespace UKHO.FileShareService.DesktopClient
-{  
+{
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
@@ -35,22 +35,19 @@ namespace UKHO.FileShareService.DesktopClient
 
         protected override IContainerExtension CreateContainerExtension()
         {
-            var serviceCollection = new ServiceCollection();         
-            serviceCollection.AddLogging(loggingBuilder =>
-            loggingBuilder.AddFile(GetFilePath(), outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}"));
+            //            var containerExtension = base.CreateContainerExtension() as UnityContainerExtension;
+            //#if DEBUG
+            //            containerExtension.Instance.AddExtension(new Diagnostic());
+            //#endif
+            //            return containerExtension;
+
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
             var container = new UnityContainer();
             container.BuildServiceProvider(serviceCollection);
 
             return new UnityContainerExtension(container);
-        }
-
-        public string GetFilePath()
-        {
-            string filePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\FssToolingAppLog\\";
-            Directory.CreateDirectory(filePath);
-            filePath = filePath + "UKHO.FileShareService.DesktopClient-Logs.txt";
-            return filePath;
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
@@ -68,12 +65,17 @@ namespace UKHO.FileShareService.DesktopClient
             containerRegistry.Register<IFileShareApiAdminClientFactory, FileShareApiAdminClientFactory>();
             containerRegistry.Register<IVersionProvider, VersionProvider>();
             containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
-            containerRegistry.Register<Microsoft.Extensions.Logging.ILogger>();
         }
 
         protected override Window CreateShell()
         {
-            return Container.Resolve<MainWindow>();           
+            Log.Logger = new LoggerConfiguration()
+                        .ReadFrom.AppSettings()                        
+                        .CreateLogger();
+
+            SetupExceptionHandling(Log.Logger);
+
+            return Container.Resolve<MainWindow>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -82,6 +84,45 @@ namespace UKHO.FileShareService.DesktopClient
             moduleCatalog.AddModule<AuthenticateUiModule>();
             moduleCatalog.AddModule<SearchUiModule>();
             moduleCatalog.AddModule<AdminUiModule>();
+        }
+
+        private void SetupExceptionHandling(ILogger logger)
+        {
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                LogUnhandledException((Exception)e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException", logger);
+
+            DispatcherUnhandledException += (s, e) =>
+            {
+                LogUnhandledException(e.Exception, "Application.Current.DispatcherUnhandledException", logger);
+                e.Handled = true;
+            };
+
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                LogUnhandledException(e.Exception, "TaskScheduler.UnobservedTaskException", logger);
+                e.SetObserved();
+            };
+        }
+
+        private void LogUnhandledException(Exception exception, string source, ILogger logger)
+        {
+            string message = $"Unhandled exception ({source})";
+            try
+            {
+                System.Reflection.AssemblyName assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();
+                message = string.Format("Unhandled exception in {0} v{1}", assemblyName.Name, assemblyName.Version);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception in LogUnhandledException");
+            }
+            finally
+            {
+                logger.Error(exception, message);
+                MessageBox.Show(string.Format("An exeption has occured: - {0}", exception.GetBaseException().Message), message, MessageBoxButton.OK, MessageBoxImage.Error);
+                //If any issues occured during application startup safely shutdown application
+                if(exception.Source == "Prism.Unity.Wpf") Shutdown();
+            }
         }
     }
 }
