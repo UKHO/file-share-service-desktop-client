@@ -228,7 +228,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         {
                                             fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
                                             fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
-                                        });          
+                                        });
+                                        if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
+                                        {
+                                            logger.LogInformation("File Share Service upload files completed for file:{file}.", f.file.Name);
+                                        }
                                     }).ContinueWith(_ => openRead.Dispose());                            
                             }).ToArray());
                     //cleaning up file progress as all uploaded
