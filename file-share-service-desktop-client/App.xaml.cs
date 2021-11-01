@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
@@ -42,7 +43,13 @@ namespace UKHO.FileShareService.DesktopClient
             //            return containerExtension;
 
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+
+            serviceCollection.AddLogging(loggingBuilder => {
+                var logger = new LoggerConfiguration()
+                        .ReadFrom.AppSettings()
+                        .CreateLogger();
+                loggingBuilder.AddSerilog(logger, dispose: true);
+            });
 
             var container = new UnityContainer();
             container.BuildServiceProvider(serviceCollection);
@@ -64,16 +71,13 @@ namespace UKHO.FileShareService.DesktopClient
 
             containerRegistry.Register<IFileShareApiAdminClientFactory, FileShareApiAdminClientFactory>();
             containerRegistry.Register<IVersionProvider, VersionProvider>();
-            containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+            containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();            
         }
 
         protected override Window CreateShell()
         {
-            Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.AppSettings()                        
-                        .CreateLogger();
-
-            SetupExceptionHandling(Log.Logger);
+            var logger = Container.Resolve<ILogger<App>>();
+            SetupExceptionHandling(logger);
 
             return Container.Resolve<MainWindow>();
         }
@@ -86,7 +90,7 @@ namespace UKHO.FileShareService.DesktopClient
             moduleCatalog.AddModule<AdminUiModule>();
         }
 
-        private void SetupExceptionHandling(ILogger logger)
+        private void SetupExceptionHandling(ILogger<App> logger)
         {
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
                 LogUnhandledException((Exception)e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException", logger);
@@ -104,7 +108,7 @@ namespace UKHO.FileShareService.DesktopClient
             };
         }
 
-        private void LogUnhandledException(Exception exception, string source, ILogger logger)
+        private void LogUnhandledException(Exception exception, string source, ILogger<App> logger)
         {
             string message = $"Unhandled exception ({source})";
             try
@@ -114,11 +118,11 @@ namespace UKHO.FileShareService.DesktopClient
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Exception in LogUnhandledException");
+                logger.LogError(ex, "Exception in LogUnhandledException");
             }
             finally
             {
-                logger.Error(exception, message);
+                logger.LogError(exception, message);
                 MessageBox.Show(string.Format("An exeption has occured: - {0}", exception.GetBaseException().Message), message, MessageBoxButton.OK, MessageBoxImage.Error);
                 //If any issues occured during application startup safely shutdown application
                 if(exception.Source == "Prism.Unity.Wpf") Shutdown();
