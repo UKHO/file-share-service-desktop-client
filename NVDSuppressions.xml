@@ -12,10 +12,111 @@
   </suppress>
 
   <suppress>
-   <notes><![CDATA[
+    <notes><![CDATA[
    file name: pyro.exe
    This is a vunerability in Pryo which is part of the WiX toolset. Although the vunerability is real, Pryo is a tool in the WiX toolset and is not deployed, it is simply used as part of building the .msi installer.
    ]]></notes>
-   <cve>CVE-2011-2765</cve>
-</suppress>
+    <cve>CVE-2011-2765</cve>
+  </suppress>
+  
+  <suppress>
+    <notes>
+      <![CDATA[
+    file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/94 for MS details on this issue
+    This applies to version of System.Net.Http as deployed as part of .Net core below 2.1.7 or 2.2.1. FSS Desktop client is pinned to .Net core SDK > 5.0.302 which is not vunerable.
+    ]]>
+    </notes>
+    <cve>CVE-2019-0545</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+   See https://github.com/dotnet/announcements/issues/97 for MS details on this CVE.
+    This CVE only applies to .NetCore versions below 2.1.8 and 2.2.2. FSS Desktop client is pinned to .Net core SDK > 5.0.302 which is not vunerable.
+   ]]>
+    </notes>
+    <cve>CVE-2019-0657</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+   See https://github.com/dotnet/announcements/issues/111 for MS details on this CVE.
+      	Vulnerable versions: 4.3.0 and below Secure versions: 4.3.1+
+    This CVE applies to .Net Core versions below 2.2.107 (runtime 2.2.5). FSS Desktop Client is pinned to .Net core SDK > 5.0.302 which is not vunerable.    
+   ]]>
+    </notes>    
+    <cve>CVE-2019-0820</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+    See https://github.com/dotnet/announcements/issues/112 for full MS Details on the CVE
+        A denial of service vulnerability exists when .NET Framework or .NET Core improperly handle web requests, aka '.Net Framework and .Net Core Denial of Service Vulnerability'. This CVE ID is unique from CVE-2019-0820, CVE-2019-0981.
+        Vunerability applies to System.Private.Uri version	4.3.0 and 4.3.1. System.Private.Uri is part of the .NetCore runtime, and fixed with version System.Private.Uri version 4.3.2.
+        FSS Desktop Client is pinned to .Net core SDK > 5.0.302 which is not vunerable.
+   ]]>
+    </notes>    
+    <cve>CVE-2019-0980</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+   See https://github.com/dotnet/announcements/issues/113 for full MS Details on the CVE
+        Vunerability applies to System.Private.Uri version	4.3.0 and 4.3.1. System.Private.Uri is part of the .NetCore runtime, and fixed with version System.Private.Uri version 4.3.2.
+        The issue is fixed:         
+          2.1.11 or SDK 2.1.507 for Visual Studio 2017 or SDK 2.1.604 for Visual Studio 2019
+          2.2.5 or SDK 2.2.107 for Visual Studio 2017 or SDK 2.2.204 for Visual Studio 2019
+        FSS Desktop Client is pinned to .Net core SDK > 5.0.302 which is not vunerable.
+   ]]>
+    </notes>    
+    <cve>CVE-2019-0981</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.AspNetCore.Hosting.Abstractions.dll
+   See https://github.com/dotnet/announcements/issues/121 for full MS Details on CVE.
+        A denial of service vulnerability exists when .NET Core improperly handles web requests. An attacker who successfully exploited this vulnerability could cause a denial of service against a .NET Core web application. The vulnerability can be exploited remotely, without authentication.
+      This CVE applies to any .NET Core based application running on .NET Core 2.1.0-2.1.12, or .NET Core 2.2.0-2.2.6. FSS Desktop Client is pinned to .Net core SDK > 5.0.302 which is not vunerable.
+   ]]>
+    </notes>    
+    <cve>CVE-2019-1301</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Serilog.Sinks.File:5.0.0
+   8117-softmagic.c in file before 5.21 does not properly limit recursion, which allows remote attackers to cause a denial of service (CPU consumption or crash) via unspecified vectors.
+      9652-The mconvert function in softmagic.c in file before 5.21, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not properly handle a certain string-length field during a copy of a truncated version of a Pascal string, which might allow remote attackers to cause a denial of service (out-of-bounds memory access and application crash) via a crafted file.
+    This is a false positive. These two CVEs references a C library softmagic.c which is not used by FSS Desktop Client.
+    ]]>
+    </notes>
+ <cve>CVE-2014-8117</cve>
+ <cve>CVE-2014-9652</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Serilog.Sinks.File:5.0.0
+    readelf.c in file before 5.22, as used in the Fileinfo component in PHP before 5.4.37, 5.5.x before 5.5.21, and 5.6.x before 5.6.5, does not consider that pread calls sometimes read only a subset of the available data, which allows remote attackers to cause a denial of service (uninitialized memory access) or possibly have unspecified other impact via a crafted ELF file.
+    This is a false positive in readelf.c as FSS Desktop Client is not using this, or PHP.
+   ]]>
+    </notes>
+    <cve>CVE-2014-9653</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Serilog.Sinks.File:5.0.0
+   cdf_read_property_info in cdf.c in file through 5.37 does not restrict the number of CDF_VECTOR elements, which allows a heap-based buffer overflow (4-byte out-of-bounds write)
+    This is a false positive in cdf.c which is not used by FSS Desktop client.
+   ]]>
+    </notes>
+    <cve>CVE-2019-18218</cve>
+  </suppress>
 </suppressions>
