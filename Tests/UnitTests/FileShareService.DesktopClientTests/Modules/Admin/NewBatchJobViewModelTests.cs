@@ -131,7 +131,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 fakeCurrentDateTimeProvider);
 
             var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
-            var expectedWeekNumber = "" + (WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow).Week + offset);
+            var expectedWeekNumber = "" + (WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Week);            
             Assert.AreEqual(expectedWeekNumber, expandedAttributes["WeekMacro1"]);
             Assert.AreEqual("Padding " + expectedWeekNumber, expandedAttributes["WeekMacro2"]);
             Assert.AreEqual("Padding " + expectedWeekNumber + " and Right Padding", expandedAttributes["WeekMacro3"]);
