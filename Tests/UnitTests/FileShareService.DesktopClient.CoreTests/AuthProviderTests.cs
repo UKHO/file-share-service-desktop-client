@@ -15,7 +15,7 @@ namespace FileShareService.DesktopClient.CoreTests
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private INavigation fakeNavigation = null!;
         private IJwtTokenParser fakeJwtTokenParser = null!;
-        private readonly ILogger<AuthProvider> logger;
+        private ILogger<AuthProvider> fakeAuthlogger;
 
         [SetUp]
         public void Setup()
@@ -23,7 +23,8 @@ namespace FileShareService.DesktopClient.CoreTests
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeNavigation = A.Fake<INavigation>();
             fakeJwtTokenParser = A.Fake<IJwtTokenParser>();
-            authProvider = new AuthProviderForTesting(fakeEnvironmentsManager, fakeNavigation, fakeJwtTokenParser,logger);
+            fakeAuthlogger = A.Fake<ILogger<AuthProvider>>();
+            authProvider = new AuthProviderForTesting(fakeEnvironmentsManager, fakeNavigation, fakeJwtTokenParser, fakeAuthlogger);
         }
 
         [Test]

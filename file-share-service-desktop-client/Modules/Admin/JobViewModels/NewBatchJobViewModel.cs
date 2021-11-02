@@ -248,7 +248,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
                         : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
 
-                    logger.LogInformation("Eexecute job completed.");
+                    logger.LogInformation("Execute job completed.");
                 }
                 catch (Exception e)
                 {

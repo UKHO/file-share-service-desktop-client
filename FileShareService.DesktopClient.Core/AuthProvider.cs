@@ -29,7 +29,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
         private readonly IJwtTokenParser jwtTokenParser;
         private bool isLoggedIn;
         protected AuthenticationResult? authenticationResult;
-        public static string TempToken;
         private readonly ILogger<AuthProvider> logger;
 
         public AuthProvider(IEnvironmentsManager environmentsManager, INavigation navigation,
@@ -78,7 +77,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             : Enumerable.Empty<string>();
 
         public async  Task<string> GetToken()
-        {
+        {          
             var tenantId = environmentsManager.CurrentEnvironment.TenantId;
             var scopes = new[] {$"{environmentsManager.CurrentEnvironment.ClientId}/.default" };
 
@@ -91,6 +90,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             var cancellationSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
             TokenCacheHelper.EnableSerialization(publicClientApplication.UserTokenCache);         
             var accounts = (await publicClientApplication.GetAccountsAsync()).ToList();
+            var TempToken = CurrentAccessToken;
             try
             {
                 authenticationResult = await publicClientApplication.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
@@ -104,13 +104,9 @@ namespace UKHO.FileShareService.DesktopClient.Core
             }        
             RaisePropertyChanged(nameof(CurrentAccessToken));
 
-            if (AuthProvider.TempToken != CurrentAccessToken )
-            {
-                if (AuthProvider.TempToken != null)
-                {
-                    logger.LogInformation("Token renewed silently");
-                }
-                AuthProvider.TempToken = CurrentAccessToken;
+            if (TempToken != CurrentAccessToken && TempToken != null)
+            {              
+                   logger.LogInformation("Token renewed silently");              
             }
            
             return authenticationResult.AccessToken;

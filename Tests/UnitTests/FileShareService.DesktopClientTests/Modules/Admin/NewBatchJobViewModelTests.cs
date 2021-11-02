@@ -23,7 +23,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private MockFileSystem fileSystem = null!;
         private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
         private ICurrentDateTimeProvider fakeCurrentDateTimeProvider = null!;
-        private readonly ILogger<NewBatchJobViewModel> logger;
+        private  ILogger<NewBatchJobViewModel> fakeLoggerNewBatchJobVM =null!;
 
 
         [SetUp]
@@ -32,6 +32,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fileSystem = new MockFileSystem();
             fakeFileShareApiAdminClient = A.Fake<IFileShareApiAdminClient>();
             fakeCurrentDateTimeProvider = A.Fake<ICurrentDateTimeProvider>();
+            fakeLoggerNewBatchJobVM = A.Fake<ILogger<NewBatchJobViewModel>>();
         }
 
         [TestCase("$(now.Year)")]
@@ -70,7 +71,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -128,7 +129,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem,logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -181,7 +182,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         ExpiryDate = input
                     }
                 },
-                fileSystem, logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -225,7 +226,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem, logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -275,7 +276,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem, logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -315,7 +316,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem, logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -349,7 +350,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem, logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -388,7 +389,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                     }
                 },
-                fileSystem, logger,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
@@ -451,7 +452,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                 }
             },
-            fileSystem, logger,
+            fileSystem, fakeLoggerNewBatchJobVM,
             () => fakeFileShareApiAdminClient,
             fakeCurrentDateTimeProvider);
             
