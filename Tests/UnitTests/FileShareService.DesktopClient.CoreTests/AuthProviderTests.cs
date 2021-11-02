@@ -15,7 +15,7 @@ namespace FileShareService.DesktopClient.CoreTests
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private INavigation fakeNavigation = null!;
         private IJwtTokenParser fakeJwtTokenParser = null!;
-        private ILogger<AuthProvider> fakeAuthlogger;
+        private ILogger<AuthProvider> fakeAuthlogger = null!;
 
         [SetUp]
         public void Setup()

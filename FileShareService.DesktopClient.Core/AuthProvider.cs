@@ -90,7 +90,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             var cancellationSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
             TokenCacheHelper.EnableSerialization(publicClientApplication.UserTokenCache);         
             var accounts = (await publicClientApplication.GetAccountsAsync()).ToList();
-            var TempToken = CurrentAccessToken;
+            var tempToken = CurrentAccessToken;
             try
             {
                 authenticationResult = await publicClientApplication.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
@@ -104,7 +104,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             }        
             RaisePropertyChanged(nameof(CurrentAccessToken));
 
-            if (TempToken != CurrentAccessToken && TempToken != null)
+            if (tempToken != CurrentAccessToken && tempToken != null)
             {              
                    logger.LogInformation("Token renewed silently");              
             }

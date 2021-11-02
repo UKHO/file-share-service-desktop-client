@@ -20,8 +20,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private IKeyValueStore fakeKeyValueStore = null!;
         private IJobsParser fakeJobsParser = null!;
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
-        private ILogger<AdminViewModel> fakeLoggerAdminVM;
-        private ILogger<NewBatchJobViewModel> fakeLoggerNewBatchVM;
+        private ILogger<AdminViewModel> fakeLoggerAdminVM = null!;
+        private ILogger<NewBatchJobViewModel> fakeLoggerNewBatchVM = null!;
 
         [SetUp]
         public void Setup()
