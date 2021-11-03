@@ -191,7 +191,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         }
                 }
             },
-                fileSystem,
+                fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
 
