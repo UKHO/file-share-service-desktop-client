@@ -200,7 +200,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsExecuting = true;
             try
             {
-                logger.LogInformation("Execute job started.");
+                logger.LogInformation("Execute job started for displayName :{displayName} .",DisplayName);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
                 logger.LogInformation("File Share Service batch create started.");
@@ -214,7 +214,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         Files.SelectMany(f => f.Files.Select(file => (f, file)))
                             .Select(f =>
                             {
-                                logger.LogInformation("File Share Service upload files started for file:{file}.", f.file.Name);
+                                logger.LogInformation("File Share Service upload files started for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
                                 var fileUploadProgressViewModel = new FileUploadProgressViewModel(f.file.Name);
                                 FileUploadProgress.Add(fileUploadProgressViewModel);
 
@@ -231,7 +231,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         });
                                         if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
                                         {
-                                            logger.LogInformation("File Share Service upload files completed for file:{file}.", f.file.Name);
+                                            logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name ,batchHandle.BatchId);
                                         }
                                     }).ContinueWith(_ => openRead.Dispose());                            
                             }).ToArray());
@@ -248,7 +248,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
                         : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
 
-                    logger.LogInformation("Execute job completed.");
+                    logger.LogInformation("Execute job completed for displayName:{displayName} and batch ID:{BatchId}.",DisplayName, batchHandle.BatchId);
                 }
                 catch (Exception e)
                 {

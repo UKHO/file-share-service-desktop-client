@@ -65,7 +65,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
         {           
             await GetToken();
             IsLoggedIn = true;
-            logger.LogInformation("User has signed into the application ");
+            logger.LogInformation("User :{User}" ,authenticationResult.Account.Username + " has signed into the application ");
             return CurrentAccessToken;           
         }
 
