@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Prism.Mvvm;
 using UKHO.FileShareClient;
@@ -28,13 +29,16 @@ namespace UKHO.FileShareService.DesktopClient.Core
         private readonly IJwtTokenParser jwtTokenParser;
         private bool isLoggedIn;
         protected AuthenticationResult? authenticationResult;
-       
+        private readonly ILogger<AuthProvider> logger;
+
         public AuthProvider(IEnvironmentsManager environmentsManager, INavigation navigation,
-            IJwtTokenParser jwtTokenParser)
+            IJwtTokenParser jwtTokenParser,
+            ILogger<AuthProvider> logger)
         {
             this.environmentsManager = environmentsManager;
             this.navigation = navigation;
             this.jwtTokenParser = jwtTokenParser;
+            this.logger = logger;
             environmentsManager.PropertyChanged += (sender, args) => IsLoggedIn = false;
         }
 
@@ -58,10 +62,11 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
         [ExcludeFromCodeCoverage] // Can't unit test the login process as it is calling out to real AAD
         public async Task<string?> Login()
-        {
+        {           
             await GetToken();
             IsLoggedIn = true;
-            return CurrentAccessToken;
+            logger.LogInformation("User:{User} has signed into the application", authenticationResult?.Account?.Username);
+            return CurrentAccessToken;           
         }
 
         public string? CurrentAccessToken => authenticationResult?.AccessToken;
@@ -72,7 +77,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             : Enumerable.Empty<string>();
 
         public async  Task<string> GetToken()
-        {
+        {          
             var tenantId = environmentsManager.CurrentEnvironment.TenantId;
             var scopes = new[] {$"{environmentsManager.CurrentEnvironment.ClientId}/.default" };
 
@@ -85,6 +90,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             var cancellationSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
             TokenCacheHelper.EnableSerialization(publicClientApplication.UserTokenCache);         
             var accounts = (await publicClientApplication.GetAccountsAsync()).ToList();
+            var tempToken = CurrentAccessToken;
             try
             {
                 authenticationResult = await publicClientApplication.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
@@ -97,6 +103,12 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 authenticationResult = await publicClientApplication.AcquireTokenInteractive(scopes).ExecuteAsync(cancellationSource.Token);
             }        
             RaisePropertyChanged(nameof(CurrentAccessToken));
+
+            if (tempToken != CurrentAccessToken && tempToken != null)
+            {              
+                   logger.LogInformation("Token renewed silently");              
+            }
+           
             return authenticationResult.AccessToken;
 
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -19,22 +20,30 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
+        private readonly ILogger<AdminViewModel> logger;
+        private readonly ILogger<NewBatchJobViewModel> Nlogger;
 
         public AdminViewModel(IFileSystem fileSystem,
             IKeyValueStore keyValueStore,
             IJobsParser jobsParser,
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
             ICurrentDateTimeProvider currentDateTimeProvider,
-            IEnvironmentsManager environmentsManager)
+            IEnvironmentsManager environmentsManager,
+            ILogger<AdminViewModel> logger,
+            ILogger<NewBatchJobViewModel> Nlogger)
         {
             this.fileSystem = fileSystem;
             this.keyValueStore = keyValueStore;
             this.jobsParser = jobsParser;
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.currentDateTimeProvider = currentDateTimeProvider;
+            this.logger = logger;
+            this.Nlogger = Nlogger;
             OpenFileCommand = new DelegateCommand(OnOpenFile);
 
             environmentsManager.PropertyChanged += OnEnvironmentsManagerPropertyChanged;
+            
+            logger.LogInformation("Admin Module selected.");           
         }
 
         private void OnEnvironmentsManagerPropertyChanged(object? sender,
@@ -46,7 +55,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         public DelegateCommand OpenFileCommand { get; }
 
         private void OnOpenFile()
-        {
+        {        
             var openFileDialog = new OpenFileDialog
             {
                 ShowReadOnly = true,
@@ -64,6 +73,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
 
                 LoadBatchJobsFile(fileName);
             }
+            logger.LogInformation("Config file loaded.");
         }
 
         public void LoadBatchJobsFile(string? fileName)
@@ -76,7 +86,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         {
             return job switch
             {
-                NewBatchJob newBatch => new NewBatchJobViewModel(newBatch, fileSystem,
+                NewBatchJob newBatch => new NewBatchJobViewModel(newBatch, fileSystem,Nlogger,
                     () => fileShareApiAdminClientFactory.Build(),
                     currentDateTimeProvider),
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl),
