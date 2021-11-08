@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using FakeItEasy;
 using FileShareService.DesktopClientTests;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using NUnit.Framework;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -14,6 +15,7 @@ namespace FileShareService.DesktopClient.CoreTests
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private INavigation fakeNavigation = null!;
         private IJwtTokenParser fakeJwtTokenParser = null!;
+        private ILogger<AuthProvider> fakeAuthlogger = null!;
 
         [SetUp]
         public void Setup()
@@ -21,7 +23,8 @@ namespace FileShareService.DesktopClient.CoreTests
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeNavigation = A.Fake<INavigation>();
             fakeJwtTokenParser = A.Fake<IJwtTokenParser>();
-            authProvider = new AuthProviderForTesting(fakeEnvironmentsManager, fakeNavigation, fakeJwtTokenParser);
+            fakeAuthlogger = A.Fake<ILogger<AuthProvider>>();
+            authProvider = new AuthProviderForTesting(fakeEnvironmentsManager, fakeNavigation, fakeJwtTokenParser, fakeAuthlogger);
         }
 
         [Test]
@@ -83,8 +86,8 @@ namespace FileShareService.DesktopClient.CoreTests
     internal class AuthProviderForTesting : AuthProvider
     {
         public AuthProviderForTesting(IEnvironmentsManager environmentsManager, INavigation navigation,
-            IJwtTokenParser jwtTokenParser) : base(
-            environmentsManager, navigation, jwtTokenParser)
+            IJwtTokenParser jwtTokenParser, ILogger<AuthProvider> logger) : base(
+            environmentsManager, navigation, jwtTokenParser,logger)
         {
         }
 
