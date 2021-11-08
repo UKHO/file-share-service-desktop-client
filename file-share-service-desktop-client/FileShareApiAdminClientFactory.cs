@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -18,7 +20,8 @@ namespace UKHO.FileShareService.DesktopClient
         private readonly IEnvironmentsManager environmentsManager;
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IVersionProvider versionProvider;
-        
+        private readonly ILogger<IFileShareApiAdminClientFactory> logger;
+
 
         public FileShareApiAdminClientFactory(IEnvironmentsManager environmentsManager, IAuthTokenProvider authTokenProvider,
             IVersionProvider versionProvider)
@@ -48,16 +51,29 @@ namespace UKHO.FileShareService.DesktopClient
 
         public HttpClient CreateClient(string name)
         {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FileShareServiceDesktopClient",
-                versionProvider.Version));
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(FileShareApiAdminClient),
-                typeof(FileShareApiAdminClient)
+            const string FSSClient = "FSSClient";
+            IServiceCollection services = new ServiceCollection();
+
+            services.AddHttpClient(FSSClient)
+                  //.AddPolicyHandler((services, request) => GetRetryPolicy(services.GetService<ILogger<IFileShareApiAdminClient>>(), "FileShareApiAdminClient", 2, 3));
+                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareApiAdminClient>>(), "FileShareApiAdminClient", 5, 2));
+            //.AddHttpMessageHandler(() => new ServiceUnavailableDelegatingHandler());
+
+            HttpClient configuredClient =
+                services
+                    .BuildServiceProvider()
+                    .GetRequiredService<IHttpClientFactory>()
+                    .CreateClient(FSSClient);
+
+            configuredClient.DefaultRequestHeaders.UserAgent.Add(
+            new ProductInfoHeaderValue("FileShareServiceDesktopClient", versionProvider.Version));
+            configuredClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(FileShareApiAdminClient), typeof(FileShareApiAdminClient)
                     .Assembly
                     .GetCustomAttributes<AssemblyFileVersionAttribute>()
                     .Single()
                     .Version));
-            return client;
+
+            return configuredClient;
         }
     }
 }
