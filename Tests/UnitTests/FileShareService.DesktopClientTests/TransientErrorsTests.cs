@@ -26,7 +26,7 @@ namespace FileShareService.DesktopClientTests
             retryCount = 1;
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share", retryCount, sleepDuration))
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration))
                 .AddHttpMessageHandler(() => new TooManyRequestsDelegatingHandler());
 
             HttpClient configuredClient =
@@ -42,18 +42,56 @@ namespace FileShareService.DesktopClientTests
             Assert.False(_isRetryCalled);
             Assert.AreEqual(HttpStatusCode.TooManyRequests, result.StatusCode);
         }
-    }
 
-    public class TooManyRequestsDelegatingHandler : DelegatingHandler
-    {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+
+        [Test]
+        public async Task WhenServiceUnavailable_GetRetryPolicy()
         {
-            var httpResponse = new HttpResponseMessage();
-            httpResponse.Headers.Add("retry-after", "3600");
-            httpResponse.RequestMessage = new HttpRequestMessage();
-            httpResponse.RequestMessage.Headers.Add("x-correlation-id", "");
-            httpResponse.StatusCode = HttpStatusCode.TooManyRequests;
-            return Task.FromResult(httpResponse);
+            // Arrange 
+            IServiceCollection services = new ServiceCollection();
+            _isRetryCalled = false;
+
+            services.AddHttpClient(TestClient)
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration))
+                .AddHttpMessageHandler(() => new ServiceUnavailableDelegatingHandler());
+
+            HttpClient configuredClient =
+                services
+                    .BuildServiceProvider()
+                    .GetRequiredService<IHttpClientFactory>()
+                    .CreateClient(TestClient);
+
+            // Act
+            var result = await configuredClient.GetAsync("https://test.com");
+
+            // Assert
+            Assert.False(_isRetryCalled);
+            Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
+
+        }
+
+        public class TooManyRequestsDelegatingHandler : DelegatingHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                var httpResponse = new HttpResponseMessage();
+                httpResponse.Headers.Add("retry-after", "3600");
+                httpResponse.RequestMessage = new HttpRequestMessage();
+                httpResponse.RequestMessage.Headers.Add("x-correlation-id", "");
+                httpResponse.StatusCode = HttpStatusCode.TooManyRequests;
+                return Task.FromResult(httpResponse);
+            }
+        }
+
+        public class ServiceUnavailableDelegatingHandler : DelegatingHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                var httpResponse = new HttpResponseMessage();
+                httpResponse.RequestMessage = new HttpRequestMessage();
+                httpResponse.StatusCode = HttpStatusCode.ServiceUnavailable;
+                return Task.FromResult(httpResponse);
+            }
         }
     }
 }

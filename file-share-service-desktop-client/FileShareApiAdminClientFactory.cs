@@ -24,16 +24,17 @@ namespace UKHO.FileShareService.DesktopClient
 
 
         public FileShareApiAdminClientFactory(IEnvironmentsManager environmentsManager, IAuthTokenProvider authTokenProvider,
-            IVersionProvider versionProvider)
+            IVersionProvider versionProvider, ILogger<IFileShareApiAdminClientFactory> logger)
         {
             this.environmentsManager = environmentsManager;
             this.authTokenProvider = authTokenProvider;
             this.versionProvider = versionProvider;
+            this.logger = logger;
         }
 
         public IFileShareApiAdminClient Build()
         {
-            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider),
+            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider, logger),
                 environmentsManager.CurrentEnvironment.BaseUrl,
                 authTokenProvider);
         }
@@ -43,10 +44,12 @@ namespace UKHO.FileShareService.DesktopClient
     public class UserAgentClientFactory : IHttpClientFactory
     {
         private readonly IVersionProvider versionProvider;
+        private readonly ILogger<IFileShareApiAdminClientFactory> logger;
 
-        public UserAgentClientFactory(IVersionProvider versionProvider)
+        public UserAgentClientFactory(IVersionProvider versionProvider, ILogger<IFileShareApiAdminClientFactory> logger)
         {
             this.versionProvider = versionProvider;
+            this.logger = logger;
         }
 
         public HttpClient CreateClient(string name)
@@ -55,8 +58,8 @@ namespace UKHO.FileShareService.DesktopClient
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(FSSClient)
-                  //.AddPolicyHandler((services, request) => GetRetryPolicy(services.GetService<ILogger<IFileShareApiAdminClient>>(), "FileShareApiAdminClient", 2, 3));
-                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareApiAdminClient>>(), "FileShareApiAdminClient", 5, 2));
+                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", 4, 2));
+                  //.AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", 4, 3));
             //.AddHttpMessageHandler(() => new ServiceUnavailableDelegatingHandler());
 
             HttpClient configuredClient =
