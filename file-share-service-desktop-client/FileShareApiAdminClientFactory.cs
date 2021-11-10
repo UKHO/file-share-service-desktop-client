@@ -7,6 +7,7 @@ using System.Reflection;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
+using System;
 
 namespace UKHO.FileShareService.DesktopClient
 {
@@ -54,13 +55,14 @@ namespace UKHO.FileShareService.DesktopClient
 
         public HttpClient CreateClient(string name)
         {
+            int retryCount = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["RetryCount"]);
+            int sleepDurationMultiplier = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SleepDurationMultiplier"]);
+
             const string FSSClient = "FSSClient";
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(FSSClient)
-                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", 4, 2));
-                  //.AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", 4, 3));
-            //.AddHttpMessageHandler(() => new ServiceUnavailableDelegatingHandler());
+                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", retryCount, sleepDurationMultiplier));
 
             HttpClient configuredClient =
                 services

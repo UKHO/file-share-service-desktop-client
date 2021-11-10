@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace UKHO.FileShareService.DesktopClient
@@ -18,6 +16,8 @@ namespace UKHO.FileShareService.DesktopClient
             return Policy
                 .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable)
                 .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
+                .OrResult(r => r.StatusCode == HttpStatusCode.InternalServerError)
+                .OrResult(r => r.StatusCode == HttpStatusCode.RequestTimeout)
                 .OrResult(r => r.StatusCode == HttpStatusCode.BadRequest)
                 .WaitAndRetryAsync(retryCount, (retryAttempt) =>
                 {
@@ -33,12 +33,8 @@ namespace UKHO.FileShareService.DesktopClient
                         retryAfter = int.Parse(retryAfterHeader.Value.First());
                         await Task.Delay(TimeSpan.FromMilliseconds(2000));
                     }
-                    //logger
-                    //.LogInformation("Re-trying {requestType} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:none as previous request was responded with {StatusCode}.",
-                    //requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, response.Result.StatusCode);
-
-                    //Debug.WriteLine("Re-trying {requestType} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:none as previous request was responded with {StatusCode}.",
-                    //requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, response.Result.StatusCode);
+                    logger.LogInformation("Re-trying {requestType} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:none as previous request was responded with {StatusCode}.",
+                    requestType, response.Result.RequestMessage.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, response.Result.StatusCode);
                 });
         }
     }

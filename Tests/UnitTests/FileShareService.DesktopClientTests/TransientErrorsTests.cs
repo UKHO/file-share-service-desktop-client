@@ -6,16 +6,23 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareService.DesktopClient;
+using FakeItEasy;
 
 namespace FileShareService.DesktopClientTests
 {
     public class TransientErrorsTests
     {
-        private ILogger<IFileShareApiAdminClientFactory> fakeLogger;
+        private ILogger<IFileShareApiAdminClientFactory> fakeLogger = null!;
         public int retryCount = 3;
         private const double sleepDuration = 2;
         const string TestClient = "TestClient";
         private bool _isRetryCalled;
+
+        [SetUp]
+        public void Setup()
+        {
+            fakeLogger = A.Fake<ILogger<IFileShareApiAdminClientFactory>>();
+        }
 
         [Test]
         public async Task WhenTooManyRequests_GetRetryPolicy()
