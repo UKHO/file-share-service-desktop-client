@@ -15,195 +15,164 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
     public class JobsParser : IJobsParser
     {
-        private readonly List<string> ValidJobActions = 
+        private static readonly List<string> ValidJobActions =
             new List<string>() { "newBatch", "appendAcl", "setExpiryDate" };
-        
+
+        private List<string> jobIdCollection;
 
         public Jobs.Jobs Parse(string jobs)
         {
             if (string.IsNullOrEmpty(jobs))
                 return new Jobs.Jobs();
 
+            var jsonSerializerSettings = new JsonSerializerSettings();
+            jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
+                .RegisterSubtype<NewBatchJob>("newBatch")
+                .RegisterSubtype<AppendAclJob>("appendAcl")
+                .RegisterSubtype<SetExpiryDateJob>("setExpiryDate")
+                .SerializeDiscriminatorProperty(true)
+                .Build()
+            );
             try
             {
-                Validate(jobs);
+                JToken jobsToken = JToken.Parse(jobs);
 
-                if(JobValidationErrors.ValidationErrors.ContainsKey(JobValidationErrors.CONFLICT_ERROR_CODE))
+                var batchJobs = jobsToken.SelectToken("jobs");
+
+                if (batchJobs == null || batchJobs.Type != JTokenType.Array || !batchJobs.HasValues)
                 {
-                    string errorMessage = string.Join(Environment.NewLine, JobValidationErrors.ValidationErrors[JobValidationErrors.CONFLICT_ERROR_CODE]);
-                    throw new JsonException(errorMessage);
+                    throw new JsonReaderException("Configuration file formatted incorrectly. Unable to find a job to process.");
                 }
 
-                var jsonSerializerSettings = new JsonSerializerSettings
-                {
-                    Error = (se, ev) =>
-                    {
-                        ev.ErrorContext.Handled = true;
-                    }
-                };
+                List<IJob> jobCollection = new List<IJob>();
 
-                jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
-                    .RegisterSubtype<NewBatchJob>("newBatch")
-                    .RegisterSubtype<AppendAclJob>("appendAcl")
-                    .RegisterSubtype<SetExpiryDateJob>("setExpiryDate")
-                    .SerializeDiscriminatorProperty(true)
-                    .Build()
-                );
-            
-                return JsonConvert.DeserializeObject<Jobs.Jobs>(jobs, jsonSerializerSettings);
+                jobIdCollection = new List<string>();
+
+                ErrorDeserializingJobsJob? errorJob = null;
+
+                // Deserialize each job and validate
+                foreach (JToken batchJob in batchJobs)
+                {
+                    string jobAction = string.Empty;
+
+                    List<string> errors = ValidateJobActionAndDisplayName(batchJob, out jobAction);
+
+                    if(errors.Any())
+                    {
+                        if(errorJob == null)
+                        {
+                            errorJob = new ErrorDeserializingJobsJob();
+                        }
+                        errorJob.ErrorMessages.AddRange(errors);
+
+                        continue;
+                    }
+
+                    IJob? job = null;
+                    string jsonString = Convert.ToString(batchJob);
+
+                    switch (jobAction)
+                    {
+                        case NewBatchJob.JobAction:
+                            job = JsonConvert.DeserializeObject<NewBatchJob>(jsonString, jsonSerializerSettings);
+                            break;
+
+                        case AppendAclJob.JobAction:
+                            job = JsonConvert.DeserializeObject<AppendAclJob>(jsonString, jsonSerializerSettings);
+                            break;
+
+                        case SetExpiryDateJob.JobAction:
+                            job = JsonConvert.DeserializeObject<SetExpiryDateJob>(jsonString, jsonSerializerSettings);
+                            break;
+                    }
+
+                    if (job != null)
+                    {
+                        job.Validate(batchJob);
+                        jobCollection.Add(job);
+                    }
+                }
+
+                //Add error job at begining of the collection, if exists.
+                if (errorJob != null)
+                {
+                    jobCollection.Insert(0, errorJob);
+                }
+
+                return  new Jobs.Jobs() { jobs = jobCollection};
             }
             catch (Exception e)
             {
-                JobValidationErrors.AddValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE, new List<string>() { e.Message });
-                return new Jobs.Jobs() {jobs = new[] {new ErrorDeserializingJobsJob(e)}};
+                return new Jobs.Jobs() { jobs = new[] { new ErrorDeserializingJobsJob(e) { ErrorMessages = new List<string>() { e.Message } } } };
             }
         }
 
-        private void Validate(string jobs)
+        private List<string> ValidateJobActionAndDisplayName(JToken job, out string jobAction)
         {
-            List<string> errorMessages;
-            List<string> jobIdCollection = new List<string>();
+            jobAction = string.Empty;
 
-            JobValidationErrors.ValidationErrors.Clear();
+            List<string> errors = new List<string>();
 
-            JToken jobsToken = JToken.Parse(jobs);
+            //Retrieve job action
+            JToken? jobActionToken = job.SelectToken("action");
 
-            var batchJobs = jobsToken.SelectToken("jobs");
-
-            if(batchJobs == null || batchJobs.Type != JTokenType.Array || !batchJobs.HasValues)
+            if (jobActionToken == null ||
+                string.IsNullOrWhiteSpace(Convert.ToString(jobActionToken)))
             {
-               JobValidationErrors.AddValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE, 
-                   new List<string>() { "Configuration file formatted incorrectly. Unable to find a job to process." });
-                return;
+                errors.Add(AddLineInfo(job, "Job action is not specified or is invalid."));
+                return errors;
             }
 
-            foreach (JToken job in batchJobs)
+            jobAction = $"{Convert.ToString(jobActionToken)}";
+
+            //Check whether job action specified in config is valid or not
+            if (!ValidJobActions.Contains(jobAction))
             {
-                errorMessages = new List<string>();
-
-                //Retrieve job action
-                JToken? jobActionToken = job.SelectToken("action");
-
-                if (jobActionToken == null ||
-                    string.IsNullOrWhiteSpace(Convert.ToString(jobActionToken)))
-                {
-                    AddValidationMessage(job, "Job action is not specified or is invalid.");
-                    continue;
-                }
-
-                string jobAction = $"{Convert.ToString(jobActionToken)}";
-
-                //Check whether job action specified in config is valid or not
-                if (!ValidJobActions.Contains(jobAction))
-                {
-                    AddValidationMessage(job, $"Specified job action '{jobAction}' is invalid.");
-                    continue;
-                }
-
-                string displayName = string.Empty;
-                //Retrieve display name
-                JToken? displayNameTokne = job.SelectToken("displayName");
-                if (displayNameTokne == null || string.IsNullOrWhiteSpace(Convert.ToString(displayNameTokne)))
-                {
-                    AddValidationMessage(job, "Job display name is not specified or is invalid.", JobValidationErrors.CONFLICT_ERROR_CODE);
-                    continue;
-                }
-
-                displayName = displayNameTokne.ToString();
-
-                string jobId = $"{jobAction}-{displayName.Replace(" ",string.Empty).ToLower()}";
-
-                //Check whether the job id already exists
-                if(jobIdCollection.Any(s => s.Equals(jobId)))
-                {
-                    AddValidationMessage(job, $"Duplicate job '{jobAction} - {displayName}' found in config file.", JobValidationErrors.CONFLICT_ERROR_CODE);
-                    continue;
-                }
-
-                //Add job-id in the collection
-                jobIdCollection.Add(jobId);
-                    
-                //Check whether job actionParams is exist or not
-                if (job.SelectToken("actionParams") == null)
-                {
-                    errorMessages.Add($"ActionParams attribute is invalid  or not specified for job '{jobAction} - {displayName}'.");
-                    JobValidationErrors.AddValidationErrors(jobId, errorMessages);
-                    continue;
-                }
-
-                switch (jobAction) 
-                {
-                    case "newBatch":
-                        //Check for batch attributes
-                        JToken? batchAttributeToken = job.SelectToken("actionParams.attributes");
-
-                        if (batchAttributeToken?.Type != JTokenType.Array)
-                        {
-                            errorMessages.Add("Invalid batch attribute.");
-                        }
-                        else if (batchAttributeToken.HasValues)
-                        {
-                            //Check for batch attribute key and value
-                            foreach (var batchAttribute in batchAttributeToken)
-                            {
-                                if (batchAttribute.SelectToken("key")?.Type != JTokenType.String)
-                                {
-                                    errorMessages.Add($"Batch attribute key is missing or is invalid for the batch.");
-                                }
-
-                                if (batchAttribute.SelectToken("value")?.Type != JTokenType.String)
-                                {
-                                    errorMessages.Add($"Batch attribute value is missing or is invalid for the batch.");
-                                }
-                            }
-                        }
-
-                        //Check for read users
-                        if (job.SelectToken("actionParams.acl.readUsers")?.Type != JTokenType.Array)
-                        {
-                            errorMessages.Add($"Invalid user groups.");
-                        }
-
-                        //Check for read groups
-                        if (job.SelectToken("actionParams.acl.readGroups")?.Type != JTokenType.Array)
-                        {
-                            errorMessages.Add($"Invalid read groups.");
-                        }
-
-                        //Check for files
-                        if (job.SelectToken("actionParams.files")?.Type != JTokenType.Array)
-                        {
-                            errorMessages.Add($"Invalid file object.");
-                        }
-
-                        break;
-
-                    case "appendAcl":
-
-                        if (job.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
-                        {
-                            errorMessages.Add($"Invalid user groups.");
-                        }
-
-                        if (job.SelectToken("actionParams.readGroups")?.Type != JTokenType.Array)
-                        {
-                            errorMessages.Add($"Invalid read groups.");
-                        }
-                        break;
-                }
-                JobValidationErrors.AddValidationErrors(jobId, errorMessages);
+                errors.Add(AddLineInfo(job, $"Specified job action '{jobAction}' is invalid."));
+                return errors;
             }
+
+            string displayName = string.Empty;
+            //Retrieve display name
+            JToken? displayNameTokne = job.SelectToken("displayName");
+            if (displayNameTokne == null || string.IsNullOrWhiteSpace(Convert.ToString(displayNameTokne)))
+            {
+                errors.Add(AddLineInfo(job, "Job display name is not specified or is invalid."));
+                return errors;
+            }
+
+            displayName = displayNameTokne.ToString();
+
+            string jobId = $"{jobAction}-{displayName.Replace(" ", string.Empty).ToLower()}";
+
+            //Check whether the job id already exists
+            if (jobIdCollection.Any(s => s.Equals(jobId)))
+            {
+                errors.Add(AddLineInfo(job, $"Duplicate job '{jobAction} - {displayName}' found in config file."));
+                return errors;
+            }
+            //Add job-id in the collection
+            jobIdCollection.Add(jobId);
+
+            //Check whether job actionParams is exist or not
+            if (job.SelectToken("actionParams") == null)
+            {
+                errors.Add(AddLineInfo(job, $"ActionParams attribute is invalid  or not specified for job '{jobAction} - {displayName}'."));
+            }
+
+            return errors;
         }
 
-        private void AddValidationMessage(JToken job, string errorMessage, string jobId= JobValidationErrors.UNKNOWN_JOB_ERROR_CODE)
+        private string AddLineInfo(JToken job, string errorMessage)
         {
             var lineInfo = job as IJsonLineInfo;
 
-            if(lineInfo.HasLineInfo())
+            if (lineInfo.HasLineInfo())
             {
                 errorMessage = $"{errorMessage} Line: {lineInfo.LineNumber}, Position: {lineInfo.LinePosition}.";
             }
-            JobValidationErrors.AddValidationErrors(jobId, new List<string>() { errorMessage });
+
+            return errorMessage;
         }
     }
 }

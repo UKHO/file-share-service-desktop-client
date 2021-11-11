@@ -1,7 +1,5 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -17,13 +15,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         
         public string BatchId => job.ActionParams.BatchId;
         public string ExpiryDate => job.ActionParams.ExpiryDate;
-        public string JobId
-        {
-            get
-            {
-                return $"setExpiryDate-{DisplayName.Replace(" ", string.Empty)}";
-            }
-        }
         protected internal override Task OnExecuteCommand()
         {
             throw new System.NotImplementedException();
@@ -32,36 +23,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             ValidationErrors.Clear();
 
-            if (JobValidationErrors.ValidationErrors.ContainsKey(JobId))
-            {
-                ValidationErrors.AddRange(
-                    JobValidationErrors.ValidationErrors[JobId]);
-            }
+            ValidationErrors = job.ErrorMessages;
 
-            ValidateViewModel();
-
-            return ValidationErrors.Count == 0;
-        }
-
-        private void ValidateViewModel()
-        {
-            if(string.IsNullOrWhiteSpace(BatchId))
-            {
-                ValidationErrors.Add("Invalid batch id attribute or value.");
-            }
-
-            if(string.IsNullOrWhiteSpace(ExpiryDate))
-            {
-                ValidationErrors.Add("Expiry date is not specified.");
-            }
-            else
-            {
-                if(!DateTime.TryParse(ExpiryDate, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal,
-                    out var result))
-                {
-                    ValidationErrors.Add("Invalid expiry date.");
-                }
-            }
+            return ValidationErrors.Any();
         }
     }
 }

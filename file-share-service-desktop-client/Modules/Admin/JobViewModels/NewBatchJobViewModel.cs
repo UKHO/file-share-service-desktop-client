@@ -58,14 +58,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        public string JobId
-        {
-            get
-            {
-                return $"newBatch-{DisplayName.Replace(" ", string.Empty).ToLower()}";
-            }
-        }
-
         public IEnumerable<KeyValuePair<string, string>> Attributes =>
             job.ActionParams.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, ExpandMacros(kv.Value)));
 
@@ -142,7 +134,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
-            PopulateValidationErrors(JobId);
+            ValidationErrors.Clear();
+            //Validate files
+            ValidateFiles();
+
+            ValidationErrors = job.ErrorMessages;
+
             return !ValidationErrors.Any();
         }
 
@@ -288,58 +285,47 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             };
         }
 
-        protected override void ValidateViewModel()
+        private void ValidateFiles()
         {
-            if(string.IsNullOrWhiteSpace(BusinessUnit))
-            {
-                ValidationErrors.Add("Business Unit is missing or is not specified.");
-            }
 
-            if(ExpiryDate.HasValue && ExpiryDate.Value <= DateTime.UtcNow)
+            if (Files.Any())
             {
-                ValidationErrors.Add("Batch expiry date is in the past.");
-            }
-
-            if(Files.Count == 0)
-            {
-                ValidationErrors.Add("File is not specified for upload.");
-            }
-
-            foreach (var file in Files)
-            {
-                string directory = Path.GetDirectoryName(file.RawSearchPath);
-
-                if(string.IsNullOrWhiteSpace(directory))
+                foreach (var file in Files)
                 {
-                    ValidationErrors.Add($"Invalid directory specified - {file.RawSearchPath}");
-                    continue;
-                }
+                    string directory = Path.GetDirectoryName(file.RawSearchPath);
 
-                if(!IsDirectoryExist(directory))
-                {
-                    string directoryNotFoundMessage = $"Directory '{directory}' does not exist or you do not have permission to access the directory selected.";
-                    string accessibleDirectory = GetAccessibleDirectoryName(Convert.ToString(fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent));
-
-                    if(!string.IsNullOrWhiteSpace(accessibleDirectory))
+                    if (string.IsNullOrWhiteSpace(directory))
                     {
-                        directoryNotFoundMessage = $"{directoryNotFoundMessage}\n\tThe level you can access is: '{accessibleDirectory}'";
+                        job.ErrorMessages.Add($"Invalid directory specified - {file.RawSearchPath}");
+                        continue;
                     }
-                    
 
-                    ValidationErrors.Add(directoryNotFoundMessage);
-                    continue;
-                }
-
-                if(!file.CorrectNumberOfFilesFound)
-                {
-                    string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
-
-                    if (file.Files?.Count() > 0)
+                    if (!IsDirectoryExist(directory))
                     {
-                        string existingFileNames = string.Join(", ", file.Files.Select(f => f.Name).ToArray());
-                        fileCountMismatchErrorMessage += $"\n\tThe existing files are: {existingFileNames}";
+                        string directoryNotFoundMessage = $"Directory '{directory}' does not exist or you do not have permission to access the directory selected.";
+                        string accessibleDirectory = GetAccessibleDirectoryName(Convert.ToString(fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent));
+
+                        if (!string.IsNullOrWhiteSpace(accessibleDirectory))
+                        {
+                            directoryNotFoundMessage = $"{directoryNotFoundMessage}\n\tThe level you can access is: '{accessibleDirectory}'";
+                        }
+
+
+                        job.ErrorMessages.Add(directoryNotFoundMessage);
+                        continue;
                     }
-                    ValidationErrors.Add($"{fileCountMismatchErrorMessage}");
+
+                    if (!file.CorrectNumberOfFilesFound)
+                    {
+                        string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
+
+                        if (file.Files?.Count() > 0)
+                        {
+                            string existingFileNames = string.Join(", ", file.Files.Select(f => f.Name).ToArray());
+                            fileCountMismatchErrorMessage += $"\n\tThe existing files are: {existingFileNames}";
+                        }
+                        job.ErrorMessages.Add($"{fileCountMismatchErrorMessage}");
+                    }
                 }
             }
         }

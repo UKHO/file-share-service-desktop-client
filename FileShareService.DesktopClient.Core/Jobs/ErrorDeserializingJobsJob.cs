@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -10,6 +11,11 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
         public List<string> ErrorMessages { get; set; } = new List<string>();
 
+        public ErrorDeserializingJobsJob()
+        {
+
+        }
+
         public ErrorDeserializingJobsJob(Exception exception)
         {
             Exception = exception;
@@ -20,6 +26,11 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             get => Exception.Message;
             [ExcludeFromCodeCoverage]
             set { }
+        }
+
+        public List<string> Validate(JToken jsonToken)
+        {
+            return new List<string>();
         }
     }
 }

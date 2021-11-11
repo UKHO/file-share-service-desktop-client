@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Mvvm;
-using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -23,9 +22,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         protected internal abstract Task OnExecuteCommand();
 
         protected abstract bool CanExecute();
-
-        protected virtual void ValidateViewModel()
-        { }
 
         public bool IsExecuting
         {
@@ -52,17 +48,5 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return ValidationErrors.Any();
             }
         }
-
-        protected virtual void PopulateValidationErrors(string jobId)
-        {
-            ValidationErrors.Clear();
-
-            if (JobValidationErrors.ValidationErrors.ContainsKey(jobId))
-            {
-                ValidationErrors.AddRange(
-                    JobValidationErrors.ValidationErrors[jobId]);
-            }
-            ValidateViewModel();
-        }        
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -12,7 +11,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public ErrorDeserializingJobsJobViewModel(ErrorDeserializingJobsJob job) : base(job)
         {
             this.job = job;
-            PopulateValidationErrors(JobValidationErrors.UNKNOWN_JOB_ERROR_CODE);
+            _ = CanExecute();
         }
 
         protected internal override Task OnExecuteCommand()
@@ -22,6 +21,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         protected override bool CanExecute()
         {
+            ValidationErrors.Clear();
+            ValidationErrors = job.ErrorMessages;
             return false;
         }
     }
