@@ -17,7 +17,8 @@ namespace FileShareService.DesktopClient.CoreTests
         public void TestEmptyJobs(string json)
         {
             var jobsParser = new JobsParser();
-            CollectionAssert.IsEmpty(jobsParser.Parse(json).jobs);
+            var result = jobsParser.Parse(json).jobs;
+            Assert.IsInstanceOf<JsonReaderException>(result.Cast<ErrorDeserializingJobsJob>().Single().Exception);
         }
 
         [Test]
@@ -94,9 +95,8 @@ namespace FileShareService.DesktopClient.CoreTests
             using var sr = new StreamReader(s);
             var result = new JobsParser().Parse(sr.ReadToEnd());
 
-            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
-            StringAssert.StartsWith("Duplicate job 'appendAcl - Sample 2' found in config file", result.jobs.Single().DisplayName);
-            Assert.IsInstanceOf<JsonException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.First());
+            StringAssert.StartsWith("Duplicate job 'appendAcl - Sample 2' found in config file", result.jobs.First().ErrorMessages.Single());
         }
     }
 }

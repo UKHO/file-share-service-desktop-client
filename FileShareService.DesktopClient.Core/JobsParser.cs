@@ -22,19 +22,22 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
         public Jobs.Jobs Parse(string jobs)
         {
-            if (string.IsNullOrEmpty(jobs))
-                return new Jobs.Jobs();
-
-            var jsonSerializerSettings = new JsonSerializerSettings();
-            jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
-                .RegisterSubtype<NewBatchJob>(NewBatchJob.JOB_ACTION)
-                .RegisterSubtype<AppendAclJob>(AppendAclJob.JOB_ACTION)
-                .RegisterSubtype<SetExpiryDateJob>(SetExpiryDateJob.JOB_ACTION)
-                .SerializeDiscriminatorProperty(true)
-                .Build()
-            );
             try
             {
+                if (string.IsNullOrEmpty(jobs))
+                {
+                    throw new JsonReaderException("Configuration file formatted incorrectly. Unable to find a job to process.");
+                }
+
+                var jsonSerializerSettings = new JsonSerializerSettings();
+                jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
+                    .RegisterSubtype<NewBatchJob>(NewBatchJob.JOB_ACTION)
+                    .RegisterSubtype<AppendAclJob>(AppendAclJob.JOB_ACTION)
+                    .RegisterSubtype<SetExpiryDateJob>(SetExpiryDateJob.JOB_ACTION)
+                    .SerializeDiscriminatorProperty(true)
+                    .Build()
+                );
+            
                 JToken jobsToken = JToken.Parse(jobs);
 
                 var batchJobs = jobsToken.SelectToken("jobs");
@@ -107,7 +110,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
             //Retrieve job action
             JToken? jobActionToken = job.SelectToken("action");
 
-            jobAction = Convert.ToString(jobActionToken);
+            jobAction = jobActionToken?.Type == JTokenType.String ? 
+                Convert.ToString(jobActionToken) : string.Empty;
 
             if (string.IsNullOrWhiteSpace(jobAction))
             {
@@ -123,7 +127,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
             
             //Retrieve display name
             JToken? displayNameTokne = job.SelectToken("displayName");
-            string displayName = Convert.ToString(displayNameTokne);
+            string displayName = jobActionToken?.Type == JTokenType.String ? 
+                Convert.ToString(displayNameTokne) : string.Empty; 
 
             if (string.IsNullOrWhiteSpace(displayName))
             {
@@ -141,8 +146,10 @@ namespace UKHO.FileShareService.DesktopClient.Core
             //Add job-id in the collection
             jobIdCollection.Add(jobId);
 
+            JToken? actionParamsToken = job.SelectToken("actionParams");
+
             //Check whether job actionParams is exist or not
-            if (job.SelectToken("actionParams") == null)
+            if (actionParamsToken == null || actionParamsToken?.Type != JTokenType.Object)
             {
                 errors.Add(AddLineInfo(job, $"ActionParams attribute is invalid  or not specified for job '{jobAction} - {displayName}'."));
             }
