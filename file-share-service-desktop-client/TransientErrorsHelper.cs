@@ -18,7 +18,6 @@ namespace UKHO.FileShareService.DesktopClient
                 .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
                 .OrResult(r => r.StatusCode == HttpStatusCode.InternalServerError)
                 .OrResult(r => r.StatusCode == HttpStatusCode.RequestTimeout)
-                .OrResult(r => r.StatusCode == HttpStatusCode.BadRequest)
                 .WaitAndRetryAsync(retryCount, (retryAttempt) =>
                 {
                     return TimeSpan.FromSeconds(Math.Pow(sleepDuration, (retryAttempt - 1)));
