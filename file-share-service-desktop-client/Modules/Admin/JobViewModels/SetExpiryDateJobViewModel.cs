@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -18,14 +17,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         protected internal override Task OnExecuteCommand()
         {
             throw new System.NotImplementedException();
-        }
-        protected override bool CanExecute()
-        {
-            ValidationErrors.Clear();
-
-            ValidationErrors = job.ErrorMessages;
-
-            return ValidationErrors.Any();
         }
     }
 }

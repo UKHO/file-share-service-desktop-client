@@ -18,12 +18,5 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             throw new NotImplementedException();
         }
-
-        protected override bool CanExecute()
-        {
-            ValidationErrors.Clear();
-            ValidationErrors = job.ErrorMessages;
-            return false;
-        }
     }
 }

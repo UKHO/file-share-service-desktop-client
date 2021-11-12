@@ -388,7 +388,7 @@
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
 
-                                        <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="Error deserializing jobs from file:" />
+                                        <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="{Binding Path=DisplayName}" />
 
                                         <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Path= ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 

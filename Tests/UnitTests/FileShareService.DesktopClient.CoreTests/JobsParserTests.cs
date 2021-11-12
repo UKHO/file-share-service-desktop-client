@@ -73,7 +73,8 @@ namespace FileShareService.DesktopClient.CoreTests
         {
             var result = new JobsParser().Parse("BadJson");
             Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
-            StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().DisplayName);
+            StringAssert.StartsWith("Error deserializing jobs from file", result.jobs.Single().DisplayName);
+            StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().ErrorMessages.Single());
             Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
         }
 
