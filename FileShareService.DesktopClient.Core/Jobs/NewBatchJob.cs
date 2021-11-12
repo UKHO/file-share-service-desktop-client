@@ -5,15 +5,13 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
     public class NewBatchJob : IJob
     {
-        public const string JobAction = "newBatch";
+        public const string JOB_ACTION = "newBatch";
         public string DisplayName { get; set; }
         public NewBatchJobParams ActionParams { get; set; } = new NewBatchJobParams();
-        public List<string> ErrorMessages { get ; set ; }
+        public List<string> ErrorMessages { get; private set; } = new List<string>();
 
-        public List<string> Validate(JToken jsonToken)
+        public void Validate(JToken jsonToken)
         {
-            ErrorMessages = new List<string>();
-
             #region Predeserialize validations
 
             //Check for batch attributes
@@ -73,7 +71,6 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
             #endregion
 
-            return ErrorMessages;
         }
     }
 

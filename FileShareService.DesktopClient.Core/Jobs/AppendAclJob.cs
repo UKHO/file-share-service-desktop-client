@@ -7,17 +7,15 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
     public class AppendAclJob : BindableBase, IJob
     {
-        public const string JobAction = "appendAcl";
+        public const string JOB_ACTION = "appendAcl";
         public string DisplayName { get; set; }
 
-        public AppendAclJobParams ActionParams { get; set; }
+        public AppendAclJobParams ActionParams { get; set; } = new AppendAclJobParams();
 
-        public List<string> ErrorMessages { get ; set ; }
+        public List<string> ErrorMessages { get; private set; } = new List<string>();
 
-        public List<string> Validate(JToken jsonToken)
+        public void Validate(JToken jsonToken)
         {
-            ErrorMessages = new List<string>();
-
             #region Predeserialize validations
 
             if (jsonToken.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
@@ -45,8 +43,6 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             }
 
             #endregion
-
-            return ErrorMessages;
         }
     }
 

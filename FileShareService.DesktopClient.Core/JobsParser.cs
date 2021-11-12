@@ -16,9 +16,9 @@ namespace UKHO.FileShareService.DesktopClient.Core
     public class JobsParser : IJobsParser
     {
         private static readonly List<string> ValidJobActions =
-            new List<string>() { "newBatch", "appendAcl", "setExpiryDate" };
+            new List<string>() { NewBatchJob.JOB_ACTION, AppendAclJob.JOB_ACTION, SetExpiryDateJob.JOB_ACTION };
 
-        private List<string> jobIdCollection;
+        private List<string> jobIdCollection = new List<string>();
 
         public Jobs.Jobs Parse(string jobs)
         {
@@ -27,9 +27,9 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
             var jsonSerializerSettings = new JsonSerializerSettings();
             jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
-                .RegisterSubtype<NewBatchJob>("newBatch")
-                .RegisterSubtype<AppendAclJob>("appendAcl")
-                .RegisterSubtype<SetExpiryDateJob>("setExpiryDate")
+                .RegisterSubtype<NewBatchJob>(NewBatchJob.JOB_ACTION)
+                .RegisterSubtype<AppendAclJob>(AppendAclJob.JOB_ACTION)
+                .RegisterSubtype<SetExpiryDateJob>(SetExpiryDateJob.JOB_ACTION)
                 .SerializeDiscriminatorProperty(true)
                 .Build()
             );
@@ -45,8 +45,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 }
 
                 List<IJob> jobCollection = new List<IJob>();
-
-                jobIdCollection = new List<string>();
 
                 ErrorDeserializingJobsJob? errorJob = null;
 
@@ -68,23 +66,16 @@ namespace UKHO.FileShareService.DesktopClient.Core
                         continue;
                     }
 
-                    IJob? job = null;
                     string jsonString = Convert.ToString(batchJob);
 
-                    switch (jobAction)
+                    IJob? job = jobAction switch
                     {
-                        case NewBatchJob.JobAction:
-                            job = JsonConvert.DeserializeObject<NewBatchJob>(jsonString, jsonSerializerSettings);
-                            break;
+                        NewBatchJob.JOB_ACTION => JsonConvert.DeserializeObject<NewBatchJob>(jsonString, jsonSerializerSettings),
+                        AppendAclJob.JOB_ACTION => JsonConvert.DeserializeObject<AppendAclJob>(jsonString, jsonSerializerSettings),
+                        SetExpiryDateJob.JOB_ACTION => JsonConvert.DeserializeObject<SetExpiryDateJob>(jsonString, jsonSerializerSettings),
+                        _ => null
+                    };
 
-                        case AppendAclJob.JobAction:
-                            job = JsonConvert.DeserializeObject<AppendAclJob>(jsonString, jsonSerializerSettings);
-                            break;
-
-                        case SetExpiryDateJob.JobAction:
-                            job = JsonConvert.DeserializeObject<SetExpiryDateJob>(jsonString, jsonSerializerSettings);
-                            break;
-                    }
 
                     if (job != null)
                     {
@@ -99,6 +90,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     jobCollection.Insert(0, errorJob);
                 }
 
+                jobIdCollection.Clear();
+
                 return  new Jobs.Jobs() { jobs = jobCollection};
             }
             catch (Exception e)
@@ -109,39 +102,34 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
         private List<string> ValidateJobActionAndDisplayName(JToken job, out string jobAction)
         {
-            jobAction = string.Empty;
-
             List<string> errors = new List<string>();
 
             //Retrieve job action
             JToken? jobActionToken = job.SelectToken("action");
 
-            if (jobActionToken == null ||
-                string.IsNullOrWhiteSpace(Convert.ToString(jobActionToken)))
+            jobAction = Convert.ToString(jobActionToken);
+
+            if (string.IsNullOrWhiteSpace(jobAction))
             {
                 errors.Add(AddLineInfo(job, "Job action is not specified or is invalid."));
                 return errors;
             }
 
-            jobAction = $"{Convert.ToString(jobActionToken)}";
-
             //Check whether job action specified in config is valid or not
             if (!ValidJobActions.Contains(jobAction))
             {
                 errors.Add(AddLineInfo(job, $"Specified job action '{jobAction}' is invalid."));
-                return errors;
             }
-
-            string displayName = string.Empty;
+            
             //Retrieve display name
             JToken? displayNameTokne = job.SelectToken("displayName");
-            if (displayNameTokne == null || string.IsNullOrWhiteSpace(Convert.ToString(displayNameTokne)))
+            string displayName = Convert.ToString(displayNameTokne);
+
+            if (string.IsNullOrWhiteSpace(displayName))
             {
                 errors.Add(AddLineInfo(job, "Job display name is not specified or is invalid."));
                 return errors;
             }
-
-            displayName = displayNameTokne.ToString();
 
             string jobId = $"{jobAction}-{displayName.Replace(" ", string.Empty).ToLower()}";
 
@@ -149,7 +137,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
             if (jobIdCollection.Any(s => s.Equals(jobId)))
             {
                 errors.Add(AddLineInfo(job, $"Duplicate job '{jobAction} - {displayName}' found in config file."));
-                return errors;
             }
             //Add job-id in the collection
             jobIdCollection.Add(jobId);

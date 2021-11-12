@@ -7,8 +7,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     {
         string DisplayName { get; set; }
         
-        List<string> ErrorMessages { get; set; }
+        List<string> ErrorMessages { get; }
 
-        List<string> Validate(JToken jsonToken);
+        void Validate(JToken jsonToken);
     }
 }

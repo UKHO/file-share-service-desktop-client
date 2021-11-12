@@ -28,9 +28,10 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             set { }
         }
 
-        public List<string> Validate(JToken jsonToken)
+        [ExcludeFromCodeCoverage]
+        public void Validate(JToken jsonToken)
         {
-            return new List<string>();
+            // Method intentionally left empty. 
         }
     }
 }

@@ -1,20 +1,20 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
     public class SetExpiryDateJob : IJob
     {
-        public const string JobAction = "setExpiryDate";
+        public const string JOB_ACTION = "setExpiryDate";
         public string DisplayName { get; set; }
 
         public SetExpiryDateJobParams ActionParams { get; set; } = new SetExpiryDateJobParams();
-        public List<string> ErrorMessages { get ; set ; }
+        public List<string> ErrorMessages { get; private set; } = new List<string>();
 
-        public List<string> Validate(JToken jsonToken)
+        public void Validate(JToken jsonToken)
         {
-            throw new NotImplementedException();
+            //This validation will be implemented when PBI SetExpiryDateJob is picked-up.
         }
     }
 
