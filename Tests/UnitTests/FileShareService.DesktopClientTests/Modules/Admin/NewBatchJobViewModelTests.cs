@@ -537,27 +537,15 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var file1FullFileName = @"c:/data/files/f1.txt";
             fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
 
-            var vm = new NewBatchJobViewModel(new NewBatchJob
-            {
-                DisplayName = "Create new Batch",
-                ActionParams = new NewBatchJobParams
-                {
-                    BusinessUnit = " ",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
-                    Files =
-                        {
-                            new NewBatchFiles
-                            {
-                                ExpectedFileCount = 1,
-                                MimeType = "text/plain",
-                                SearchPath = file1FullFileName
-                            }
-                        }
-                }
-            },
+            var newBatchJob = A.Fake<NewBatchJob>();
+            newBatchJob.ErrorMessages.Add("Test validation error message.");
+            newBatchJob.DisplayName = "Create new Batch";
+
+            var vm = new NewBatchJobViewModel(newBatchJob,
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider);
+
 
             Assert.AreEqual("Create new Batch", vm.DisplayName);
 
@@ -588,9 +576,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             await executeTask;
             Assert.IsFalse(vm.IsExecuting);
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
-
-            Assert.AreEqual(1, vm.ValidationErrors.Count);
-            Assert.AreEqual("Business Unit is missing or is not specified.", vm.ValidationErrors[0]);
+            StringAssert.StartsWith("Test validation error", vm.ValidationErrors[0]);
         }        
     }
 }
