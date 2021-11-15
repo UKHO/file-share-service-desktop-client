@@ -59,8 +59,7 @@ namespace FileShareService.DesktopClientTests
             _isRetryCalled = false;
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration))
-                .AddHttpMessageHandler(() => new ServiceUnavailableDelegatingHandler());
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration));
 
             HttpClient configuredClient =
                 services
@@ -69,12 +68,10 @@ namespace FileShareService.DesktopClientTests
                     .CreateClient(TestClient);
 
             // Act
-            var result = await configuredClient.GetAsync("https://test.com");
+            var result = await configuredClient.GetAsync("https://filesqa1.admiralty.co.uk/");
 
             // Assert
-            //Assert.False(_isRetryCalled);
             Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
-
         }
 
         public class TooManyRequestsDelegatingHandler : DelegatingHandler
@@ -86,17 +83,6 @@ namespace FileShareService.DesktopClientTests
                 httpResponse.RequestMessage = new HttpRequestMessage();
                 httpResponse.RequestMessage.Headers.Add("x-correlation-id", "");
                 httpResponse.StatusCode = HttpStatusCode.TooManyRequests;
-                return Task.FromResult(httpResponse);
-            }
-        }
-
-        public class ServiceUnavailableDelegatingHandler : DelegatingHandler
-        {
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            {
-                var httpResponse = new HttpResponseMessage();
-                httpResponse.RequestMessage = new HttpRequestMessage();
-                httpResponse.StatusCode = HttpStatusCode.ServiceUnavailable;
                 return Task.FromResult(httpResponse);
             }
         }
