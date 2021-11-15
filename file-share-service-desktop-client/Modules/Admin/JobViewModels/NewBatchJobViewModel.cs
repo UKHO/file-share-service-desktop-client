@@ -42,8 +42,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             this.fileShareClientFactory = fileShareClientFactory;
             this.logger = logger;
             this.currentDateTimeProvider = currentDateTimeProvider;
-            Files = job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, ExpandMacros))
-                .ToList();
+            Files = job.ActionParams.Files != null ? 
+                job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, ExpandMacros)).ToList() 
+                    : new List<NewBatchFilesViewModel>();
         }
 
         public string BusinessUnit => job.ActionParams.BusinessUnit;
@@ -342,7 +343,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {
-                        job.ErrorMessages.Add($"Invalid directory specified - {file.RawSearchPath}");
+                        job.ErrorMessages.Add($"Invalid directory specified - '{file.RawSearchPath}'");
+                        continue;
+                    }
+
+                    if(file.ExpectedFileCount <= 0)
+                    {
+                        job.ErrorMessages.Add($"File expected count is missing or invalid in file path '{file.RawSearchPath}'");
                         continue;
                     }
 

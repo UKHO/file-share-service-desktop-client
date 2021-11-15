@@ -51,7 +51,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             }
 
             //Check for files
-            if (jsonToken.SelectToken("actionParams.files")?.Type != JTokenType.Array)
+            if (jsonToken.SelectToken("actionParams.files") != null && 
+                jsonToken.SelectToken("actionParams.files").Type != JTokenType.Array)
             {
                 ErrorMessages.Add($"Invalid file object.");
             }
@@ -64,7 +65,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                 ErrorMessages.Add("Business Unit is missing or is not specified.");
             }
 
-            if (ActionParams.Files.Count == 0)
+            if (ActionParams.Files?.Count == 0)
             {
                 ErrorMessages.Add("File is not specified for upload.");
             }
