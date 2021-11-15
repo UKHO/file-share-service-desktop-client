@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,8 +10,9 @@ namespace UKHO.FileShareService.DesktopClient
 {
     public static class TransientErrorsHelper
     {
-        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ILogger logger, string requestType, int retryCount, double sleepDuration)
+        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ILogger logger, string requestType, int retryCount, double sleepDuration, out bool isRetryCalled)
         {
+            isRetryCalled = true;
             return Policy
                 .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.ServiceUnavailable)
                 .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)

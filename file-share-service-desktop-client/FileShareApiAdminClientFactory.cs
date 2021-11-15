@@ -59,10 +59,11 @@ namespace UKHO.FileShareService.DesktopClient
             int sleepDurationMultiplier = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SleepDurationMultiplier"]);
 
             const string FSSClient = "FSSClient";
+            bool isRetryCalled = false;
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(FSSClient)
-                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", retryCount, sleepDurationMultiplier));
+                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", retryCount, sleepDurationMultiplier, out isRetryCalled));
 
             HttpClient configuredClient =
                 services

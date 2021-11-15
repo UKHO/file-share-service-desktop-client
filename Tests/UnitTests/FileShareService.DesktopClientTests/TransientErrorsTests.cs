@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareService.DesktopClient;
 using FakeItEasy;
@@ -16,6 +15,7 @@ namespace FileShareService.DesktopClientTests
         public int retryCount = 3;
         private const double sleepDuration = 2;
         const string TestClient = "TestClient";
+        private bool _isRetryCalled = false;
 
         [SetUp]
         public void Setup()
@@ -30,7 +30,7 @@ namespace FileShareService.DesktopClientTests
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration));
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
 
             HttpClient configuredClient =
                 services
@@ -40,8 +40,8 @@ namespace FileShareService.DesktopClientTests
 
             // Act
             var result = await configuredClient.GetAsync("https://filesqa1.admiralty.co.uk/");
-
             // Assert
+            Assert.True(_isRetryCalled);
             Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
         }
 
@@ -52,7 +52,7 @@ namespace FileShareService.DesktopClientTests
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration));
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
 
             HttpClient configuredClient =
                 services
@@ -64,6 +64,7 @@ namespace FileShareService.DesktopClientTests
             var result = await configuredClient.GetAsync("https://mock.codes/429");
 
             // Assert
+            Assert.True(_isRetryCalled);
             Assert.AreEqual(HttpStatusCode.TooManyRequests, result.StatusCode);
         }
         [Test]
@@ -73,7 +74,7 @@ namespace FileShareService.DesktopClientTests
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration));
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
 
             HttpClient configuredClient =
                 services
@@ -85,8 +86,10 @@ namespace FileShareService.DesktopClientTests
             var result = await configuredClient.GetAsync("https://mock.codes/500");
 
             // Assert
+            Assert.True(_isRetryCalled);
             Assert.AreEqual(HttpStatusCode.InternalServerError, result.StatusCode);
         }
+
         [Test]
         public async Task WhenRequestTimeout_GetRetryPolicy()
         {
@@ -94,7 +97,7 @@ namespace FileShareService.DesktopClientTests
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration));
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
 
             HttpClient configuredClient =
                 services
@@ -106,8 +109,8 @@ namespace FileShareService.DesktopClientTests
             var result = await configuredClient.GetAsync("https://mock.codes/408");
 
             // Assert
+            Assert.True(_isRetryCalled);
             Assert.AreEqual(HttpStatusCode.RequestTimeout, result.StatusCode);
         }
-
     }
 }
