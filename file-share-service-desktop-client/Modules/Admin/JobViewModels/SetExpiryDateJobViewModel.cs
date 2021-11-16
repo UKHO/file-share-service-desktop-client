@@ -18,9 +18,5 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             throw new System.NotImplementedException();
         }
-        protected override bool CanExecute()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

@@ -17,7 +17,8 @@ namespace FileShareService.DesktopClient.CoreTests
         public void TestEmptyJobs(string json)
         {
             var jobsParser = new JobsParser();
-            CollectionAssert.IsEmpty(jobsParser.Parse(json).jobs);
+            var result = jobsParser.Parse(json).jobs;
+            Assert.IsInstanceOf<JsonReaderException>(result.Cast<ErrorDeserializingJobsJob>().Single().Exception);
         }
 
         [Test]
@@ -72,8 +73,31 @@ namespace FileShareService.DesktopClient.CoreTests
         {
             var result = new JobsParser().Parse("BadJson");
             Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
-            StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().DisplayName);
+            StringAssert.StartsWith("Error deserializing jobs from file", result.jobs.Single().DisplayName);
+            StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().ErrorMessages.Single());
             Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+        }
+
+        [Test]
+        public void TestErrorDeserializingJobsWhenParseInvalidFormatFile()
+        {
+            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithInvalidFormat.json")!;
+            using var sr = new StreamReader(s);
+            var result = new JobsParser().Parse(sr.ReadToEnd());
+
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
+            Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+        }
+
+        [Test]
+        public void TestErrorDeserializingJobsWhenParseInvalidActions()
+        {
+            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithDuplicateJobs.json")!;
+            using var sr = new StreamReader(s);
+            var result = new JobsParser().Parse(sr.ReadToEnd());
+
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.First());
+            StringAssert.StartsWith("Duplicate job 'appendAcl - Sample 2' found in config file", result.jobs.First().ErrorMessages.Single());
         }
     }
 }

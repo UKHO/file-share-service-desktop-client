@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
@@ -19,7 +21,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public DelegateCommand ExcecuteJobCommand { get; }
         protected internal abstract Task OnExecuteCommand();
 
-        protected abstract bool CanExecute();
+        protected virtual bool CanExecute()
+        {
+            ValidationErrors.Clear();
+
+            ValidationErrors = job.ErrorMessages;
+
+            return !ValidationErrors.Any();
+        }
 
         public bool IsExecuting
         {
@@ -36,5 +45,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         }
 
         public string DisplayName => job.DisplayName;
+
+        public List<string> ValidationErrors { get; set; } = new List<string>();
+
+        public bool IsVisibleValidationErrorsArea
+        {
+            get
+            {
+                return ValidationErrors.Any();
+            }
+        }
     }
 }
