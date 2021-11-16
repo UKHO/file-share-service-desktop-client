@@ -11,18 +11,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public ErrorDeserializingJobsJobViewModel(ErrorDeserializingJobsJob job) : base(job)
         {
             this.job = job;
+            _ = CanExecute();
         }
 
         protected internal override Task OnExecuteCommand()
         {
             throw new NotImplementedException();
         }
-
-        protected override bool CanExecute()
-        {
-            return false;
-        }
-
-        public string ErrorDetails => job.Exception.ToString();
     }
 }
