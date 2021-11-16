@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
@@ -7,6 +9,12 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public string DisplayName { get; set; }
 
         public SetExpiryDateJobParams ActionParams { get; set; } = new SetExpiryDateJobParams();
+        public List<string> ErrorMessages { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public List<string> Validate(JToken jsonToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class SetExpiryDateJobParams

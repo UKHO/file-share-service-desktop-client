@@ -22,6 +22,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
         private readonly ILogger<AdminViewModel> logger;
         private readonly ILogger<NewBatchJobViewModel> Nlogger;
+        private readonly ILogger<ReplaceAclJobViewModel> Rlogger;
 
         public AdminViewModel(IFileSystem fileSystem,
             IKeyValueStore keyValueStore,
@@ -30,7 +31,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             ICurrentDateTimeProvider currentDateTimeProvider,
             IEnvironmentsManager environmentsManager,
             ILogger<AdminViewModel> logger,
-            ILogger<NewBatchJobViewModel> Nlogger)
+            ILogger<NewBatchJobViewModel> Nlogger,
+            ILogger<ReplaceAclJobViewModel> Rlogger)
         {
             this.fileSystem = fileSystem;
             this.keyValueStore = keyValueStore;
@@ -39,6 +41,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.logger = logger;
             this.Nlogger = Nlogger;
+            this.Rlogger = Rlogger;
             OpenFileCommand = new DelegateCommand(OnOpenFile);
 
             environmentsManager.PropertyChanged += OnEnvironmentsManagerPropertyChanged;
@@ -91,6 +94,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                     currentDateTimeProvider),
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl),
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate),
+                ReplaceAclJob replaceAcl => new ReplaceAclJobViewModel(replaceAcl, () => fileShareApiAdminClientFactory.Build(), Rlogger),
                 ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
                     errorDeserializingJobs),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())

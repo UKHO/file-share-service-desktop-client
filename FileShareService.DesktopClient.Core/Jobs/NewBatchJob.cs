@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
@@ -7,6 +8,12 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public string DisplayName { get; set; }
 
         public NewBatchJobParams ActionParams { get; set; } = new NewBatchJobParams();
+        public List<string> ErrorMessages { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+        public List<string> Validate(JToken jsonToken)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     public class NewBatchJobParams

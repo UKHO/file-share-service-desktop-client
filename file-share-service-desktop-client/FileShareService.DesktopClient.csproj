@@ -28,8 +28,8 @@
     <PackageReference Include="Serilog.Settings.AppSettings" Version="2.2.2" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
-    <PackageReference Include="UKHO.FileShareAdminClient" Version="0.1.11006.4" />
-    <PackageReference Include="UKHO.FileShareClient" Version="0.1.11006.4" />
+    <PackageReference Include="UKHO.FileShareAdminClient" Version="0.1.11116.8" />
+    <PackageReference Include="UKHO.FileShareClient" Version="0.1.11116.8" />
     <PackageReference Include="UKHO.WeekNumberUtils" Version="1.5.21167.4" />
     <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
   </ItemGroup>
