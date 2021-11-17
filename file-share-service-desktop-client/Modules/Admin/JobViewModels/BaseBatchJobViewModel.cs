@@ -21,7 +21,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public DelegateCommand ExcecuteJobCommand { get; }
         protected internal abstract Task OnExecuteCommand();
 
-        protected abstract bool CanExecute();
+        protected virtual bool CanExecute()
+        {
+            ValidationErrors.Clear();
+
+            ValidationErrors = job.ErrorMessages;
+
+            return !ValidationErrors.Any();
+        }
 
         public bool IsExecuting
         {

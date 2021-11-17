@@ -155,7 +155,7 @@
                                         <ItemsControl Grid.Row="6" Grid.Column="1" ItemsSource="{Binding ReadUsers}" />
 
                                         <Label Grid.Row="7" Content="Read Groups:" Margin="15 0" />
-                                        <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />
+                                        <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />     
 
                                         <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
@@ -169,8 +169,8 @@
 
                                             <ItemsControl ItemsSource="{Binding ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>                                                                               
+                                            
                                         </StackPanel>
 
                                         <views:Spinner
@@ -313,7 +313,7 @@
                                             <ItemsControl ItemsSource="{Binding ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 
                                                           Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                        </StackPanel>
+                                        </StackPanel>                                        
                                     </Grid>
                                 </Border>
 
@@ -351,7 +351,7 @@
 
                                         <Label Grid.Row="2" Grid.Column="0" Content="Expiry Date:" />
                                         <Label Grid.Row="2" Grid.Column="1" Content="{Binding ExpiryDate}" />
-
+                                    
                                         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
                                             Content="Execute Job"

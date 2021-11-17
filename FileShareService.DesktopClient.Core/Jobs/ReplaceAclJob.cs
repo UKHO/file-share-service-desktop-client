@@ -9,14 +9,13 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
     public class ReplaceAclJob : BindableBase, IJob
     {
-        public const string JobAction = "replaceAcl";
+        public const string JOB_ACTION = "replaceAcl";
         public string DisplayName { get; set; }
         public ReplaceAclJobParams ActionParams { get; set; }
-        public List<string> ErrorMessages { get; set; }
-        public List<string> Validate(JToken jsonToken)
-        {
-            ErrorMessages = new List<string>();
+        public List<string> ErrorMessages { get; private set; } = new List<string>();
 
+        public void Validate(JToken jsonToken)
+        {
             #region Predeserialize validations
 
             if (jsonToken.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
@@ -44,8 +43,6 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             }
 
             #endregion
-
-            return ErrorMessages;
         }
     }
     public class ReplaceAclJobParams : Acl

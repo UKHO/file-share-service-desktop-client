@@ -429,9 +429,6 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
         }
 
-
-
-
         [Test]
         public async Task TestSimpleExceuteNewBatchJob()
         {
@@ -533,5 +530,53 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             result = await vm.CheckBatchIsCommitted(fakeFileShareApiAdminClient, batchHandle, 0.1);
             Assert.IsFalse(result);
         }
+
+        [Test]
+        public async Task TestExceuteNewBatchJobHasValidationErrors()
+        {
+            var file1FullFileName = @"c:/data/files/f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var newBatchJob = A.Fake<NewBatchJob>();
+            newBatchJob.ErrorMessages.Add("Test validation error message.");
+            newBatchJob.DisplayName = "Create new Batch";
+
+            var vm = new NewBatchJobViewModel(newBatchJob,
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider);
+
+
+            Assert.AreEqual("Create new Batch", vm.DisplayName);
+
+            var batchHandle = A.Fake<IBatchHandle>();
+
+            var createBatchTcs = new TaskCompletionSource<IBatchHandle>();
+            var addFileToBatchTcs = new TaskCompletionSource();
+            var commitBatchTcs = new TaskCompletionSource();
+
+
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored))
+                .Returns(createBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored))
+                .Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
+
+            var executeTask = vm.OnExecuteCommand();
+            vm.ExcecuteJobCommand.Execute();
+            Assert.IsTrue(vm.IsExecuting);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+
+            createBatchTcs.SetResult(batchHandle);
+            addFileToBatchTcs.SetResult();
+            commitBatchTcs.SetResult();
+
+            await executeTask;
+            Assert.IsFalse(vm.IsExecuting);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+            StringAssert.StartsWith("Test validation error", vm.ValidationErrors[0]);
+        }        
     }
 }

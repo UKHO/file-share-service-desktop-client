@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 {
@@ -41,14 +42,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
                 var response = await fileShareClient.ReplaceAclAsync(BatchId, buildBatchModel.Acl);
-                if (response == "")
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
                     ExecutionResult = $"File Share Service replace acl completed for batch ID: {BatchId}";
                     logger.LogInformation("Execute job completed for displayName:{displayName} and batch ID:{BatchId}.", DisplayName, BatchId);
                 }
                 else
                 {
-                    ExecutionResult = response;
+                    var content = await response.Content.ReadAsStringAsync();
+                    var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
+                    ExecutionResult = errorMessage.Errors.Select(e => e.Description).FirstOrDefault();
+                    logger.LogInformation("Execute job in-complete for displayName:{displayName} and batch ID:{BatchId}.", DisplayName, BatchId);
+                    logger.LogError(ExecutionResult);
                 }
             }
 

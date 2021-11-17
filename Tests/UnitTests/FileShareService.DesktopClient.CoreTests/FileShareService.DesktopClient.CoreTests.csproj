@@ -9,10 +9,14 @@
 
   <ItemGroup>
     <None Remove="sampleActions.json" />
+    <None Remove="sampleActionsWithDuplicateJobs.json" />
+    <None Remove="sampleActionsWithInvalidFormat.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="sampleActions.json" />
+    <EmbeddedResource Include="sampleActionsWithInvalidFormat.json" />
+    <EmbeddedResource Include="sampleActionsWithDuplicateJobs.json" />
   </ItemGroup>
 
   <ItemGroup>
