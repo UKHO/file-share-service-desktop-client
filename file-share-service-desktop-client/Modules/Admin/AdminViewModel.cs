@@ -22,6 +22,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
         private readonly ILogger<AdminViewModel> logger;
         private readonly ILogger<NewBatchJobViewModel> Nlogger;
+        private readonly ILogger<SetExpiryDateJobViewModel> setExpirylogger;
 
         public AdminViewModel(IFileSystem fileSystem,
             IKeyValueStore keyValueStore,
@@ -30,7 +31,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             ICurrentDateTimeProvider currentDateTimeProvider,
             IEnvironmentsManager environmentsManager,
             ILogger<AdminViewModel> logger,
-            ILogger<NewBatchJobViewModel> Nlogger)
+            ILogger<NewBatchJobViewModel> Nlogger,
+            ILogger<SetExpiryDateJobViewModel> setExpirylogger)
         {
             this.fileSystem = fileSystem;
             this.keyValueStore = keyValueStore;
@@ -39,6 +41,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.logger = logger;
             this.Nlogger = Nlogger;
+            this.setExpirylogger = setExpirylogger;
             OpenFileCommand = new DelegateCommand(OnOpenFile);
 
             environmentsManager.PropertyChanged += OnEnvironmentsManagerPropertyChanged;
@@ -90,7 +93,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                     () => fileShareApiAdminClientFactory.Build(),
                     currentDateTimeProvider),
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl),
-                SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate),
+                SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, setExpirylogger, 
+                                () => fileShareApiAdminClientFactory.Build()),
                 ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
                     errorDeserializingJobs),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())

@@ -371,10 +371,53 @@
 
 
                                         </StackPanel>
+                                        <views:Spinner
+                                            Grid.Row="0" 
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="2"
+                                            Grid.RowSpan="9"
+                                            Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+
+                                            ></views:Spinner>
+                                        <Border Grid.Row="1" Grid.RowSpan="8" 
+                                                Grid.Column="0" Grid.ColumnSpan="2"
+                                                Background="Gray"
+                                                Opacity="0.9"
+                                                Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                Padding="24"
+                                                >
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition  Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBox Text="{Binding ExecutionResult}" 
+                                                               FontSize="22"
+                                                               Grid.ColumnSpan="3"
+                                                               IsReadOnly="true"
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"/>
+                                                <Button Command="{Binding CloseExecutionCommand}" 
+                                                            Grid.Row="1"
+                                                            Grid.Column="1"
+                                                            Content="Close"/>
+                                            </Grid>
+
+                                        </Border>                                      
+                                        
                                     </Grid>
                                 </Border>
+                                
                             </DataTemplate>
                         </local:JobViewModelsTemplateSelector.SetExpiryDateTemplate>
+                        
                         <local:JobViewModelsTemplateSelector.ErrorTemplate>
                             <DataTemplate DataType="jobViewModels:ErrorDeserializingJobsJobViewModel">
                                 <Border BorderThickness="2 " BorderBrush="Red">

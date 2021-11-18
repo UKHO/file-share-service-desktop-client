@@ -25,10 +25,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly NewBatchJob job;
         private readonly IFileSystem fileSystem;
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
-        private readonly ICurrentDateTimeProvider currentDateTimeProvider;
-        private bool isExecutingComplete;
-        private string executionResult = string.Empty;
-        private bool isCommitting;
+        private readonly ICurrentDateTimeProvider currentDateTimeProvider;        
         private readonly ILogger<NewBatchJobViewModel> logger;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
@@ -179,44 +176,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public List<string> ReadUsers => job.ActionParams.Acl.ReadUsers;
         public List<string> ReadGroups => job.ActionParams.Acl.ReadGroups;
 
-        public bool IsExecutingComplete
-        {
-            get => isExecutingComplete;
-            set
-            {
-                if (isExecutingComplete != value)
-                {
-                    isExecutingComplete = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public bool IsCommitting
-        {
-            get => isCommitting;
-            set
-            {
-                if (isCommitting != value)
-                {
-                    isCommitting = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string ExecutionResult
-        {
-            get => executionResult;
-            set
-            {
-                if (executionResult != value)
-                {
-                    executionResult = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
+        
 
         public DelegateCommand CloseExecutionCommand { get; }
 

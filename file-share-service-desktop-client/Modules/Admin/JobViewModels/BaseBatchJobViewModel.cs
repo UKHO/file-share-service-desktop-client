@@ -11,6 +11,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
     {
         private readonly IJob job;
         private bool isExecuting;
+        private string executionResult = string.Empty;
+        private bool isExecutingComplete;
+        private bool isCommitting;
 
         protected BaseBatchJobViewModel(IJob job)
         {
@@ -40,6 +43,45 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     isExecuting = value;
                     RaisePropertyChanged();
                     ExcecuteJobCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+        public bool IsExecutingComplete
+        {
+            get => isExecutingComplete;
+            set
+            {
+                if (isExecutingComplete != value)
+                {
+                    isExecutingComplete = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public bool IsCommitting
+        {
+            get => isCommitting;
+            set
+            {
+                if (isCommitting != value)
+                {
+                    isCommitting = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string ExecutionResult
+        {
+            get => executionResult;
+            set
+            {
+                if (executionResult != value)
+                {
+                    executionResult = value;
+                    RaisePropertyChanged();
                 }
             }
         }

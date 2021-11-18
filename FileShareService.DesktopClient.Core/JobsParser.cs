@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using JsonSubTypes;
 using Newtonsoft.Json;
@@ -29,7 +30,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     throw new JsonReaderException("Configuration file formatted incorrectly. Unable to find a job to process.");
                 }
 
-                var jsonSerializerSettings = new JsonSerializerSettings();
+                var jsonSerializerSettings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.None};
                 jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
                     .RegisterSubtype<NewBatchJob>(NewBatchJob.JOB_ACTION)
                     .RegisterSubtype<AppendAclJob>(AppendAclJob.JOB_ACTION)
@@ -37,8 +38,15 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     .SerializeDiscriminatorProperty(true)
                     .Build()
                 );
-            
-                JToken jobsToken = JToken.Parse(jobs);
+
+                JToken? jobsToken = null;
+
+                using (var stringReader = new StringReader(jobs))
+                using (var jsonTextReader = new JsonTextReader(stringReader) 
+                { DateParseHandling = DateParseHandling.None})
+                {
+                    jobsToken = JToken.ReadFrom(jsonTextReader);
+                }
 
                 var batchJobs = jobsToken.SelectToken("jobs");
 
