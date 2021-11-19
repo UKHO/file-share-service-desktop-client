@@ -48,7 +48,10 @@ namespace UKHO.FileShareService.DesktopClient
                         .CreateLogger();
                 loggingBuilder.AddSerilog(logger, dispose: true);
             });
-                       
+
+            var retryCount = configuration.GetValue<int>("RetryCount");
+            var sleepDurationMultiplier = configuration.GetValue<int>("SleepDurationMultiplier");
+
             var container = new UnityContainer();
             container.BuildServiceProvider(serviceCollection);
             container.RegisterInstance<IConfiguration>(configuration);
