@@ -21,13 +21,22 @@
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.4.5" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
     <PackageReference Include="Prism.Unity" Version="8.0.0.1909" />
     <PackageReference Include="Prism.Wpf" Version="8.0.0.1909" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
-    <PackageReference Include="Serilog.Settings.AppSettings" Version="2.2.2" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+    <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
+    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
     <PackageReference Include="UKHO.FileShareAdminClient" Version="0.1.11006.4" />
     <PackageReference Include="UKHO.FileShareClient" Version="0.1.11006.4" />
     <PackageReference Include="UKHO.WeekNumberUtils" Version="1.5.21167.4" />
@@ -48,6 +57,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="environments.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
