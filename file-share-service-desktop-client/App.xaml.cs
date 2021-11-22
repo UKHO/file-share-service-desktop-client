@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -49,7 +50,22 @@ namespace UKHO.FileShareService.DesktopClient
                         .ReadFrom.AppSettings()
                         .CreateLogger();
                 loggingBuilder.AddSerilog(logger, dispose: true);
-            });
+            });            
+
+            int retryCount = Convert.ToInt32(ConfigurationManager.AppSettings["RetryCount"]);
+            int sleepDurationMultiplier = Convert.ToInt32(ConfigurationManager.AppSettings["SleepDurationMultiplier"]);
+            const string FSSClient = "FSSClient";
+
+            serviceCollection.AddHttpClient(FSSClient)
+                .AddPolicyHandler((services, request) =>
+                {
+                    var logger = services.GetService<ILogger<IFileShareApiAdminClientFactory>>();
+                    if (logger == null)
+                    {
+                        throw new ArgumentNullException();
+                    }
+                    return TransientErrorsHelper.GetRetryPolicy(logger, "FileShareApiAdminClient", retryCount, sleepDurationMultiplier);
+                });
 
             var container = new UnityContainer();
             container.BuildServiceProvider(serviceCollection);

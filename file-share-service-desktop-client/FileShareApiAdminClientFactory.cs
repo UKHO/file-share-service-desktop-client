@@ -21,21 +21,21 @@ namespace UKHO.FileShareService.DesktopClient
         private readonly IEnvironmentsManager environmentsManager;
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IVersionProvider versionProvider;
-        private readonly ILogger<IFileShareApiAdminClientFactory> logger;
-
+        private readonly IServiceProvider sp;
 
         public FileShareApiAdminClientFactory(IEnvironmentsManager environmentsManager, IAuthTokenProvider authTokenProvider,
-            IVersionProvider versionProvider, ILogger<IFileShareApiAdminClientFactory> logger)
+        IVersionProvider versionProvider, IServiceProvider sp)
+
         {
             this.environmentsManager = environmentsManager;
             this.authTokenProvider = authTokenProvider;
             this.versionProvider = versionProvider;
-            this.logger = logger;
+            this.sp = sp;
         }
 
         public IFileShareApiAdminClient Build()
         {
-            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider, logger),
+            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider, sp),
                 environmentsManager.CurrentEnvironment.BaseUrl,
                 authTokenProvider);
         }
@@ -45,31 +45,18 @@ namespace UKHO.FileShareService.DesktopClient
     public class UserAgentClientFactory : IHttpClientFactory
     {
         private readonly IVersionProvider versionProvider;
-        private readonly ILogger<IFileShareApiAdminClientFactory> logger;
+        private readonly IServiceProvider sp;
 
-        public UserAgentClientFactory(IVersionProvider versionProvider, ILogger<IFileShareApiAdminClientFactory> logger)
+        public UserAgentClientFactory(IVersionProvider versionProvider, IServiceProvider sp)
         {
             this.versionProvider = versionProvider;
-            this.logger = logger;
+            this.sp = sp;
         }
 
         public HttpClient CreateClient(string name)
         {
-            int retryCount = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["RetryCount"]);
-            int sleepDurationMultiplier = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SleepDurationMultiplier"]);
-
-            const string FSSClient = "FSSClient";
-            bool isRetryCalled = false;
-            IServiceCollection services = new ServiceCollection();
-
-            services.AddHttpClient(FSSClient)
-                  .AddPolicyHandler((services, request) => TransientErrorsHelper.GetRetryPolicy(this.logger, "FileShareApiAdminClient", retryCount, sleepDurationMultiplier, out isRetryCalled));
-
-            HttpClient configuredClient =
-                services
-                    .BuildServiceProvider()
-                    .GetRequiredService<IHttpClientFactory>()
-                    .CreateClient(FSSClient);
+            var configuredClient = sp.GetRequiredService<IHttpClientFactory>()
+                    .CreateClient("FSSClient");
 
             configuredClient.DefaultRequestHeaders.UserAgent.Add(
             new ProductInfoHeaderValue("FileShareServiceDesktopClient", versionProvider.Version));
