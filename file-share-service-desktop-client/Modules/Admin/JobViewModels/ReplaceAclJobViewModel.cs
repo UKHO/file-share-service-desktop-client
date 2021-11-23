@@ -20,6 +20,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly ILogger<ReplaceAclJobViewModel> logger;
         private bool isExecutingComplete;
         private string executionResult = string.Empty;
+        private string responseMessage = string.Empty;
 
         public ReplaceAclJobViewModel(ReplaceAclJob job, Func<IFileShareApiAdminClient> fileShareClientFactory, ILogger<ReplaceAclJobViewModel> logger) : base(job)
         {
@@ -37,31 +38,32 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         protected internal override async Task OnExecuteCommand()
         {
             IsExecuting = true;
+        
             try
             {
+                logger.LogInformation("Execute job started for displayName :{displayName} .", DisplayName);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
                 var response = await fileShareClient.ReplaceAclAsync(BatchId, buildBatchModel.Acl);
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    ExecutionResult = $"File Share Service replace acl completed for batch ID: {BatchId}";
-                    logger.LogInformation("Execute job completed for displayName:{displayName} and batch ID:{BatchId}.", DisplayName, BatchId);
-                }
-                else
+                if(response.StatusCode != HttpStatusCode.NoContent)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
-                    ExecutionResult = errorMessage.Errors.Select(e => e.Description).FirstOrDefault();
-                    logger.LogInformation("Execute job in-complete for displayName:{displayName} and batch ID:{BatchId}.", DisplayName, BatchId);
-                    logger.LogError(ExecutionResult);
-                }
-            }
 
+                    var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
+                    responseMessage = string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description)) ;
+                    logger.LogInformation("File Share Service replace acl in-complete for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", DisplayName, BatchId, responseMessage);
+                }
+                ExecutionResult = response.StatusCode != HttpStatusCode.NoContent
+                        ? responseMessage!
+                        : $"File Share Service replace acl completed for batch ID: {BatchId}";
+
+                logger.LogInformation("Execute job completed for displayName:{DisplayName} and batch ID:{BatchId}.", DisplayName, BatchId);
+            }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
-                logger.LogInformation("File Share Service replace acl for batch ID:", BatchId);
                 ExecutionResult = e.ToString();
+                logger.LogError(e.Message);
+                logger.LogInformation("File Share Service replace acl for batch ID:{BatchId} and error:{ExecutionResult}", BatchId,ExecutionResult);
                 throw;
             }
             finally

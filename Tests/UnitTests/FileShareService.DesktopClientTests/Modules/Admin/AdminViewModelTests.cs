@@ -57,6 +57,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsInstanceOf<NewBatchJobViewModel>(batchJobViewModels[0]);
             Assert.IsInstanceOf<AppendAclJobViewModel>(batchJobViewModels[1]);
             Assert.IsInstanceOf<SetExpiryDateJobViewModel>(batchJobViewModels[2]);
+            Assert.IsInstanceOf<ReplaceAclJobViewModel>(batchJobViewModels[3]);
         }
 
         [Test]

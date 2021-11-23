@@ -18,14 +18,23 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         {
             #region Predeserialize validations
 
-            if (jsonToken.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
+            //Check for batchId
+            if (jsonToken.SelectToken("actionParams.batchId")?.Type != JTokenType.String)
             {
-                ErrorMessages.Add("Invalid user groups.");
+                ErrorMessages.Add($"Invalid batch Id.");
             }
 
+
+            //Check for read users
+            if (jsonToken.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
+            {
+                ErrorMessages.Add($"Invalid user groups.");
+            }
+
+            //Check for read groups
             if (jsonToken.SelectToken("actionParams.readGroups")?.Type != JTokenType.Array)
             {
-                ErrorMessages.Add("Invalid read groups.");
+                ErrorMessages.Add($"Invalid read groups.");
             }
 
             #endregion
@@ -35,6 +44,11 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             if (string.IsNullOrWhiteSpace(ActionParams.BatchId))
             {
                 ErrorMessages.Add("Batch id is missing.");
+            }
+           
+            if (!string.IsNullOrWhiteSpace(ActionParams.BatchId) && !Guid.TryParse(ActionParams.BatchId, out Guid guid))
+            {
+              ErrorMessages.Add("Batch id should be GUID.");
             }
 
             if (!ActionParams.ReadGroups.Any() && !ActionParams.ReadUsers.Any())

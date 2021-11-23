@@ -491,14 +491,6 @@
                                             </Grid>
 
                                         </Border>
-                                        <TextBox Text="{Binding ExecutionResult}" 
-                                                               FontSize="22"
-                                                               Grid.Row="5"
-                                                               Grid.ColumnSpan="3"
-                                                               IsReadOnly="true"
-                                                               VerticalAlignment="Center"
-                                                               HorizontalAlignment="Center"
-                                                                Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                     </Grid>
                                 </Border>
 
