@@ -349,9 +349,12 @@
                                         <Label Grid.Row="1" Grid.Column="0" Content="Batch ID:" />
                                         <Label Grid.Row="1" Grid.Column="1" Content="{Binding BatchId}" />
 
-                                        <Label Grid.Row="2" Grid.Column="0" Content="Expiry Date:" />
-                                        <Label Grid.Row="2" Grid.Column="1" Content="{Binding ExpiryDate}" />
-                                    
+                                        <Label Grid.Row="2" Grid.Column="0" Content="ExpiryDate:" />
+                                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                            <Label FontWeight="Bold" Content="{Binding ExpiryDate}" />
+                                            <Label FontWeight="ExtraLight" Content="{Binding RawExpiryDate}" ContentStringFormat="Raw: {0}"/>
+                                        </StackPanel>
+
                                         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
                                             Content="Execute Job"
