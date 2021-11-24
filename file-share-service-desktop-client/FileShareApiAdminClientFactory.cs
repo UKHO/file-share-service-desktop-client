@@ -21,21 +21,21 @@ namespace UKHO.FileShareService.DesktopClient
         private readonly IEnvironmentsManager environmentsManager;
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IVersionProvider versionProvider;
-        private readonly IServiceProvider sp;
+        private readonly IServiceProvider serviceProvider;
 
         public FileShareApiAdminClientFactory(IEnvironmentsManager environmentsManager, IAuthTokenProvider authTokenProvider,
-        IVersionProvider versionProvider, IServiceProvider sp)
+        IVersionProvider versionProvider, IServiceProvider serviceProvider)
 
         {
             this.environmentsManager = environmentsManager;
             this.authTokenProvider = authTokenProvider;
             this.versionProvider = versionProvider;
-            this.sp = sp;
+            this.serviceProvider = serviceProvider;
         }
 
         public IFileShareApiAdminClient Build()
         {
-            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider, sp),
+            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider, serviceProvider),
                 environmentsManager.CurrentEnvironment.BaseUrl,
                 authTokenProvider);
         }
@@ -45,17 +45,17 @@ namespace UKHO.FileShareService.DesktopClient
     public class UserAgentClientFactory : IHttpClientFactory
     {
         private readonly IVersionProvider versionProvider;
-        private readonly IServiceProvider sp;
+        private readonly IServiceProvider serviceProvider;
 
-        public UserAgentClientFactory(IVersionProvider versionProvider, IServiceProvider sp)
+        public UserAgentClientFactory(IVersionProvider versionProvider, IServiceProvider serviceProvider)
         {
             this.versionProvider = versionProvider;
-            this.sp = sp;
+            this.serviceProvider = serviceProvider;
         }
 
         public HttpClient CreateClient(string name)
         {
-            var configuredClient = sp.GetRequiredService<IHttpClientFactory>()
+            var configuredClient = serviceProvider.GetRequiredService<IHttpClientFactory>()
                     .CreateClient("FSSClient");
 
             configuredClient.DefaultRequestHeaders.UserAgent.Add(

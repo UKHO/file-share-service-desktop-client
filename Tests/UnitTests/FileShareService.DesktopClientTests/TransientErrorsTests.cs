@@ -15,7 +15,6 @@ namespace FileShareService.DesktopClientTests
         public int retryCount = 3;
         private const double sleepDuration = 2;
         const string TestClient = "TestClient";
-        private bool _isRetryCalled = false;
 
         [SetUp]
         public void Setup()
@@ -24,13 +23,14 @@ namespace FileShareService.DesktopClientTests
         }
 
         [Test]
-        public async Task WhenServiceUnavailable_GetRetryPolicy()
+        public async Task WhenTooManyRequests__RetryShouldBeCalled()
         {
             // Arrange 
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration))
+            .AddHttpMessageHandler(() => new TooManyRequestsDelegatingHandler());
 
             HttpClient configuredClient =
                 services
@@ -39,42 +39,21 @@ namespace FileShareService.DesktopClientTests
                     .CreateClient(TestClient);
 
             // Act
-            var result = await configuredClient.GetAsync("https://filesqa1.admiralty.co.uk/");
-            // Assert
-            Assert.True(_isRetryCalled);
-            Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
-        }
-
-        [Test]
-        public async Task WhenTooManyRequests_GetRetryPolicy()
-        {
-            // Arrange 
-            IServiceCollection services = new ServiceCollection();
-
-            services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
-
-            HttpClient configuredClient =
-                services
-                    .BuildServiceProvider()
-                    .GetRequiredService<IHttpClientFactory>()
-                    .CreateClient(TestClient);
-
-            // Act
-            var result = await configuredClient.GetAsync("https://mock.codes/429");
+            var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.True(_isRetryCalled);
+            fakeLogger.VerifyLog(LogLevel.Warning).MustHaveHappened();//TooManyRequest is transient error so retry will be called logs warning
             Assert.AreEqual(HttpStatusCode.TooManyRequests, result.StatusCode);
         }
         [Test]
-        public async Task WhenInternalServerError_GetRetryPolicy()
+        public async Task WhenOKResponse_RetryShouldNotBeCalled()
         {
             // Arrange 
             IServiceCollection services = new ServiceCollection();
 
             services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
+                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration))
+            .AddHttpMessageHandler(() => new OKDelegatingHandler());
 
             HttpClient configuredClient =
                 services
@@ -83,34 +62,11 @@ namespace FileShareService.DesktopClientTests
                     .CreateClient(TestClient);
 
             // Act
-            var result = await configuredClient.GetAsync("https://mock.codes/500");
+            var result = await configuredClient.GetAsync("https://test.com");
 
             // Assert
-            Assert.True(_isRetryCalled);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, result.StatusCode);
-        }
-
-        [Test]
-        public async Task WhenRequestTimeout_GetRetryPolicy()
-        {
-            // Arrange 
-            IServiceCollection services = new ServiceCollection();
-
-            services.AddHttpClient(TestClient)
-                .AddPolicyHandler(TransientErrorsHelper.GetRetryPolicy(fakeLogger, "File Share Service", retryCount, sleepDuration, out _isRetryCalled));
-
-            HttpClient configuredClient =
-                services
-                    .BuildServiceProvider()
-                    .GetRequiredService<IHttpClientFactory>()
-                    .CreateClient(TestClient);
-
-            // Act
-            var result = await configuredClient.GetAsync("https://mock.codes/408");
-
-            // Assert
-            Assert.True(_isRetryCalled);
-            Assert.AreEqual(HttpStatusCode.RequestTimeout, result.StatusCode);
+            fakeLogger.VerifyLog(LogLevel.Warning).MustNotHaveHappened();//Ok response will not call retry so there will be no log
+            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
         }
     }
 }

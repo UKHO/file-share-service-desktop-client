@@ -17,7 +17,6 @@ namespace UKHO.FileShareService.DesktopClient
                 .OrResult(r => r.StatusCode == HttpStatusCode.TooManyRequests)
                 .OrResult(r => r.StatusCode == HttpStatusCode.InternalServerError)
                 .OrResult(r => r.StatusCode == HttpStatusCode.GatewayTimeout)
-                .OrResult(r => r.StatusCode == HttpStatusCode.BadRequest)
                 .WaitAndRetryAsync(retryCount, (retryAttempt) =>
                 {
                     return TimeSpan.FromSeconds(Math.Pow(sleepDuration, (retryAttempt - 1)));
@@ -31,7 +30,7 @@ namespace UKHO.FileShareService.DesktopClient
                         retryAfter = int.Parse(retryAfterHeader.Value.First());
                         await Task.Delay(TimeSpan.FromMilliseconds(retryAfter));
                     }
-                    logger.LogInformation("Re-trying {requestType} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
+                    logger.LogWarning("Re-trying {requestType} service request with uri {RequestUri} and delay {delay}ms and retry attempt {retry} with _X-Correlation-ID:{correlationId} as previous request was responded with {StatusCode}.",
                     requestType, response.Result.RequestMessage?.RequestUri, timespan.Add(TimeSpan.FromMilliseconds(retryAfter)).TotalMilliseconds, retryAttempt, correlationId?.Value, response.Result.StatusCode);
 
                 });
