@@ -1,5 +1,6 @@
 ﻿
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs
@@ -12,9 +13,29 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public SetExpiryDateJobParams ActionParams { get; set; } = new SetExpiryDateJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
 
+        // To hold whether expiry date is specified as NULL in the config or not.
+        public bool IsExpiryDateKeyExist { get; private set; }
+
         public void Validate(JToken jsonToken)
         {
-            //This validation will be implemented when PBI SetExpiryDateJob is picked-up.
+            JToken? expiryDateToken = jsonToken.SelectToken("actionParams.expiryDate");
+
+            //Set value if token exists and value is null (not empty or blank)
+            IsExpiryDateKeyExist = expiryDateToken != null;
+
+            if (expiryDateToken == null)
+            {
+                ErrorMessages.Add("Either expiry date key is missing or invalid.");
+            }
+
+            if (string.IsNullOrWhiteSpace(ActionParams.BatchId))
+            {
+                ErrorMessages.Add("Batch id is missing.");
+            }
+            else if (!Guid.TryParse(ActionParams.BatchId, out _))
+            {
+                ErrorMessages.Add("Batch id should be GUID.");
+            }
         }
     }
 

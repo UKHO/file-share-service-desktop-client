@@ -43,67 +43,67 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
                 using (var stringReader = new StringReader(jobs))
                 using (var jsonTextReader = new JsonTextReader(stringReader) 
-                { DateParseHandling = DateParseHandling.None})
+                        { DateParseHandling = DateParseHandling.None})
                 {
                     jobsToken = JToken.ReadFrom(jsonTextReader);
-                }
 
-                var batchJobs = jobsToken.SelectToken("jobs");
+                    var batchJobs = jobsToken.SelectToken("jobs");
 
-                if (batchJobs == null || batchJobs.Type != JTokenType.Array || !batchJobs.HasValues)
-                {
-                    throw new JsonReaderException("Configuration file formatted incorrectly. Unable to find a job to process.");
-                }
-
-                List<IJob> jobCollection = new List<IJob>();
-
-                ErrorDeserializingJobsJob? errorJob = null;
-
-                // Deserialize each job and validate
-                foreach (JToken batchJob in batchJobs)
-                {
-                    string jobAction = string.Empty;
-
-                    List<string> errors = ValidateJobActionAndDisplayName(batchJob, out jobAction);
-
-                    if(errors.Any())
+                    if (batchJobs == null || batchJobs.Type != JTokenType.Array || !batchJobs.HasValues)
                     {
-                        if(errorJob == null)
+                        throw new JsonReaderException("Configuration file formatted incorrectly. Unable to find a job to process.");
+                    }
+
+                    List<IJob> jobCollection = new List<IJob>();
+
+                    ErrorDeserializingJobsJob? errorJob = null;
+
+                    // Deserialize each job and validate
+                    foreach (JToken batchJob in batchJobs)
+                    {
+                        string jobAction = string.Empty;
+
+                        List<string> errors = ValidateJobActionAndDisplayName(batchJob, out jobAction);
+
+                        if (errors.Any())
                         {
-                            errorJob = new ErrorDeserializingJobsJob();
+                            if (errorJob == null)
+                            {
+                                errorJob = new ErrorDeserializingJobsJob();
+                            }
+                            errorJob.ErrorMessages.AddRange(errors);
+
+                            continue;
                         }
-                        errorJob.ErrorMessages.AddRange(errors);
 
-                        continue;
+                        string jsonString = Convert.ToString(batchJob);
+
+                        IJob? job = jobAction switch
+                        {
+                            NewBatchJob.JOB_ACTION => JsonConvert.DeserializeObject<NewBatchJob>(jsonString, jsonSerializerSettings),
+                            AppendAclJob.JOB_ACTION => JsonConvert.DeserializeObject<AppendAclJob>(jsonString, jsonSerializerSettings),
+                            SetExpiryDateJob.JOB_ACTION => JsonConvert.DeserializeObject<SetExpiryDateJob>(jsonString, jsonSerializerSettings),
+                            _ => null
+                        };
+
+
+                        if (job != null)
+                        {
+                            job.Validate(batchJob);
+                            jobCollection.Add(job);
+                        }
                     }
 
-                    string jsonString = Convert.ToString(batchJob);
-
-                    IJob? job = jobAction switch
+                    //Add error job at begining of the collection, if exists.
+                    if (errorJob != null)
                     {
-                        NewBatchJob.JOB_ACTION => JsonConvert.DeserializeObject<NewBatchJob>(jsonString, jsonSerializerSettings),
-                        AppendAclJob.JOB_ACTION => JsonConvert.DeserializeObject<AppendAclJob>(jsonString, jsonSerializerSettings),
-                        SetExpiryDateJob.JOB_ACTION => JsonConvert.DeserializeObject<SetExpiryDateJob>(jsonString, jsonSerializerSettings),
-                        _ => null
-                    };
-
-
-                    if (job != null)
-                    {
-                        job.Validate(batchJob);
-                        jobCollection.Add(job);
+                        jobCollection.Insert(0, errorJob);
                     }
+
+                    jobIdCollection.Clear();
+
+                    return new Jobs.Jobs() { jobs = jobCollection };
                 }
-
-                //Add error job at begining of the collection, if exists.
-                if (errorJob != null)
-                {
-                    jobCollection.Insert(0, errorJob);
-                }
-
-                jobIdCollection.Clear();
-
-                return  new Jobs.Jobs() { jobs = jobCollection};
             }
             catch (Exception e)
             {
@@ -135,7 +135,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             
             //Retrieve display name
             JToken? displayNameTokne = job.SelectToken("displayName");
-            string displayName = jobActionToken?.Type == JTokenType.String ? 
+            string displayName = displayNameTokne?.Type == JTokenType.String ? 
                 Convert.ToString(displayNameTokne) : string.Empty; 
 
             if (string.IsNullOrWhiteSpace(displayName))

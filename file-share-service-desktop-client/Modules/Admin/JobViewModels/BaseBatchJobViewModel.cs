@@ -15,6 +15,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private bool isExecutingComplete;
         private bool isCommitting;
 
+        protected readonly string[] RFC3339_FORMATS = new string[]
+        {
+            "yyyy-MM-ddTHH:mm:ssK",
+            "yyyy-MM-ddTHH:mm:ss.fK",
+            "yyyy-MM-ddTHH:mm:ss.ffK",
+            "yyyy-MM-ddTHH:mm:ss.fffK"
+        };
+
         protected BaseBatchJobViewModel(IJob job)
         {
             this.job = job;
