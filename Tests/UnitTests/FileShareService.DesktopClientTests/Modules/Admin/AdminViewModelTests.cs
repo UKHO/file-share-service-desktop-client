@@ -9,6 +9,7 @@ using NUnit.Framework;
 using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Helper;
 using UKHO.FileShareService.DesktopClient.Modules.Admin;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 
@@ -22,6 +23,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private ILogger<AdminViewModel> fakeLoggerAdminVM = null!;
         private ILogger<NewBatchJobViewModel> fakeLoggerNewBatchVM = null!;
+        private MacroTransformer fakeMacroTransformer = null!;
+        private ILogger<SetExpiryDateJobViewModel> slogger = null!;
 
         [SetUp]
         public void Setup()
@@ -32,6 +35,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeLoggerAdminVM = A.Fake<ILogger<AdminViewModel>>();
             fakeLoggerNewBatchVM = A.Fake<ILogger<NewBatchJobViewModel>>();
+            fakeMacroTransformer = A.Fake<MacroTransformer>();
+            slogger = A.Fake<ILogger<SetExpiryDateJobViewModel>>();
         }
 
         [Test]
@@ -39,8 +44,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         {
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
-                A.Fake<ICurrentDateTimeProvider>(),
-                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM);
+                A.Fake<ICurrentDateTimeProvider>(), fakeMacroTransformer,
+                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM, slogger);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
@@ -62,8 +67,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         {
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
-                A.Fake<ICurrentDateTimeProvider>(),
-                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM);
+                A.Fake<ICurrentDateTimeProvider>(),fakeMacroTransformer,
+                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM, slogger);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
@@ -83,8 +88,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         {
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
-                A.Fake<ICurrentDateTimeProvider>(),
-                fakeEnvironmentsManager, fakeLoggerAdminVM, fakeLoggerNewBatchVM);
+                A.Fake<ICurrentDateTimeProvider>(),fakeMacroTransformer,
+                fakeEnvironmentsManager, fakeLoggerAdminVM, fakeLoggerNewBatchVM, slogger);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
