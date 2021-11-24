@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Prism.Ioc;
@@ -36,23 +36,25 @@ namespace UKHO.FileShareService.DesktopClient
 
         protected override IContainerExtension CreateContainerExtension()
         {
-            //            var containerExtension = base.CreateContainerExtension() as UnityContainerExtension;
-            //#if DEBUG
-            //            containerExtension.Instance.AddExtension(new Diagnostic());
-            //#endif
-            //            return containerExtension;
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", false, true)
+                .Build();
 
             var serviceCollection = new ServiceCollection();
-
             serviceCollection.AddLogging(loggingBuilder => {
                 var logger = new LoggerConfiguration()
-                        .ReadFrom.AppSettings()
+                        .ReadFrom.Configuration(configuration)
                         .CreateLogger();
                 loggingBuilder.AddSerilog(logger, dispose: true);
             });
 
+            var retryCount = configuration.GetValue<int>("RetryCount");
+            var sleepDurationMultiplier = configuration.GetValue<int>("SleepDurationMultiplier");
+
             var container = new UnityContainer();
             container.BuildServiceProvider(serviceCollection);
+            container.RegisterInstance<IConfiguration>(configuration);
 
             return new UnityContainerExtension(container);
         }
