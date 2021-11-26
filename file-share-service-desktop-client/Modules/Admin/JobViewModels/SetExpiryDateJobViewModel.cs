@@ -2,13 +2,14 @@
 using Newtonsoft.Json;
 using Prism.Commands;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Helper;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -49,33 +50,44 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
             try
             {
+                logger.LogInformation("Execute job started for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", 
+                                                SetExpiryDateJob.JOB_ACTION, DisplayName, BatchId);
+
                 var fileShareClient = fileShareClientFactory();
                 var batchExpiryModel = BuildBatchExpiryModel();
 
-                var response = await fileShareClient.SetExpiryDateAsync(BatchId, batchExpiryModel);
+                var response = await fileShareClient.SetExpiryDateAsync(BatchId, batchExpiryModel, CancellationToken.None);
 
                 if(response.IsSuccessStatusCode)
                 {
-                    ExecutionResult = $"File Share Service set expiry date completed for batch ID: {BatchId}";
+                    ExecutionResult = $"Job successfully completed for batch ID: {BatchId}";
                 }
                 else
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var errorMessage = string.IsNullOrWhiteSpace(content) ? new ErrorDescriptionModel() :
-                        JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
-                    ExecutionResult = string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description));
+                    var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
+
+                    ExecutionResult = errorMessage != null ? string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description)) :
+                        $"Job failed for batch id: {BatchId} with {(int)response.StatusCode} - {response.ReasonPhrase}";
+
+                    logger.LogError("File Share Service set expiry date job failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", 
+                        DisplayName, BatchId, ExecutionResult);
                 }
+
+                logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", 
+                    SetExpiryDateJob.JOB_ACTION, DisplayName, BatchId);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                ExecutionResult = ex.ToString();
+                ExecutionResult = ex.Message;
+                logger.LogError("Execute job failed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.\n Error: {Error}",
+                    SetExpiryDateJob.JOB_ACTION, DisplayName, BatchId, ex.ToString());
             }
             finally
             {
                 IsExecuting = false;
                 IsExecutingComplete = true;
             }
-            
         }
 
         protected override bool CanExecute()
@@ -86,6 +98,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             ValidateViewModel();
 
             ValidationErrors = job.ErrorMessages;
+
+            for (int i = 0; i < ValidationErrors.Count; i++)
+            {
+                logger.LogError("Configuration Error : {ValidationErrors}  for Action : {Action}, displayName:{displayName} and BatchId: {BatchId}. ", 
+                    ValidationErrors[i].ToString(), SetExpiryDateJob.JOB_ACTION, DisplayName, BatchId);
+            }
 
             return !ValidationErrors.Any();
         }
@@ -107,13 +125,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if(RawExpiryDate.Equals(expandedDateTime))
                     {
-                        job.ErrorMessages.Add("Expiry date is either invalid or in an invalid format - the valid formats are 'RFC3339 formats'.");
+                        job.ErrorMessages.Add("Expiry date is either invalid or in an invalid format.");
                     }
                     else
                     {
                         if (DateTime.TryParse(expandedDateTime,CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
                         {
                             ExpiryDate = dateTime;
+                        }
+                        else
+                        {
+                            job.ErrorMessages.Add($"Unable to parse the date {expandedDateTime}");
                         }
                     }
                 }
@@ -140,16 +162,5 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 ExpiryDate = RawExpiryDate
             };
         }
-    }
-
-    public class ErrorDescriptionModel
-    {
-        public IEnumerable<Error> Errors { get; set; } = new List<Error>();
-    }
-
-    public class Error
-    {
-        public string Source { get; set; }
-        public string Description { get; set; }
     }
 }

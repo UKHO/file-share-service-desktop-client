@@ -81,8 +81,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public List<string> ReadUsers => job.ActionParams.Acl.ReadUsers;
         public List<string> ReadGroups => job.ActionParams.Acl.ReadGroups;
 
-        
-
         public DelegateCommand CloseExecutionCommand { get; }
 
         private void OnCloseExecutionCommand()
@@ -248,7 +246,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 }
             }
         }
-
         private string GetAccessibleDirectoryName(string? directory)
         {
            if(!string.IsNullOrWhiteSpace(directory))
@@ -267,7 +264,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
             return string.Empty;
         }
-
 
         private bool IsDirectoryExist(string directory)
         {
@@ -320,8 +316,5 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return Enumerable.Empty<IFileSystemInfo>();
             }
         }
-
     }
-
-    
 }

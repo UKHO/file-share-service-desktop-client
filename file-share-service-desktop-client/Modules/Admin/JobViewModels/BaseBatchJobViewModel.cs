@@ -55,7 +55,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        public bool IsExecutingComplete
+        public virtual bool IsExecutingComplete
         {
             get => isExecutingComplete;
             set
@@ -68,7 +68,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        public bool IsCommitting
+        public virtual bool IsCommitting
         {
             get => isCommitting;
             set
@@ -81,7 +81,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        public string ExecutionResult
+        public virtual string ExecutionResult
         {
             get => executionResult;
             set

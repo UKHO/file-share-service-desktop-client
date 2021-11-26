@@ -1,5 +1,4 @@
-﻿
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -18,10 +17,15 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
         public void Validate(JToken jsonToken)
         {
+            #region Predeserialize validations
             JToken? expiryDateToken = jsonToken.SelectToken("actionParams.expiryDate");
 
             //Set value if token exists and value is null (not empty or blank)
             IsExpiryDateKeyExist = expiryDateToken != null;
+
+            #endregion
+
+            #region Post deserialize validations
 
             if (expiryDateToken == null)
             {
@@ -34,8 +38,9 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             }
             else if (!Guid.TryParse(ActionParams.BatchId, out _))
             {
-                ErrorMessages.Add("Batch id should be GUID.");
+                ErrorMessages.Add("Batch id not in the correct format/GUID.");
             }
+            #endregion
         }
     }
 

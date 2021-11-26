@@ -30,7 +30,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     throw new JsonReaderException("Configuration file formatted incorrectly. Unable to find a job to process.");
                 }
 
-                var jsonSerializerSettings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.None};
+                var jsonSerializerSettings = new JsonSerializerSettings();
                 jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
                     .RegisterSubtype<NewBatchJob>(NewBatchJob.JOB_ACTION)
                     .RegisterSubtype<AppendAclJob>(AppendAclJob.JOB_ACTION)
