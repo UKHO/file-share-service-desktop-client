@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
@@ -38,33 +39,41 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         protected internal override async Task OnExecuteCommand()
         {
             IsExecuting = true;
-        
+            
             try
             {
-                logger.LogInformation("Execute job started for displayName :{displayName} .", DisplayName);
+                logger.LogInformation("Execute job started for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", ReplaceAclJob.JOB_ACTION, DisplayName, BatchId);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
-                var response = await fileShareClient.ReplaceAclAsync(BatchId, buildBatchModel.Acl);
+                var response = await fileShareClient.ReplaceAclAsync(BatchId, buildBatchModel.Acl, CancellationToken.None);
+
                 if(response.StatusCode != HttpStatusCode.NoContent)
                 {
+                    
                     var content = await response.Content.ReadAsStringAsync();
-
-                    var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
-                    responseMessage = string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description)) ;
-                    logger.LogInformation("File Share Service replace acl in-complete for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", DisplayName, BatchId, responseMessage);
+                    if(string.IsNullOrWhiteSpace(content))
+                    {
+                        responseMessage = $"File Share Service replace Access Control List failed for batch ID:{BatchId} with status: {(int)response.StatusCode} {response.StatusCode}.";
+                    }
+                    else
+                    {
+                        var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
+                        responseMessage = string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description));
+                    }
+                    
+                    logger.LogError("File Share Service replace Access Control List failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", DisplayName, BatchId, responseMessage);
                 }
-                ExecutionResult = response.StatusCode != HttpStatusCode.NoContent
+                  ExecutionResult = response.StatusCode != HttpStatusCode.NoContent
                         ? responseMessage!
-                        : $"File Share Service replace acl completed for batch ID: {BatchId}";
+                        : $"File Share Service replace Access Control List completed for batch ID: {BatchId}";
 
-                logger.LogInformation("Execute job completed for displayName:{DisplayName} and batch ID:{BatchId}.", DisplayName, BatchId);
+                logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", ReplaceAclJob.JOB_ACTION, DisplayName, BatchId);
             }
             catch (Exception e)
             {
-                ExecutionResult = e.ToString();
-                logger.LogError(e.Message);
-                logger.LogInformation("File Share Service replace acl for batch ID:{BatchId} and error:{ExecutionResult}", BatchId,ExecutionResult);
-                throw;
+                ExecutionResult = e.Message;
+                logger.LogError("File Share Service replace Access Control List failed for batch ID:{BatchId} with error:{ExecutionResult}", BatchId,ExecutionResult);
+                logger.LogError(e.ToString());
             }
             finally
             {
@@ -91,6 +100,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             ValidationErrors.Clear();
             ValidationErrors = job.ErrorMessages;
+            
+            for (int i = 0; i < ValidationErrors.Count; i++)
+            {
+                logger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName} and BatchId: {BatchId}. ", ValidationErrors[i].ToString(), ReplaceAclJob.JOB_ACTION, DisplayName, BatchId);
+            }
+           
             return !ValidationErrors.Any();
         }
 

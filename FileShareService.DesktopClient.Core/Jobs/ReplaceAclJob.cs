@@ -16,47 +16,20 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
         public void Validate(JToken jsonToken)
         {
-            #region Predeserialize validations
-
-            //Check for batchId
-            if (jsonToken.SelectToken("actionParams.batchId")?.Type != JTokenType.String)
-            {
-                ErrorMessages.Add($"Invalid batch Id.");
-            }
-
-
-            //Check for read users
-            if (jsonToken.SelectToken("actionParams.readUsers")?.Type != JTokenType.Array)
-            {
-                ErrorMessages.Add($"Invalid user groups.");
-            }
-
-            //Check for read groups
-            if (jsonToken.SelectToken("actionParams.readGroups")?.Type != JTokenType.Array)
-            {
-                ErrorMessages.Add($"Invalid read groups.");
-            }
-
-            #endregion
-
-            #region Post deserialize validations
-
             if (string.IsNullOrWhiteSpace(ActionParams.BatchId))
             {
-                ErrorMessages.Add("Batch id is missing.");
+                ErrorMessages.Add("Batch ID is missing.");
             }
-           
-            if (!string.IsNullOrWhiteSpace(ActionParams.BatchId) && !Guid.TryParse(ActionParams.BatchId, out Guid guid))
+            else if (!Guid.TryParse(ActionParams.BatchId, out _))
             {
-              ErrorMessages.Add("Batch id should be GUID.");
+                ErrorMessages.Add("Batch ID is not in the correct format/GUID.");
             }
 
             if (!ActionParams.ReadGroups.Any() && !ActionParams.ReadUsers.Any())
             {
-                ErrorMessages.Add("ReadGroups/ReadUsers are not specified.");
+                ErrorMessages.Add("Either ReadUsers or ReadGroups should be specified.");
             }
 
-            #endregion
         }
     }
     public class ReplaceAclJobParams : Acl

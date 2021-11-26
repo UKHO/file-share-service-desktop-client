@@ -422,19 +422,18 @@
                                             BorderBrush="{StaticResource AccentColorBrush}"
                                             Grid.ColumnSpan="2" />
 
-                                        <Label FontSize="21" Content="Replace ACL:" />
+                                        <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="Replace ACL:" />
                                         <Label Grid.Row="0" Grid.Column="1" FontWeight="Medium"
                                                Content="{Binding DisplayName}" />
 
-                                        <Label Grid.Row="1" Content="Batch ID:" />
-                                        <Label Grid.Row="1" Grid.Column="1" FontWeight="Medium"
-                                               Content="{Binding BatchId}" />
+                                        <Label Grid.Row="1" Grid.Column="0" Content="Batch ID:" />
+                                        <Label Grid.Row="1" Grid.Column="1" Content="{Binding BatchId}" />
 
-                                        <Label Grid.Row="2" Content="Additional Users:" />
-                                        <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding ReadUsers}" />
+                                        <Label Grid.Row="2" Grid.Column="0" Content="Additional Users:" />
+                                        <ItemsControl Grid.Row="2" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadUsers}" />
 
-                                        <Label Grid.Row="3" Content="Additional Groups:" />
-                                        <ItemsControl Grid.Row="3" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />
+                                        <Label Grid.Row="3" Grid.Column="0" Content="Additional Groups:" />
+                                        <ItemsControl Grid.Row="3" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadGroups}" />
 
                                         <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
