@@ -39,10 +39,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string RawExpiryDate
         {
             get => job.ActionParams.ExpiryDate;
-            set {  }
+            //set { }
         }
 
-        public DateTime? ExpiryDate { get; private set; }
+        public DateTime? ExpiryDate => GetExpirtDate();
 
         protected internal override async Task OnExecuteCommand()
         {
@@ -70,7 +70,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ExecutionResult = errorMessage != null ? string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description)) :
                         $"Job failed for batch id: {BatchId} with {(int)response.StatusCode} - {response.ReasonPhrase}";
 
-                    logger.LogError("File Share Service set expiry date job failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", 
+                    logger.LogError("File Share Service set expiry date failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", 
                         DisplayName, BatchId, ExecutionResult);
                 }
 
@@ -94,9 +94,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             ValidationErrors.Clear();
             
-            //Validate view model
-            ValidateViewModel();
-
             ValidationErrors = job.ErrorMessages;
 
             for (int i = 0; i < ValidationErrors.Count; i++)
@@ -106,45 +103,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
 
             return !ValidationErrors.Any();
-        }
-
-        private void ValidateViewModel()
-        {
-            if(IsExpiryDateKeyExist && RawExpiryDate is not null)
-            {
-                DateTime dateTime;
-                //Parse if date is valid RFC 3339 format
-                if (DateTime.TryParseExact(RawExpiryDate, RFC3339_FORMATS, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime))
-                {
-                    ExpiryDate = dateTime;
-                }
-                else
-                {
-                    //Get expand macro data
-                    var expandedDateTime = macroTransformer.ExpandMacros(RawExpiryDate);
-
-                    if(RawExpiryDate.Equals(expandedDateTime))
-                    {
-                        job.ErrorMessages.Add("Expiry date is either invalid or in an invalid format.");
-                    }
-                    else
-                    {
-                        if (DateTime.TryParse(expandedDateTime,CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
-                        {
-                            ExpiryDate = dateTime;
-                        }
-                        else
-                        {
-                            job.ErrorMessages.Add($"Unable to parse the date {expandedDateTime}");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                RawExpiryDate = RawExpiryDate is null ? "null" : RawExpiryDate;
-                ExpiryDate = null;
-            }
         }
 
         public DelegateCommand CloseExecutionCommand { get; }
@@ -162,5 +120,43 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 ExpiryDate = RawExpiryDate
             };
         }
+
+        private DateTime? GetExpirtDate()
+        {
+            if (IsExpiryDateKeyExist && RawExpiryDate is not null)
+            {
+                DateTime dateTime;
+                //Parse if date is valid RFC 3339 format
+                if (DateTime.TryParseExact(RawExpiryDate, RFC3339_FORMATS, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime))
+                {
+                    return dateTime;
+                }
+                //Get expand macro data
+                var expandedDateTime = macroTransformer.ExpandMacros(RawExpiryDate);
+
+                if (RawExpiryDate.Equals(expandedDateTime))
+                {
+                    job.ErrorMessages.Add("Expiry date is either invalid or in an invalid format.");
+                    return null;
+                }
+
+                if (DateTime.TryParse(expandedDateTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
+                {
+                    return dateTime;
+                }
+
+                job.ErrorMessages.Add($"Unable to parse the date {expandedDateTime}");
+                return null;
+            }
+            return null;
+        }
+
+
+
+
+
+
+
+
     }
 }
