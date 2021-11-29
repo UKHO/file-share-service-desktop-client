@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
@@ -11,10 +12,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
     {
         private readonly IJob job;
         private bool isExecuting;
+        private readonly ILogger<BaseBatchJobViewModel> baseLogger;
 
-        protected BaseBatchJobViewModel(IJob job)
+        protected BaseBatchJobViewModel(IJob job, ILogger<BaseBatchJobViewModel> baseLogger)
         {
             this.job = job;
+            this.baseLogger = baseLogger;
             ExcecuteJobCommand = new DelegateCommand(async () => await OnExecuteCommand(), () => !IsExecuting && CanExecute());
         }
 
@@ -26,8 +29,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             ValidationErrors.Clear();
 
             ValidationErrors = job.ErrorMessages;
+            for (int i = 0; i < ValidationErrors.Count; i++)
+            {
+                baseLogger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName}. ", ValidationErrors[i].ToString(), Action, DisplayName);
+            }
 
             return !ValidationErrors.Any();
+
         }
 
         public bool IsExecuting
@@ -46,14 +54,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         public string DisplayName => job.DisplayName;
 
-        public List<string> ValidationErrors { get; set; } = new List<string>();
+        public string Action => job.Action;
 
-        public bool IsVisibleValidationErrorsArea
-        {
-            get
-            {
-                return ValidationErrors.Any();
-            }
-        }
+        public List<string> ValidationErrors { get; set; } = new List<string>();
     }
 }

@@ -9,6 +9,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public const string JOB_ACTION = "setExpiryDate";
         public string DisplayName { get; set; }
 
+        public string Action { get; set; }
+
         public SetExpiryDateJobParams ActionParams { get; set; } = new SetExpiryDateJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
 

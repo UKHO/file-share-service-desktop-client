@@ -313,8 +313,49 @@
                                             <ItemsControl ItemsSource="{Binding ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 
                                                           Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                        </StackPanel>                                        
+                                        </StackPanel>
+                                        <views:Spinner
+                                            Grid.Row="0" 
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="2"
+                                            Grid.RowSpan="9"
+                                            Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+
+                                            ></views:Spinner>
+                                        <Border Grid.Row="1" Grid.RowSpan="8" 
+                                                Grid.Column="0" Grid.ColumnSpan="2"
+                                                Background="Gray"
+                                                Opacity="0.9"
+                                                Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                Padding="24"
+                                                >
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition  Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBox Text="{Binding ExecutionResult}" 
+                                                               FontSize="22"
+                                                               Grid.ColumnSpan="3"
+                                                               IsReadOnly="true"
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"/>
+                                                <Button Command="{Binding CloseExecutionCommand}" 
+                                                            Grid.Row="1"
+                                                            Grid.Column="1"
+                                                            Content="Close"/>
+                                            </Grid>
+
+                                        </Border>
                                     </Grid>
+                                    
                                 </Border>
 
                             </DataTemplate>
@@ -351,7 +392,7 @@
 
                                         <Label Grid.Row="2" Grid.Column="0" Content="Expiry Date:" />
                                         <Label Grid.Row="2" Grid.Column="1" Content="{Binding ExpiryDate}" />
-                                    
+
                                         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
                                             Content="Execute Job"

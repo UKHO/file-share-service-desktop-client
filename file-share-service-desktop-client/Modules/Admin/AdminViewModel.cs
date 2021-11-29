@@ -22,6 +22,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
         private readonly ILogger<AdminViewModel> logger;
         private readonly ILogger<NewBatchJobViewModel> Nlogger;
+        private readonly ILogger<AppendAclJobViewModel> ACLlogger;
+        private readonly ILogger<SetExpiryDateJobViewModel> sLogger;
+        private readonly ILogger<ErrorDeserializingJobsJobViewModel> ELogger;
 
         public AdminViewModel(IFileSystem fileSystem,
             IKeyValueStore keyValueStore,
@@ -30,7 +33,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             ICurrentDateTimeProvider currentDateTimeProvider,
             IEnvironmentsManager environmentsManager,
             ILogger<AdminViewModel> logger,
-            ILogger<NewBatchJobViewModel> Nlogger)
+            ILogger<NewBatchJobViewModel> Nlogger,
+            ILogger<AppendAclJobViewModel> ACLlogger, ILogger<SetExpiryDateJobViewModel> sLogger, ILogger<ErrorDeserializingJobsJobViewModel> ELogger)
         {
             this.fileSystem = fileSystem;
             this.keyValueStore = keyValueStore;
@@ -39,6 +43,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.logger = logger;
             this.Nlogger = Nlogger;
+            this.ACLlogger = ACLlogger;
+            this.sLogger = sLogger;
+            this.ELogger = ELogger;
+
             OpenFileCommand = new DelegateCommand(OnOpenFile);
 
             environmentsManager.PropertyChanged += OnEnvironmentsManagerPropertyChanged;
@@ -89,10 +97,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                 NewBatchJob newBatch => new NewBatchJobViewModel(newBatch, fileSystem,Nlogger,
                     () => fileShareApiAdminClientFactory.Build(),
                     currentDateTimeProvider),
-                AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl),
-                SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate),
+                AppendAclJob appendAcl => new AppendAclJobViewModel(() => fileShareApiAdminClientFactory.Build(),appendAcl, ACLlogger),
+                SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate,sLogger),
                 ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
-                    errorDeserializingJobs),
+                    errorDeserializingJobs,ELogger),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())
             };
         }

@@ -6,7 +6,9 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     public interface IJob
     {
         string DisplayName { get; set; }
-        
+
+        string Action { get; set; }
+
         List<string> ErrorMessages { get; }
 
         void Validate(JToken jsonToken);

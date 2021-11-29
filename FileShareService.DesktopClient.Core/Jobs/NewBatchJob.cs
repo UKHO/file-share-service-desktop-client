@@ -7,6 +7,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     {
         public const string JOB_ACTION = "newBatch";
         public string DisplayName { get; set; }
+
+        public string Action { get; set; }
         public NewBatchJobParams ActionParams { get; set; } = new NewBatchJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
 
