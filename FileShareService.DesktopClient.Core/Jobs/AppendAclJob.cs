@@ -10,6 +10,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public const string JOB_ACTION = "appendAcl";
         public string DisplayName { get; set; }
 
+        public string Action { get; set; }
+
         public AppendAclJobParams ActionParams { get; set; } = new AppendAclJobParams();
 
         public List<string> ErrorMessages { get; private set; } = new List<string>();

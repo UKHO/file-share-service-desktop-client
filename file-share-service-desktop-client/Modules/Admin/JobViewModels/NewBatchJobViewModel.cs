@@ -34,7 +34,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
              ILogger<NewBatchJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,   
-            ICurrentDateTimeProvider currentDateTimeProvider) : base(job)
+            ICurrentDateTimeProvider currentDateTimeProvider) : base(job, logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;

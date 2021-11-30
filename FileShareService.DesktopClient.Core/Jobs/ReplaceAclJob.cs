@@ -11,6 +11,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     {
         public const string JOB_ACTION = "replaceAcl";
         public string DisplayName { get; set; }
+        public string Action { get; set; }
         public ReplaceAclJobParams ActionParams { get; set; }
         public List<string> ErrorMessages { get; private set; } = new List<string>();
 

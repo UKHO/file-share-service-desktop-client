@@ -23,7 +23,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private string executionResult = string.Empty;
         private string responseMessage = string.Empty;
 
-        public ReplaceAclJobViewModel(ReplaceAclJob job, Func<IFileShareApiAdminClient> fileShareClientFactory, ILogger<ReplaceAclJobViewModel> logger) : base(job)
+        public ReplaceAclJobViewModel(ReplaceAclJob job, Func<IFileShareApiAdminClient> fileShareClientFactory, ILogger<ReplaceAclJobViewModel> logger) : base(job, logger)
         {
             this.job = job;
             this.fileShareClientFactory = fileShareClientFactory;
@@ -94,21 +94,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 },
             };
         }
-
-
-        protected override bool CanExecute()
-        {
-            ValidationErrors.Clear();
-            ValidationErrors = job.ErrorMessages;
-            
-            for (int i = 0; i < ValidationErrors.Count; i++)
-            {
-                logger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName} and BatchId: {BatchId}. ", ValidationErrors[i].ToString(), ReplaceAclJob.JOB_ACTION, DisplayName, BatchId);
-            }
-           
-            return !ValidationErrors.Any();
-        }
-
 
         public bool IsExecutingComplete
         {
