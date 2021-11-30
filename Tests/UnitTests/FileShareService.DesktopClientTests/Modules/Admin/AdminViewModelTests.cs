@@ -55,7 +55,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
             A.CallTo(() => fakeJobsParser.Parse("JsonContent"))
                 .Returns(new Jobs
-                    {jobs = new List<IJob> {new NewBatchJob(), new AppendAclJob(), new SetExpiryDateJob()}});
+                    {jobs = new List<IJob> {new NewBatchJob(), new AppendAclJob(), new SetExpiryDateJob(), new ReplaceAclJob()}});
 
             vm.LoadBatchJobsFile(jobsFilePath);
 
