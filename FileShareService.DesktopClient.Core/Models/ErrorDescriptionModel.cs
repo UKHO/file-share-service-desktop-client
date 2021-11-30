@@ -6,7 +6,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Models
     {
         public IEnumerable<Error> Errors { get; set; }
     }
-
+   
     public class ErrorDescription
     {
         public string CorrelationId { get; set; }

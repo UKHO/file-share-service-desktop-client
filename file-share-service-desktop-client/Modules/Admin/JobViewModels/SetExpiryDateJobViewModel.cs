@@ -9,7 +9,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly SetExpiryDateJob job;
         private readonly ILogger<SetExpiryDateJobViewModel> logger;
 
-        public SetExpiryDateJobViewModel(SetExpiryDateJob job, ILogger<SetExpiryDateJobViewModel> logger) : base(job,logger)
+        public SetExpiryDateJobViewModel(SetExpiryDateJob job, ILogger<SetExpiryDateJobViewModel> logger) : base(job, logger)
         {
             this.job = job;
             this.logger = logger;

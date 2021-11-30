@@ -429,7 +429,7 @@
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
 
-                                        <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="{Binding Path=DisplayName}" />
+                                        <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="Error deserializing jobs from file:" />
 
                                         <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Path= ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 
@@ -440,6 +440,104 @@
                                 </Border>
                             </DataTemplate>
                         </local:JobViewModelsTemplateSelector.ErrorTemplate>
+
+                        <local:JobViewModelsTemplateSelector.ReplaceAclTemplate>
+                            <DataTemplate DataType="jobViewModels:ReplaceAclJobViewModel">
+                                <Border BorderThickness="2" BorderBrush="{StaticResource AccentColorBrush}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border
+                                            BorderThickness="0 0 0 1 "
+                                            BorderBrush="{StaticResource AccentColorBrush}"
+                                            Grid.ColumnSpan="2" />
+
+                                        <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="Replace ACL:" />
+                                        <Label Grid.Row="0" Grid.Column="1" FontWeight="Medium"
+                                               Content="{Binding DisplayName}" />
+
+                                        <Label Grid.Row="1" Grid.Column="0" Content="Batch ID:" />
+                                        <Label Grid.Row="1" Grid.Column="1" Content="{Binding BatchId}" />
+
+                                        <Label Grid.Row="2" Grid.Column="0" Content="Additional Users:" />
+                                        <ItemsControl Grid.Row="2" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadUsers}" />
+
+                                        <Label Grid.Row="3" Grid.Column="0" Content="Additional Groups:" />
+                                        <ItemsControl Grid.Row="3" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadGroups}" />
+
+                                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                                            <Button                                            
+                                            Content="Execute Job"
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Top"    
+                                            Command="{Binding ExcecuteJobCommand}" Margin="10 0"/>
+
+                                            <Label HorizontalAlignment="Left" 
+                                                   Content="Validation errors:" Margin="20 0" 
+                                                   Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
+                                                          FontStyle="Normal" Foreground="Red" 
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        </StackPanel>
+                                        <views:Spinner
+                                            Grid.Row="0" 
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="2"
+                                            Grid.RowSpan="9"
+                                            Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+
+                                            ></views:Spinner>
+                                        <Border Grid.Row="1" Grid.RowSpan="8" 
+                                                Grid.Column="0" Grid.ColumnSpan="2"
+                                                Background="Gray"
+                                                Opacity="0.9"
+                                                Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                Padding="24"
+                                                >
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition  Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBox Text="{Binding ExecutionResult}" 
+                                                               FontSize="22"
+                                                               Grid.ColumnSpan="3"
+                                                               IsReadOnly="true"
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"/>
+                                                <Button Command="{Binding CloseExecutionCommand}" 
+                                                            Grid.Row="1"
+                                                            Grid.Column="1"
+                                                            Content="Close"/>
+                                            </Grid>
+
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                            </DataTemplate>
+                        </local:JobViewModelsTemplateSelector.ReplaceAclTemplate>
+
+
                     </local:JobViewModelsTemplateSelector>
                 </ItemsControl.ItemTemplateSelector>
             </ItemsControl>
