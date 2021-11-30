@@ -2,6 +2,9 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <DirectoryRef Id="INSTALLFOLDER">
+            <Component Id="cmp5331CA5F52193D033714FDDF20C463C5" Guid="{9064F926-A941-4D86-96A2-8A4E1B6A7923}">
+              <File Id="filCB70EB97061F227F60A18AA79D1F1486" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\appsettings.json" />
+            </Component>
             <Component Id="cmp2E5EDA8D72F327AFF452AE2FE00CEA69" Guid="{B4A22AE5-A88C-4BA4-B7B8-AB767C3F07F7}">
                 <File Id="fil0AC151BF3F546CFD05E806D12E6A5768" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\clrcompression.dll" />
             </Component>
@@ -39,6 +42,7 @@
     </Fragment>
     <Fragment>
         <ComponentGroup Id="ApplicationFilesComponentGroup">
+            <ComponentRef Id="cmp5331CA5F52193D033714FDDF20C463C5" />
             <ComponentRef Id="cmp2E5EDA8D72F327AFF452AE2FE00CEA69" />
             <ComponentRef Id="cmp170DFF239B610B0ACA2229119DEA678E" />
             <ComponentRef Id="cmp1FAC008E6AA14459AD5390EB28F23EFE" />
