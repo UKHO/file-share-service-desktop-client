@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
+using System;
 
 namespace UKHO.FileShareService.DesktopClient
 {
@@ -18,19 +21,21 @@ namespace UKHO.FileShareService.DesktopClient
         private readonly IEnvironmentsManager environmentsManager;
         private readonly IAuthTokenProvider authTokenProvider;
         private readonly IVersionProvider versionProvider;
-        
+        private readonly IServiceProvider serviceProvider;
 
         public FileShareApiAdminClientFactory(IEnvironmentsManager environmentsManager, IAuthTokenProvider authTokenProvider,
-            IVersionProvider versionProvider)
+        IVersionProvider versionProvider, IServiceProvider serviceProvider)
+
         {
             this.environmentsManager = environmentsManager;
             this.authTokenProvider = authTokenProvider;
             this.versionProvider = versionProvider;
+            this.serviceProvider = serviceProvider;
         }
 
         public IFileShareApiAdminClient Build()
         {
-            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider),
+            return new FileShareApiAdminClient(new UserAgentClientFactory(versionProvider, serviceProvider),
                 environmentsManager.CurrentEnvironment.BaseUrl,
                 authTokenProvider);
         }
@@ -40,24 +45,28 @@ namespace UKHO.FileShareService.DesktopClient
     public class UserAgentClientFactory : IHttpClientFactory
     {
         private readonly IVersionProvider versionProvider;
+        private readonly IServiceProvider serviceProvider;
 
-        public UserAgentClientFactory(IVersionProvider versionProvider)
+        public UserAgentClientFactory(IVersionProvider versionProvider, IServiceProvider serviceProvider)
         {
             this.versionProvider = versionProvider;
+            this.serviceProvider = serviceProvider;
         }
 
         public HttpClient CreateClient(string name)
         {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FileShareServiceDesktopClient",
-                versionProvider.Version));
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(FileShareApiAdminClient),
-                typeof(FileShareApiAdminClient)
+            var configuredClient = serviceProvider.GetRequiredService<IHttpClientFactory>()
+                    .CreateClient("FSSClient");
+
+            configuredClient.DefaultRequestHeaders.UserAgent.Add(
+            new ProductInfoHeaderValue("FileShareServiceDesktopClient", versionProvider.Version));
+            configuredClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(nameof(FileShareApiAdminClient), typeof(FileShareApiAdminClient)
                     .Assembly
                     .GetCustomAttributes<AssemblyFileVersionAttribute>()
                     .Single()
                     .Version));
-            return client;
+
+            return configuredClient;
         }
     }
 }
