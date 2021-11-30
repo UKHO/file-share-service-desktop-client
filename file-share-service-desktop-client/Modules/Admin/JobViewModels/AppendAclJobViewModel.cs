@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 
@@ -7,8 +8,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
     public class AppendAclJobViewModel : BaseBatchJobViewModel
     {
         private readonly AppendAclJob job;
+        private readonly ILogger<AppendAclJobViewModel> logger;
 
-        public AppendAclJobViewModel(AppendAclJob job):base (job)
+        public AppendAclJobViewModel(AppendAclJob job, ILogger<AppendAclJobViewModel> logger):base (job, logger)
         {
             this.job = job;
         }
