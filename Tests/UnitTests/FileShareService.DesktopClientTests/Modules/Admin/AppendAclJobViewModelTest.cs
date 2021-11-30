@@ -2,16 +2,15 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 using AdminClientModell = UKHO.FileShareAdminClient.Models;
 
@@ -40,7 +39,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 DisplayName = "Append Acl",
                 ActionParams = new AppendAclJobParams
                 {
-                    BatchId = "123",
+                    BatchId = "Batch_Id",
                     ReadGroups = new List<string> { "AppendAclTest" },
                     ReadUsers = new List<string> { "public" }
                 }
@@ -49,10 +48,10 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fakeLoggerAppendAclJobVM); 
 
             Assert.AreEqual("Append Acl", vm.DisplayName);
-            A.CallTo(() => fakeFileShareApiAdminClient.AppendAclAsync( A<AdminClientModell.Acl>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareApiAdminClient.AppendAclAsync(A<string>.Ignored, A<AdminClientModell.Acl>.Ignored, CancellationToken.None))
             .Returns(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.NoContent }); 
             await vm.OnExecuteCommand();
-            Assert.AreEqual("File Share Service append Access Control List completed for batch ID: 123", vm.ExecutionResult);
+            Assert.AreEqual("File Share Service append Access Control List completed for batch ID: Batch_Id", vm.ExecutionResult);
         }
         [Test]
         public async Task TestExceuteReplaceAclJobReturns400()
@@ -62,7 +61,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 DisplayName = "Append Acl",
                 ActionParams = new AppendAclJobParams
                 {
-                    BatchId = "123",
+                    BatchId = "Batch_Id",
                     ReadGroups = new List<string> { "AppendAclTest" },
                     ReadUsers = new List<string> { "public" }
                 }
@@ -75,7 +74,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             };
             Assert.AreEqual("Append Acl", vm.DisplayName);
           
-            A.CallTo(() => fakeFileShareApiAdminClient.AppendAclAsync( A<AdminClientModell.Acl>.Ignored, A<string>.Ignored))
+            A.CallTo(() => fakeFileShareApiAdminClient.AppendAclAsync(A<string>.Ignored, A<AdminClientModell.Acl>.Ignored,CancellationToken.None ))
             .Returns(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.BadRequest, Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json") }); 
             await vm.OnExecuteCommand();
            
@@ -90,7 +89,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             AppendAclJob.DisplayName = "Test - Append Acl";
             AppendAclJob.ActionParams = new AppendAclJobParams
             {
-                BatchId = "123",
+                BatchId = "Batch_Id",
                 ReadGroups = new List<string> { "AppendAclTest" },
                 ReadUsers = new List<string> { "public" }
             };

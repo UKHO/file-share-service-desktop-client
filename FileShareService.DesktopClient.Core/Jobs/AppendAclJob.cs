@@ -23,7 +23,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             
             if (string.IsNullOrWhiteSpace(ActionParams.BatchId))
             {
-                ErrorMessages.Add("Batch id is missing.");
+                ErrorMessages.Add("Batch ID is missing.");
             }
             else if (!Guid.TryParse(ActionParams.BatchId, out _))
             {
@@ -32,7 +32,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
             if (!ActionParams.ReadGroups.Any() && !ActionParams.ReadUsers.Any())
             {
-                ErrorMessages.Add("ReadGroups/ReadUsers are not specified.");
+                ErrorMessages.Add("Either ReadUsers or ReadGroups should be specified.");
             }          
         }
     }

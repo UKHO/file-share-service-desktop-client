@@ -3,15 +3,14 @@ using System.Threading.Tasks;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
-using UKHO.FileShareClient.Models;
 using System;
-using System.Diagnostics;
-using System.Net.Http;
 using System.Linq;
 using System.Net;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using Prism.Commands;
+using System.Threading;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 {
@@ -53,7 +52,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     var fileShareClient = fileShareClientFactory(); 
                     var buildBatchModel = BuildBatchModel();
                     logger.LogInformation("Execute job started for Action :{Action}  and displayName :{displayName} and batchId:{BatchId} .", Action, DisplayName,BatchId);
-                    var response = await fileShareClient.AppendAclAsync(buildBatchModel.Acl, BatchId);
+                    var response = await fileShareClient.AppendAclAsync(BatchId, buildBatchModel.Acl,CancellationToken.None);
                               
                 if (response.StatusCode != HttpStatusCode.NoContent)
                 {
@@ -88,18 +87,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 }
         }
 
-        protected override bool CanExecute()
-        {
-            ValidationErrors.Clear();           
-            ValidationErrors = job.ErrorMessages;
-            for (int i = 0; i < ValidationErrors.Count; i++)
-            {
-                logger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName} and BatchId: {BatchId}. ", ValidationErrors[i].ToString(), Action, DisplayName,BatchId);
-            }
-
-            return !ValidationErrors.Any();
-
-        }
+        
 
         public BatchModel BuildBatchModel()
         {
