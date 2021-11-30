@@ -58,7 +58,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     else
                     {
                         var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
-                        responseMessage = string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description));
+                        responseMessage = string.Join(Environment.NewLine, errorMessage!.Errors.Select(e => e.Description));
                     }
                     
                     logger.LogError("File Share Service replace Access Control List failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", DisplayName, BatchId, responseMessage);

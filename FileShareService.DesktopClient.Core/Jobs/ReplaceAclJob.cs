@@ -10,9 +10,9 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     public class ReplaceAclJob : BindableBase, IJob
     {
         public const string JOB_ACTION = "replaceAcl";
-        public string DisplayName { get; set; }
-        public string Action { get; set; }
-        public ReplaceAclJobParams ActionParams { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
+        public ReplaceAclJobParams ActionParams { get; set; } = new ReplaceAclJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
 
         public void Validate(JToken jsonToken)
@@ -35,7 +35,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     }
     public class ReplaceAclJobParams : Acl
     {
-        public string BatchId { get; set; }
+        public string BatchId { get; set; } = string.Empty;
     }
 
 }
