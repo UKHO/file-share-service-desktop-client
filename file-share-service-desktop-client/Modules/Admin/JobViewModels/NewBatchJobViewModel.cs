@@ -415,7 +415,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 _= fileSystem.DirectoryInfo.FromDirectoryName(directory).GetDirectories();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -454,7 +454,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return directory.EnumerateFileSystemInfos(filePathName);
 
             }
-            catch(DirectoryNotFoundException ex)
+            catch(DirectoryNotFoundException )
             {
                 return Enumerable.Empty<IFileSystemInfo>();
             }

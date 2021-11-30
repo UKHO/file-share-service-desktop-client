@@ -12,12 +12,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
     {
         private readonly IJob job;
         private bool isExecuting;
-        private readonly ILogger<BaseBatchJobViewModel> baseLogger;
+        private readonly ILogger<BaseBatchJobViewModel> logger;
 
-        protected BaseBatchJobViewModel(IJob job, ILogger<BaseBatchJobViewModel> baseLogger)
+        protected BaseBatchJobViewModel(IJob job, ILogger<BaseBatchJobViewModel> logger)
         {
             this.job = job;
-            this.baseLogger = baseLogger;
+            this.logger = logger;
             ExcecuteJobCommand = new DelegateCommand(async () => await OnExecuteCommand(), () => !IsExecuting && CanExecute());
         }
 
@@ -31,7 +31,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             ValidationErrors = job.ErrorMessages;
             for (int i = 0; i < ValidationErrors.Count; i++)
             {
-                baseLogger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName}. ", ValidationErrors[i].ToString(), Action, DisplayName);
+                logger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName}. ", ValidationErrors[i].ToString(), Action, DisplayName);
             }
 
             return !ValidationErrors.Any();

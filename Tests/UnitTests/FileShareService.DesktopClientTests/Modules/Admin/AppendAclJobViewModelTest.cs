@@ -34,7 +34,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         [Test]
         public async Task TestExceuteReplaceAclJobReturns204()
         {
-            var vm = new AppendAclJobViewModel(() => fakeFileShareApiAdminClient, new AppendAclJob
+            var vm = new AppendAclJobViewModel(new AppendAclJob
             {
                 DisplayName = "Append Acl",
                 ActionParams = new AppendAclJobParams
@@ -44,7 +44,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                     ReadUsers = new List<string> { "public" }
                 }
             },
-            
+            () => fakeFileShareApiAdminClient,
             fakeLoggerAppendAclJobVM); 
 
             Assert.AreEqual("Append Acl", vm.DisplayName);
@@ -56,7 +56,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         [Test]
         public async Task TestExceuteReplaceAclJobReturns400()
         {
-            var vm = new AppendAclJobViewModel(() => fakeFileShareApiAdminClient, new AppendAclJob
+            var vm = new AppendAclJobViewModel(new AppendAclJob
             {
                 DisplayName = "Append Acl",
                 ActionParams = new AppendAclJobParams
@@ -65,7 +65,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                     ReadGroups = new List<string> { "AppendAclTest" },
                     ReadUsers = new List<string> { "public" }
                 }
-            },         
+            }, () => fakeFileShareApiAdminClient,
             fakeLoggerAppendAclJobVM); 
             
             ErrorDescriptionModel content = new ErrorDescriptionModel
@@ -94,8 +94,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ReadUsers = new List<string> { "public" }
             };
 
-            var vm = new AppendAclJobViewModel(() => fakeFileShareApiAdminClient, 
-               AppendAclJob,fakeLoggerAppendAclJobVM);
+            var vm = new AppendAclJobViewModel( 
+               AppendAclJob, () => fakeFileShareApiAdminClient,fakeLoggerAppendAclJobVM);
 
             Assert.AreEqual("Test - Append Acl", vm.DisplayName);
 

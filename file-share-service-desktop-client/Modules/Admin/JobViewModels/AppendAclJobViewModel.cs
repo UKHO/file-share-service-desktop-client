@@ -20,16 +20,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
         private string executionResult = string.Empty;
         string responseMessage = string.Empty;
-        private bool isCommitting;
         private bool isExecutingComplete;
-        private readonly ILogger<AppendAclJobViewModel> logger;       
+        private readonly ILogger<AppendAclJobViewModel> logger;
 
-        public AppendAclJobViewModel(Func<IFileShareApiAdminClient> fileShareClientFactory, AppendAclJob job, ILogger<AppendAclJobViewModel> logger) : base(job,logger)
+        public AppendAclJobViewModel(AppendAclJob job, Func<IFileShareApiAdminClient> fileShareClientFactory, ILogger<AppendAclJobViewModel> logger) : base(job, logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
-            this.fileShareClientFactory = fileShareClientFactory;
             this.job = job;
-            this.logger = logger;          
+            this.fileShareClientFactory = fileShareClientFactory;
+            this.logger = logger;
         }
 
         public string BatchId => job.ActionParams.BatchId;
@@ -45,15 +44,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         }
         protected internal override async Task OnExecuteCommand()
         {
-                IsExecuting = true; 
-            
-                try
-                {
-                    var fileShareClient = fileShareClientFactory(); 
-                    var buildBatchModel = BuildBatchModel();
-                    logger.LogInformation("Execute job started for Action :{Action}  and displayName :{displayName} and batchId:{BatchId} .", Action, DisplayName,BatchId);
-                    var response = await fileShareClient.AppendAclAsync(BatchId, buildBatchModel.Acl,CancellationToken.None);
-                              
+            IsExecuting = true;
+            try
+            {
+                logger.LogInformation("Execute job started for Action :{Action}  and displayName :{displayName} and batchId:{BatchId} .", Action, DisplayName, BatchId);
+                var fileShareClient = fileShareClientFactory();
+                var buildBatchModel = BuildBatchModel();                
+                var response = await fileShareClient.AppendAclAsync(BatchId, buildBatchModel.Acl, CancellationToken.None);
+
                 if (response.StatusCode != HttpStatusCode.NoContent)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -65,29 +63,29 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     {
                         var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
                         responseMessage = string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description));
-                    }                   
-                    logger.LogError("File Share Service append acl failed for Action:{Action}, displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", Action,DisplayName, BatchId, responseMessage);
+                    }
+                    logger.LogError("File Share Service append acl failed for Action:{Action}, displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", Action, DisplayName, BatchId, responseMessage);
                 }
                 ExecutionResult = response.StatusCode != HttpStatusCode.NoContent
                        ? responseMessage!
                        : $"File Share Service append Access Control List completed for batch ID: {BatchId}";
 
                 logger.LogInformation("Execute job completed for Action : {Action}, displayName:{DisplayName} and batch ID:{BatchId}.", Action, DisplayName, BatchId);
-                }
-                catch (Exception e)
-                {
-                    ExecutionResult = e.Message;
-                    logger.LogError("File Share Service append Access Control List failed for batch ID:{BatchId} with error:{ExecutionResult}", BatchId, ExecutionResult);
-                    logger.LogError(e.ToString());
-            }            
-                finally
-                {            
-                    IsExecuting = false;
-                    IsExecutingComplete = true;
-                }
+            }
+            catch (Exception e)
+            {
+                ExecutionResult = e.Message;
+                logger.LogError("File Share Service append Access Control List failed for batch ID:{BatchId} with error:{ExecutionResult}", BatchId, ExecutionResult);
+                logger.LogError(e.ToString());
+            }
+            finally
+            {
+                IsExecuting = false;
+                IsExecutingComplete = true;
+            }
         }
 
-        
+
 
         public BatchModel BuildBatchModel()
         {
