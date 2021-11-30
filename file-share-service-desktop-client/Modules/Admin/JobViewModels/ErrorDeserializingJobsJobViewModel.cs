@@ -8,12 +8,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
     public class ErrorDeserializingJobsJobViewModel : BaseBatchJobViewModel
     {
         private readonly ErrorDeserializingJobsJob job;
-        private readonly ILogger<ErrorDeserializingJobsJobViewModel> ELogger;
-
-        public ErrorDeserializingJobsJobViewModel(ErrorDeserializingJobsJob job, ILogger<ErrorDeserializingJobsJobViewModel> ELogger) : base(job, ELogger)
+        private readonly ILogger<ErrorDeserializingJobsJobViewModel> eLogger;
+        public ErrorDeserializingJobsJobViewModel(ErrorDeserializingJobsJob job, ILogger<ErrorDeserializingJobsJobViewModel> eLogger) : base(job, eLogger)
         {
             this.job = job;
-            this.ELogger = ELogger;
+            this.eLogger = eLogger;
             _ = CanExecute();
         }
 

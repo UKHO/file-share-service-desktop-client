@@ -101,7 +101,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                 NewBatchJob newBatch => new NewBatchJobViewModel(newBatch, fileSystem,Nlogger,
                     () => fileShareApiAdminClientFactory.Build(),
                     currentDateTimeProvider),
-                AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl, aLogger),
+                AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl, () => fileShareApiAdminClientFactory.Build(), aLogger),
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, sLogger),
                 ReplaceAclJob replaceAcl => new ReplaceAclJobViewModel(replaceAcl, () => fileShareApiAdminClientFactory.Build(), rLogger),
                 ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
