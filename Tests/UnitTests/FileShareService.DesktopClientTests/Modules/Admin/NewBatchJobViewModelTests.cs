@@ -25,7 +25,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
         private ICurrentDateTimeProvider fakeCurrentDateTimeProvider = null!;
         private  ILogger<NewBatchJobViewModel> fakeLoggerNewBatchJobVM =null!;
-        private MacroTransformer macroTransformer = null!;
+        private IMacroTransformer macroTransformer = null!;
+        private IDateTimeValidator dateTimeValidator = null!;
 
 
         [SetUp]
@@ -36,6 +37,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fakeCurrentDateTimeProvider = A.Fake<ICurrentDateTimeProvider>();
             fakeLoggerNewBatchJobVM = A.Fake<ILogger<NewBatchJobViewModel>>();
             macroTransformer = new MacroTransformer(fakeCurrentDateTimeProvider);
+            dateTimeValidator = new DateTimeValidator(macroTransformer);
         }
 
         [TestCase("$(now.Year)")]

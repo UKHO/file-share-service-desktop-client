@@ -8,7 +8,7 @@ using UKHO.WeekNumberUtils;
 
 namespace UKHO.FileShareService.DesktopClient.Helper
 {
-    public class MacroTransformer
+    public class MacroTransformer : IMacroTransformer
     {
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
 

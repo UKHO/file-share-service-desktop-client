@@ -20,7 +20,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private readonly IJobsParser jobsParser;
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
-        private readonly MacroTransformer macroTransformer;
+        private readonly IMacroTransformer macroTransformer;
+        private readonly IDateTimeValidator dateTimeValidator;
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
         private readonly ILogger<AdminViewModel> logger;
         private readonly ILogger<NewBatchJobViewModel> Nlogger;
@@ -31,7 +32,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             IJobsParser jobsParser,
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
             ICurrentDateTimeProvider currentDateTimeProvider,
-            MacroTransformer macroTransformer,
+            IMacroTransformer macroTransformer,
+            IDateTimeValidator dateTimeValidator,
             IEnvironmentsManager environmentsManager,
             ILogger<AdminViewModel> logger,
             ILogger<NewBatchJobViewModel> Nlogger,
@@ -43,6 +45,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.macroTransformer = macroTransformer;
+            this.dateTimeValidator = dateTimeValidator;
             this.logger = logger;
             this.Nlogger = Nlogger;
             this.setExpirylogger = setExpirylogger;
@@ -98,7 +101,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                     currentDateTimeProvider,macroTransformer),
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl),
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, setExpirylogger, 
-                                () => fileShareApiAdminClientFactory.Build(),macroTransformer),
+                                () => fileShareApiAdminClientFactory.Build(), dateTimeValidator),
                 ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
                     errorDeserializingJobs),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())

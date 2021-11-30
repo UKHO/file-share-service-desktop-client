@@ -25,14 +25,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly IFileSystem fileSystem;
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
-        private readonly MacroTransformer macroTransformer;
+        private readonly IMacroTransformer macroTransformer;
         private readonly ILogger<NewBatchJobViewModel> logger;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
              ILogger<NewBatchJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,   
             ICurrentDateTimeProvider currentDateTimeProvider,
-            MacroTransformer macroTransformer) : base(job)
+            IMacroTransformer macroTransformer) : base(job)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;

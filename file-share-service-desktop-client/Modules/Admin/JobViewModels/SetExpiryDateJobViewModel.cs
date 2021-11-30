@@ -19,18 +19,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly SetExpiryDateJob job;
         private readonly ILogger<SetExpiryDateJobViewModel> logger;
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
-        private readonly MacroTransformer macroTransformer;
+        private readonly IDateTimeValidator dateTimeValidator;
 
         public SetExpiryDateJobViewModel(SetExpiryDateJob job,
             ILogger<SetExpiryDateJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,
-            MacroTransformer macroTransformer) : base(job)
+            IDateTimeValidator dateTimeValidator) : base(job)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;
             this.logger = logger;
             this.fileShareClientFactory = fileShareClientFactory;
-            this.macroTransformer = macroTransformer;
+            this.dateTimeValidator = dateTimeValidator;
         }
         
         public string BatchId => job.ActionParams.BatchId;
@@ -39,10 +39,23 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string RawExpiryDate
         {
             get => job.ActionParams.ExpiryDate;
-            //set { }
         }
 
-        public DateTime? ExpiryDate => GetExpirtDate();
+        private DateTime? expiryDate = null;
+
+        public string? ExpiryDate
+        {
+            get
+            {
+                if(!expiryDate.HasValue)
+                {
+                    expiryDate = dateTimeValidator.ValidateExpiryDate(IsExpiryDateKeyExist, RFC3339_FORMATS, RawExpiryDate, job.ErrorMessages);
+                }
+
+                return expiryDate.HasValue ?
+                    expiryDate.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : null;
+            }
+        }
 
         protected internal override async Task OnExecuteCommand()
         {
@@ -90,21 +103,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        protected override bool CanExecute()
-        {
-            ValidationErrors.Clear();
-            
-            ValidationErrors = job.ErrorMessages;
-
-            for (int i = 0; i < ValidationErrors.Count; i++)
-            {
-                logger.LogError("Configuration Error : {ValidationErrors}  for Action : {Action}, displayName:{displayName} and BatchId: {BatchId}. ", 
-                    ValidationErrors[i].ToString(), SetExpiryDateJob.JOB_ACTION, DisplayName, BatchId);
-            }
-
-            return !ValidationErrors.Any();
-        }
-
         public DelegateCommand CloseExecutionCommand { get; }
 
         private void OnCloseExecutionCommand()
@@ -117,46 +115,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             return new BatchExpiryModel
             {
-                ExpiryDate = RawExpiryDate
+                ExpiryDate = ExpiryDate
             };
         }
-
-        private DateTime? GetExpirtDate()
-        {
-            if (IsExpiryDateKeyExist && RawExpiryDate is not null)
-            {
-                DateTime dateTime;
-                //Parse if date is valid RFC 3339 format
-                if (DateTime.TryParseExact(RawExpiryDate, RFC3339_FORMATS, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime))
-                {
-                    return dateTime;
-                }
-                //Get expand macro data
-                var expandedDateTime = macroTransformer.ExpandMacros(RawExpiryDate);
-
-                if (RawExpiryDate.Equals(expandedDateTime))
-                {
-                    job.ErrorMessages.Add("Expiry date is either invalid or in an invalid format.");
-                    return null;
-                }
-
-                if (DateTime.TryParse(expandedDateTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
-                {
-                    return dateTime;
-                }
-
-                job.ErrorMessages.Add($"Unable to parse the date {expandedDateTime}");
-                return null;
-            }
-            return null;
-        }
-
-
-
-
-
-
-
-
     }
 }
