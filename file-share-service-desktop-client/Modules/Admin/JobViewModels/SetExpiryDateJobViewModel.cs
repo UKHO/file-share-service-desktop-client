@@ -36,10 +36,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string BatchId => job.ActionParams.BatchId;
         public bool IsExpiryDateKeyExist => job.IsExpiryDateKeyExist;
 
-        public string RawExpiryDate
-        {
-            get => job.ActionParams.ExpiryDate;
-        }
+        public string RawExpiryDate => job.ActionParams.ExpiryDate;
 
         private DateTime? expiryDate = null;
 

@@ -98,7 +98,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             {
                 NewBatchJob newBatch => new NewBatchJobViewModel(newBatch, fileSystem,Nlogger,
                     () => fileShareApiAdminClientFactory.Build(),
-                    currentDateTimeProvider,macroTransformer),
+                    currentDateTimeProvider,macroTransformer, dateTimeValidator),
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl),
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, setExpirylogger, 
                                 () => fileShareApiAdminClientFactory.Build(), dateTimeValidator),

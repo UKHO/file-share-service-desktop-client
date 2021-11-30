@@ -83,7 +83,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient, 
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
             
@@ -147,7 +147,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer,dateTimeValidator);
 
             var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekNumber = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Week.ToString();
@@ -198,7 +198,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekYear = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Year.ToString();
@@ -232,7 +232,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var file1FullFileName = @"c:/data/files/f1.txt";
             fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
 
-            var vm = new NewBatchJobViewModel(new NewBatchJob
+            var newJob = new NewBatchJob
             {
                 DisplayName = "Create new Batch 123",
                 ActionParams = new NewBatchJobParams
@@ -253,19 +253,66 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         },
                     ExpiryDate = input
                 }
-            },
+            };
+
+            typeof(NewBatchJob).GetProperty(nameof(newJob.IsExpiryDateKeyExist))?.SetValue(newJob, true, null);
+
+            var vm = new NewBatchJobViewModel(newJob,
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
-
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             Assert.AreEqual(input, vm.RawExpiryDate);
 
             var expiry = vm.ExpiryDate;
             Assert.IsNotNull(expiry);
-            Assert.AreEqual(DateTime.UtcNow.AddDays(dayOffsetFromNow).Date, expiry!.Value.Date);
+            Assert.AreEqual(DateTime.UtcNow.AddDays(dayOffsetFromNow).Date, DateTime.Parse(expiry).Date);
         }
 
+        [Test]
+        public void TestExpiryDateWithPastDate()
+        {
+            A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime).Returns(DateTime.UtcNow);
+            var file1FullFileName = @"c:/data/files/f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var newJob = new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new Dictionary<string, string>
+                    {
+                        { "BatchAttribute1", "Value1" }
+                    },
+                    Files =
+                    {
+                        new NewBatchFiles
+                        {
+                            ExpectedFileCount = 1,
+                            MimeType = "text/plain",
+                            SearchPath = file1FullFileName
+                        }
+                    },
+                    ExpiryDate = "$(now.AddDays(-5))"
+                }
+            };
+
+            typeof(NewBatchJob).GetProperty(nameof(newJob.IsExpiryDateKeyExist))?.SetValue(newJob, true, null);
+
+            var vm = new NewBatchJobViewModel(newJob,
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+
+            Assert.AreEqual("$(now.AddDays(-5))", vm.RawExpiryDate);
+
+            var expiry = vm.ExpiryDate;
+            Assert.IsNotNull(expiry);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+            StringAssert.StartsWith("Expiry date cannot be a past date", vm.ValidationErrors[0]);
+        }
         [Test]
         public void TestFileSearch()
         {
@@ -300,7 +347,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             Assert.AreEqual(2, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName, file2FullFileName },
@@ -350,7 +397,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             Assert.AreEqual(2, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName, file2FullFileName },
@@ -390,7 +437,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName },
@@ -424,7 +471,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName },
@@ -460,7 +507,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             Assert.AreEqual("Create new Batch 123", vm.DisplayName);
 
@@ -523,7 +570,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
             fileSystem, fakeLoggerNewBatchJobVM,
             () => fakeFileShareApiAdminClient,
-            fakeCurrentDateTimeProvider, macroTransformer);
+            fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
             // Testing method returns true when committed
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
@@ -549,7 +596,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new NewBatchJobViewModel(newBatchJob,
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
 
             Assert.AreEqual("Create new Batch", vm.DisplayName);

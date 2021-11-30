@@ -27,12 +27,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
         private readonly IMacroTransformer macroTransformer;
         private readonly ILogger<NewBatchJobViewModel> logger;
+        private readonly IDateTimeValidator dateTimeValidator;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
              ILogger<NewBatchJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,   
             ICurrentDateTimeProvider currentDateTimeProvider,
-            IMacroTransformer macroTransformer) : base(job)
+            IMacroTransformer macroTransformer,
+            IDateTimeValidator dateTimeValidator) : base(job)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;
@@ -41,6 +43,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             this.logger = logger;
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.macroTransformer = macroTransformer;
+            this.dateTimeValidator = dateTimeValidator;
             Files = job.ActionParams.Files != null ? 
                 job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, macroTransformer.ExpandMacros)).ToList() 
                     : new List<NewBatchFilesViewModel>();
@@ -48,17 +51,23 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         public string BusinessUnit => job.ActionParams.BusinessUnit;
 
+        public bool IsExpiryDateKeyExist => job.IsExpiryDateKeyExist;
+
         public string RawExpiryDate => job.ActionParams.ExpiryDate;
 
-        public DateTime? ExpiryDate
+        private DateTime? expiryDate = null;
+
+        public string? ExpiryDate
         {
             get
             {
-                var expandedDateTime = macroTransformer.ExpandMacros(RawExpiryDate);
-                if (DateTime.TryParse(expandedDateTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal,
-                    out var result))
-                    return result;
-                return null;
+                if (!expiryDate.HasValue)
+                {
+                    expiryDate = dateTimeValidator.ValidateExpiryDate(IsExpiryDateKeyExist, RFC3339_FORMATS, RawExpiryDate, job.ErrorMessages);
+                }
+
+                return expiryDate.HasValue ?
+                    expiryDate.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : null;
             }
         }
 
@@ -191,14 +200,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ReadUsers = ReadUsers
                 },
                 Attributes = Attributes.ToList(),
-                ExpiryDate = ExpiryDate
+                ExpiryDate = expiryDate
             };
         }
 
         private void ValidateViewModel()
         {
             // Add validations for expiry date.
-            //ToDo:
+            if (expiryDate.HasValue && DateTime.Compare(expiryDate.Value.ToUniversalTime(), DateTime.UtcNow) <= 0)
+            {
+                job.ErrorMessages.Add("Expiry date cannot be a past date.");
+            }
+
             if (Files.Any())
             {
                 foreach (var file in Files)

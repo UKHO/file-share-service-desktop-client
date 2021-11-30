@@ -12,7 +12,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public SetExpiryDateJobParams ActionParams { get; set; } = new SetExpiryDateJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
 
-        // To hold whether expiry date is specified as NULL in the config or not.
+        // To hold whether expiry date is specified in config or not.
         public bool IsExpiryDateKeyExist { get; private set; }
 
         public void Validate(JToken jsonToken)
@@ -20,7 +20,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             #region Predeserialize validations
             JToken? expiryDateToken = jsonToken.SelectToken("actionParams.expiryDate");
 
-            //Set value if token exists and value is null (not empty or blank)
+            //Set value if key exists
             IsExpiryDateKeyExist = expiryDateToken != null;
 
             #endregion

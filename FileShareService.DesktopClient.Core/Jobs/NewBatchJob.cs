@@ -9,6 +9,9 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public string DisplayName { get; set; }
         public NewBatchJobParams ActionParams { get; set; } = new NewBatchJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
+        
+        // To hold whether expiry date is specified in config or not.
+        public bool IsExpiryDateKeyExist { get; private set; }
 
         public void Validate(JToken jsonToken)
         {
@@ -56,6 +59,10 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             {
                 ErrorMessages.Add($"Invalid file object.");
             }
+
+            JToken? expiryDateToken = jsonToken.SelectToken("actionParams.expiryDate");
+            //Set value if key exists
+            IsExpiryDateKeyExist = expiryDateToken != null;
             #endregion
 
             #region Post deserialize validations
