@@ -266,7 +266,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
             var expiry = vm.ExpiryDate;
             Assert.IsNotNull(expiry);
-            Assert.AreEqual(DateTime.UtcNow.AddDays(dayOffsetFromNow).Date, DateTime.Parse(expiry).Date);
+            Assert.AreEqual(DateTime.UtcNow.AddDays(dayOffsetFromNow).Date, DateTime.Parse(expiry!).Date);
         }
 
         [Test]

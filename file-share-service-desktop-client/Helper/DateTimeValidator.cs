@@ -21,7 +21,7 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 //Parse if date is valid RFC 3339 format
                 if (DateTime.TryParseExact(rawDateTime, validFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTime))
                 {
-                    return dateTime.ToUniversalTime();
+                    return dateTime;
                 }
                 //Get expand macro data
                 var expandedDateTime = macroTransformer.ExpandMacros(rawDateTime);
@@ -34,7 +34,7 @@ namespace UKHO.FileShareService.DesktopClient.Helper
 
                 if (DateTime.TryParse(expandedDateTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
                 {
-                    return dateTime.ToUniversalTime();
+                    return dateTime;
                 }
 
                 errorMessages.Add($"Unable to parse the date {expandedDateTime}");

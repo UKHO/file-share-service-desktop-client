@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Commands;
@@ -104,6 +106,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             {
                 return ValidationErrors.Any();
             }
+        }
+
+        protected string ConvertToRFC3339Format(DateTime dateTime)
+        {
+            return dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
         }
     }
 }

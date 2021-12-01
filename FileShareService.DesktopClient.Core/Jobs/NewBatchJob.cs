@@ -55,7 +55,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
             //Check for files
             if (jsonToken.SelectToken("actionParams.files") != null && 
-                jsonToken.SelectToken("actionParams.files").Type != JTokenType.Array)
+                jsonToken.SelectToken("actionParams.files")?.Type != JTokenType.Array)
             {
                 ErrorMessages.Add($"Invalid file object.");
             }

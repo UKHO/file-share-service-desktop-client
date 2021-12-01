@@ -67,7 +67,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 }
 
                 return expiryDate.HasValue ?
-                    expiryDate.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : null;
+                    ConvertToRFC3339Format(expiryDate.Value.ToUniversalTime()) : null;
             }
         }
 
