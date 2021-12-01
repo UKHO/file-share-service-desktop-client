@@ -379,7 +379,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         }
                         job.ErrorMessages.Add($"{fileCountMismatchErrorMessage}");
                     }
-                }
+               }
             }
         }
 
@@ -441,7 +441,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string MimeType => newBatchFile.MimeType;
 
         public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
-        
+        public IEnumerable<KeyValuePair<string, string>> Attributes =>
+        //newBatchFile.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, ExpandMacros(kv.Value)));
+        newBatchFile.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value));
         private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
         {
             try

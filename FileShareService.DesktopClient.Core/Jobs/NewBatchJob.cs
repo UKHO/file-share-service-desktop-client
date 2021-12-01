@@ -51,10 +51,41 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             }
 
             //Check for files
-            if (jsonToken.SelectToken("actionParams.files") != null && 
+            if (jsonToken.SelectToken("actionParams.files") != null &&
                 jsonToken.SelectToken("actionParams.files").Type != JTokenType.Array)
             {
                 ErrorMessages.Add($"Invalid file object.");
+            }
+
+            //Check for file attributes
+            //int fileCount = JArray.FromObject(jsonToken.SelectToken("actionParams.files")).Count;
+
+            foreach (JToken fileObj in jsonToken.SelectToken("actionParams.files"))
+            {
+                JToken? fileAttributeToken = fileObj.SelectToken("attributes");
+                if (fileAttributeToken != null && JArray.FromObject(fileAttributeToken).Count > 0)
+                {
+                    if (fileAttributeToken?.Type != JTokenType.Array)
+                    {
+                        ErrorMessages.Add("Invalid file attribute.");
+                    }
+                    else if (fileAttributeToken.HasValues)
+                    {
+                        //Check for batch attribute key and value
+                        foreach (var fileAttribute in fileAttributeToken)
+                        {
+                            if (fileAttribute.SelectToken("key")?.Type != JTokenType.String)
+                            {
+                                ErrorMessages.Add($"File attribute key is missing or is invalid for the file.");
+                            }
+
+                            if (fileAttribute.SelectToken("value")?.Type != JTokenType.String)
+                            {
+                                ErrorMessages.Add($"File attribute value is missing or is invalid for the file.");
+                            }
+                        }
+                    }
+                }
             }
             #endregion
 
@@ -93,6 +124,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public string SearchPath { get; set; }
         public int ExpectedFileCount { get; set; }
         public string MimeType { get; set; }
+        public IEnumerable<KeyValuePair<string, string>> Attributes { get; set; } =
+            new List<KeyValuePair<string, string>>();
     }
 
     public class Acl

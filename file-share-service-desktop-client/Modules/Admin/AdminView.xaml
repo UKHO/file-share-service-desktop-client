@@ -146,6 +146,8 @@
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="Attributes" Width="100" 
+                                                                    Binding="{Binding Attributes}" />
                                                 <DataGridTextColumn Header="MIME Type" Binding="{Binding MimeType}" />
                                             </DataGrid.Columns>
                                         </DataGrid>
