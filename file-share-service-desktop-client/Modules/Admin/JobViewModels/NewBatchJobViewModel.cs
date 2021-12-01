@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             Func<IFileShareApiAdminClient> fileShareClientFactory,   
             ICurrentDateTimeProvider currentDateTimeProvider,
             IMacroTransformer macroTransformer,
-            IDateTimeValidator dateTimeValidator) : base(job)
+            IDateTimeValidator dateTimeValidator) : base(job, logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;
@@ -81,6 +80,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             ValidateViewModel();
 
             ValidationErrors = job.ErrorMessages;
+            for (int i = 0; i < ValidationErrors.Count; i++)
+            {
+                logger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName}. ", ValidationErrors[i].ToString(), Action, DisplayName);
+            }
 
             return !ValidationErrors.Any();
         }
@@ -105,7 +108,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsExecuting = true;
             try
             {
-                logger.LogInformation("Execute job started for displayName :{displayName} .",DisplayName);
+                logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .",Action,DisplayName);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
                 logger.LogInformation("File Share Service batch create started.");
@@ -153,7 +156,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
                         : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
 
-                    logger.LogInformation("Execute job completed for displayName:{displayName} and batch ID:{BatchId}.",DisplayName, batchHandle.BatchId);
+                    logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
                 }
                 catch (Exception e)
                 {

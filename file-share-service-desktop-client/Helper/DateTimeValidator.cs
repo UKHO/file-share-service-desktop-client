@@ -23,21 +23,15 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 {
                     return dateTime;
                 }
+                
                 //Get expand macro data
                 var expandedDateTime = macroTransformer.ExpandMacros(rawDateTime);
-
-                if (rawDateTime.Equals(expandedDateTime))
-                {
-                    errorMessages.Add("Expiry date is either invalid or in an invalid format.");
-                    return null;
-                }
-
                 if (DateTime.TryParse(expandedDateTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
                 {
                     return dateTime;
                 }
 
-                errorMessages.Add($"Unable to parse the date {expandedDateTime}");
+                errorMessages.Add("Either expiry date is invalid or invalid format.");
                 return null;
             }
             return null;

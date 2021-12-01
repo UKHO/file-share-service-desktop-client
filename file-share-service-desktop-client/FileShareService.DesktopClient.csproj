@@ -34,8 +34,12 @@
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
-    <PackageReference Include="UKHO.FileShareAdminClient" Version="0.1.11126.1" />
-    <PackageReference Include="UKHO.FileShareClient" Version="0.1.11126.1" />
+    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+    <PackageReference Include="UKHO.FileShareAdminClient" Version="0.1.11129.8" />
+    <PackageReference Include="UKHO.FileShareClient" Version="0.1.11129.8" />
     <PackageReference Include="UKHO.WeekNumberUtils" Version="1.5.21167.4" />
     <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
   </ItemGroup>

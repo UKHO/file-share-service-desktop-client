@@ -17,7 +17,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
     public class JobsParser : IJobsParser
     {
         private static readonly List<string> ValidJobActions =
-            new List<string>() { NewBatchJob.JOB_ACTION, AppendAclJob.JOB_ACTION, SetExpiryDateJob.JOB_ACTION };
+            new List<string>() { NewBatchJob.JOB_ACTION, AppendAclJob.JOB_ACTION, 
+                                 SetExpiryDateJob.JOB_ACTION, ReplaceAclJob.JOB_ACTION };
 
         private List<string> jobIdCollection = new List<string>();
 
@@ -35,6 +36,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     .RegisterSubtype<NewBatchJob>(NewBatchJob.JOB_ACTION)
                     .RegisterSubtype<AppendAclJob>(AppendAclJob.JOB_ACTION)
                     .RegisterSubtype<SetExpiryDateJob>(SetExpiryDateJob.JOB_ACTION)
+                    .RegisterSubtype<ReplaceAclJob>(ReplaceAclJob.JOB_ACTION)
                     .SerializeDiscriminatorProperty(true)
                     .Build()
                 );
@@ -78,13 +80,14 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
                         string jsonString = Convert.ToString(batchJob);
 
-                        IJob? job = jobAction switch
-                        {
-                            NewBatchJob.JOB_ACTION => JsonConvert.DeserializeObject<NewBatchJob>(jsonString, jsonSerializerSettings),
-                            AppendAclJob.JOB_ACTION => JsonConvert.DeserializeObject<AppendAclJob>(jsonString, jsonSerializerSettings),
-                            SetExpiryDateJob.JOB_ACTION => JsonConvert.DeserializeObject<SetExpiryDateJob>(jsonString, jsonSerializerSettings),
-                            _ => null
-                        };
+                    IJob? job = jobAction switch
+                    {
+                        NewBatchJob.JOB_ACTION => JsonConvert.DeserializeObject<NewBatchJob>(jsonString, jsonSerializerSettings),
+                        AppendAclJob.JOB_ACTION => JsonConvert.DeserializeObject<AppendAclJob>(jsonString, jsonSerializerSettings),
+                        SetExpiryDateJob.JOB_ACTION => JsonConvert.DeserializeObject<SetExpiryDateJob>(jsonString, jsonSerializerSettings),
+                        ReplaceAclJob.JOB_ACTION => JsonConvert.DeserializeObject<ReplaceAclJob>(jsonString, jsonSerializerSettings),
+                        _ => null
+                    };
 
 
                         if (job != null)

@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using Prism.Commands;
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +23,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public SetExpiryDateJobViewModel(SetExpiryDateJob job,
             ILogger<SetExpiryDateJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,
-            IDateTimeValidator dateTimeValidator) : base(job)
+            IDateTimeValidator dateTimeValidator) : base(job, logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;

@@ -23,10 +23,12 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private ILogger<AdminViewModel> fakeLoggerAdminVM = null!;
         private ILogger<NewBatchJobViewModel> fakeLoggerNewBatchVM = null!;
+        private ILogger<AppendAclJobViewModel> fakeLoggerAppenAclVM = null!;
+        private ILogger<SetExpiryDateJobViewModel> fakeLoggerSetExpiryDateVM = null!;
+        private ILogger<ReplaceAclJobViewModel> fakeLoggerReplaceAclVM = null!;
+        private ILogger<ErrorDeserializingJobsJobViewModel> fakeLoggerErrorDeserialisingVM = null!;
         private IMacroTransformer fakeMacroTransformer = null!;
         private IDateTimeValidator fakeDateTimeValidator = null!;
-        private ILogger<SetExpiryDateJobViewModel> slogger = null!;
-        
 
         [SetUp]
         public void Setup()
@@ -37,9 +39,12 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeLoggerAdminVM = A.Fake<ILogger<AdminViewModel>>();
             fakeLoggerNewBatchVM = A.Fake<ILogger<NewBatchJobViewModel>>();
+            fakeLoggerAppenAclVM = A.Fake<ILogger<AppendAclJobViewModel>>();
+            fakeLoggerSetExpiryDateVM = A.Fake<ILogger<SetExpiryDateJobViewModel>>();
+            fakeLoggerReplaceAclVM = A.Fake<ILogger<ReplaceAclJobViewModel>>();
+            fakeLoggerErrorDeserialisingVM = A.Fake<ILogger<ErrorDeserializingJobsJobViewModel>>();
             fakeMacroTransformer = A.Fake<IMacroTransformer>();
             fakeDateTimeValidator = A.Fake<DateTimeValidator>();
-            slogger = A.Fake<ILogger<SetExpiryDateJobViewModel>>();
         }
 
         [Test]
@@ -47,14 +52,16 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         {
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
-                A.Fake<ICurrentDateTimeProvider>(), fakeMacroTransformer,fakeDateTimeValidator,
-                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM, slogger);
+                A.Fake<ICurrentDateTimeProvider>(),
+                fakeMacroTransformer, fakeDateTimeValidator,
+                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM, 
+                fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
             A.CallTo(() => fakeJobsParser.Parse("JsonContent"))
                 .Returns(new Jobs
-                    {jobs = new List<IJob> {new NewBatchJob(), new AppendAclJob(), new SetExpiryDateJob()}});
+                    {jobs = new List<IJob> {new NewBatchJob(), new AppendAclJob(), new SetExpiryDateJob(), new ReplaceAclJob()}});
 
             vm.LoadBatchJobsFile(jobsFilePath);
 
@@ -63,6 +70,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsInstanceOf<NewBatchJobViewModel>(batchJobViewModels[0]);
             Assert.IsInstanceOf<AppendAclJobViewModel>(batchJobViewModels[1]);
             Assert.IsInstanceOf<SetExpiryDateJobViewModel>(batchJobViewModels[2]);
+            Assert.IsInstanceOf<ReplaceAclJobViewModel>(batchJobViewModels[3]);
         }
 
         [Test]
@@ -70,8 +78,10 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         {
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
-                A.Fake<ICurrentDateTimeProvider>(),fakeMacroTransformer,fakeDateTimeValidator,
-                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM, slogger);
+                A.Fake<ICurrentDateTimeProvider>(),
+                fakeMacroTransformer, fakeDateTimeValidator,
+                fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM,
+                 fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
@@ -91,8 +101,10 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         {
             var vm = new AdminViewModel(mockFileSystem, fakeKeyValueStore, fakeJobsParser,
                 A.Fake<IFileShareApiAdminClientFactory>(),
-                A.Fake<ICurrentDateTimeProvider>(),fakeMacroTransformer,fakeDateTimeValidator,
-                fakeEnvironmentsManager, fakeLoggerAdminVM, fakeLoggerNewBatchVM, slogger);
+                A.Fake<ICurrentDateTimeProvider>(),
+                fakeMacroTransformer, fakeDateTimeValidator,
+                fakeEnvironmentsManager, fakeLoggerAdminVM, fakeLoggerNewBatchVM,
+                 fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
