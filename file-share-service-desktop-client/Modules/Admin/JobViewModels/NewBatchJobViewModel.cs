@@ -34,7 +34,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
              ILogger<NewBatchJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,   
-            ICurrentDateTimeProvider currentDateTimeProvider) : base(job)
+            ICurrentDateTimeProvider currentDateTimeProvider
+           ) : base(job,logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;
@@ -170,6 +171,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             ValidateFiles();
 
             ValidationErrors = job.ErrorMessages;
+            for (int i = 0; i < ValidationErrors.Count; i++)
+            {
+                logger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName}. ", ValidationErrors[i].ToString(), Action, DisplayName);
+            }
 
             return !ValidationErrors.Any();
         }
@@ -233,7 +238,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsExecuting = true;
             try
             {
-                logger.LogInformation("Execute job started for displayName :{displayName} .",DisplayName);
+                logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .",Action,DisplayName);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
                 logger.LogInformation("File Share Service batch create started.");
@@ -281,7 +286,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
                         : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
 
-                    logger.LogInformation("Execute job completed for displayName:{displayName} and batch ID:{BatchId}.",DisplayName, batchHandle.BatchId);
+                    logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
                 }
                 catch (Exception e)
                 {
@@ -410,7 +415,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 _= fileSystem.DirectoryInfo.FromDirectoryName(directory).GetDirectories();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -451,7 +456,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return directory.EnumerateFileSystemInfos(filePathName);
 
             }
-            catch(DirectoryNotFoundException ex)
+            catch(DirectoryNotFoundException )
             {
                 return Enumerable.Empty<IFileSystemInfo>();
             }
