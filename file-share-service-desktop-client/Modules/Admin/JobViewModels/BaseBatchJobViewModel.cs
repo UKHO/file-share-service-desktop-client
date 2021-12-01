@@ -42,13 +42,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             ValidationErrors.Clear();
 
             ValidationErrors = job.ErrorMessages;
+
             for (int i = 0; i < ValidationErrors.Count; i++)
             {
                 logger.LogError("Configuration Error : {ValidationErrors} for Action : {Action}, displayName:{displayName}. ", ValidationErrors[i].ToString(), Action, DisplayName);
             }
 
             return !ValidationErrors.Any();
-
         }
 
         public bool IsExecuting
@@ -109,13 +109,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string Action => job.Action;
 
         public List<string> ValidationErrors { get; set; } = new List<string>();
-        public bool IsVisibleValidationErrorsArea
-        {
-            get
-            {
-                return ValidationErrors.Any();
-            }
-        }
+       
+        public bool IsVisibleValidationErrorsArea => ValidationErrors.Any();
 
         protected string ConvertToRFC3339Format(DateTime dateTime)
         {

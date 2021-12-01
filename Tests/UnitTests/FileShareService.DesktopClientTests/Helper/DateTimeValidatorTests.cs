@@ -55,7 +55,7 @@ namespace FileShareService.DesktopClientTests.Helper
         }
 
         [Test]
-        public void TestForinvalidFormat()
+        public void TestForInvalidFormat()
         {
             list.Clear();
 
@@ -63,7 +63,7 @@ namespace FileShareService.DesktopClientTests.Helper
 
             Assert.IsNull(expectedDate);
             Assert.AreEqual(1, list.Count);
-            StringAssert.StartsWith("Expiry date is either invalid or in an invalid format", list[0]);
+            StringAssert.StartsWith("Either expiry date is invalid or invalid format", list[0]);
         }
     }
 }

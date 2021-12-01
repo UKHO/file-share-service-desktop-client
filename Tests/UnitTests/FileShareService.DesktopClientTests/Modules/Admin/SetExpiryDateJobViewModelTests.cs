@@ -137,18 +137,18 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         }
 
         [TestCase("")]
-        //[TestCase(" ")]
-        //[TestCase("10/10/2022")]
-        //[TestCase("2022-01-10")]
-        //[TestCase("2022-01-1T10:00:00Z")]
-        //[TestCase("2022-01-01T10:70:00Z")]
-        //[TestCase("now.AddDays(28)")]
-        //[TestCase("(now.AddDays(2))")]
-        //[TestCase("#(now.AddDays(2))")]
-        //[TestCase("$(now.AddDaysAndMonths(2))")]
-        //[TestCase("$(now.AddDays(xyz))")]
-        //[TestCase("$(now.AddDays(10x))")]
-        //[TestCase("$(now.AddDays(1).AddMonths(1))")]
+        [TestCase(" ")]
+        [TestCase("10/10/2022")]
+        [TestCase("2022-01-10")]
+        [TestCase("2022-01-1T10:00:00Z")]
+        [TestCase("2022-01-01T10:70:00Z")]
+        [TestCase("now.AddDays(28)")]
+        [TestCase("(now.AddDays(2))")]
+        [TestCase("#(now.AddDays(2))")]
+        [TestCase("$(now.AddDaysAndMonths(2))")]
+        [TestCase("$(now.AddDays(xyz))")]
+        [TestCase("$(now.AddDays(10x))")]
+        [TestCase("$(now.AddDays(1).AddMonths(1))")]
         public void TestSetExpiryDateJobHasInvalidExpiryDateFormat(string invalidExpiryDate)
         {
             var setBatchExpiryJob = new SetExpiryDateJob();
@@ -165,7 +165,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.AreEqual("Test - Set expiry date", vm.DisplayName);
             Assert.IsNull(vm.ExpiryDate);
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute(), $"Expected validation error message for format { invalidExpiryDate}, but no validation error message.");
-            StringAssert.StartsWith("Expiry date is either invalid or in an invalid format", vm.ValidationErrors[0], $"Expected error message for format {invalidExpiryDate}, but no validation message.");
+            StringAssert.StartsWith("Either expiry date is invalid or invalid format", vm.ValidationErrors[0], $"Expected error message for format {invalidExpiryDate}, but no validation message.");
         }
 
         [TestCase(null)]
