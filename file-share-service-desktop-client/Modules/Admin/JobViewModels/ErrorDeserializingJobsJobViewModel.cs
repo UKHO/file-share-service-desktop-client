@@ -14,7 +14,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly List<IJob>? jobs;
 
         public ErrorDeserializingJobsJobViewModel(List<IJob>? jobs, ILogger<ErrorDeserializingJobsJobViewModel> logger) 
-            : base(jobs![0], logger)
+            : base(new ErrorDeserializingJobsJob(), logger)
         {
             this.jobs = jobs;
             this.logger = logger;
