@@ -39,18 +39,6 @@
           ]
         },
         "expiryDate": "$(now.AddDays(21))",
-        //"files": [
-        //  {
-        //    "searchPath": "D:\\SampleFilesTooling\\test1.txt",
-        //    "expectedFileCount": 1,
-        //    "mimeType": "application/x-raw-disk-image"
-        //  },
-        //  {
-        //    "searchPath": "D:\\SampleFilesTooling\\test2.txt",
-        //    "expectedFileCount": 1,
-        //    "mimeType": "text/plain"
-        //  }
-        //]
         "files": [
           {
             "searchPath": "D:\\SampleFilesTooling\\test1.txt",
@@ -58,7 +46,7 @@
             "mimeType": "application/x-raw-disk-image",
             "attributes": [
               {
-                "key": "Key1",
+                "key": "",
                 "value": "Value1"
               }
             ]
@@ -69,8 +57,8 @@
             "mimeType": "text/plain",
             "attributes": [
               {
-                "key": "Key1",
-                "value": "Value1"
+                "key": "Key2",
+                "value": "value2"
               }
             ]
           }
