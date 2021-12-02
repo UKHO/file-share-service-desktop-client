@@ -29,7 +29,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
             if (expiryDateToken == null)
             {
-                ErrorMessages.Add("Either expiry date key is missing or invalid.");
+                ErrorMessages.Add("The expiry date key is missing or invalid.");
             }
 
             if (string.IsNullOrWhiteSpace(ActionParams.BatchId))

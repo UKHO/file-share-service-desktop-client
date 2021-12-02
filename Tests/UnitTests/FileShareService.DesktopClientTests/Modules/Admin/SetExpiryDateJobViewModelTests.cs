@@ -138,6 +138,25 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
         [TestCase("")]
         [TestCase(" ")]
+        public void TestSetExpiryDateJobHasEmptyOrWhiteSpaceData(string invalidExpiryDate)
+        {
+            var setBatchExpiryJob = new SetExpiryDateJob();
+            setBatchExpiryJob.DisplayName = "Test - Set expiry date";
+            setBatchExpiryJob.ActionParams = new SetExpiryDateJobParams
+            {
+                BatchId = "batch_id",
+                ExpiryDate = invalidExpiryDate
+            };
+            typeof(SetExpiryDateJob).GetProperty(nameof(setBatchExpiryJob.IsExpiryDateKeyExist))?.SetValue(setBatchExpiryJob, true, null);
+
+            var vm = new SetExpiryDateJobViewModel(setBatchExpiryJob, fakeLogger, () => fakeFileShareApiAdminClient, dateTimeValidator);
+
+            Assert.AreEqual("Test - Set expiry date", vm.DisplayName);
+            Assert.IsNull(vm.ExpiryDate);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute(), $"Expected validation error message for format { invalidExpiryDate}, but no validation error message.");
+            StringAssert.StartsWith("The expiry date is missing.", vm.ValidationErrors[0], $"Expected error message for format {invalidExpiryDate}, but no validation message.");
+        }
+
         [TestCase("10/10/2022")]
         [TestCase("2022-01-10")]
         [TestCase("2022-01-1T10:00:00Z")]
@@ -165,7 +184,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.AreEqual("Test - Set expiry date", vm.DisplayName);
             Assert.IsNull(vm.ExpiryDate);
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute(), $"Expected validation error message for format { invalidExpiryDate}, but no validation error message.");
-            StringAssert.StartsWith("Either expiry date is invalid or invalid format", vm.ValidationErrors[0], $"Expected error message for format {invalidExpiryDate}, but no validation message.");
+            StringAssert.StartsWith("The expiry date format is invalid", vm.ValidationErrors[0], $"Expected error message for format {invalidExpiryDate}, but no validation message.");
         }
 
         [TestCase(null)]
