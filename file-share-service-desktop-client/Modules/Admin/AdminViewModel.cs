@@ -112,7 +112,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, sLogger, () => fileShareApiAdminClientFactory.Build(), dateTimeValidator),
                 ReplaceAclJob replaceAcl => new ReplaceAclJobViewModel(replaceAcl, () => fileShareApiAdminClientFactory.Build(), rLogger),
                 ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
-                    errorDeserializingJobs, eLogger),
+                    jobsParser.ErrorJobs, eLogger),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())
             };
         }

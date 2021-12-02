@@ -72,8 +72,7 @@ namespace FileShareService.DesktopClient.CoreTests
         public void TestErrorDeserializingJobs()
         {
             var result = new JobsParser().Parse("BadJson");
-            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
-            StringAssert.StartsWith("Error deserializing jobs from file", result.jobs.Single().DisplayName);
+            Assert.IsInstanceOf<IJob>(result.jobs.Single());
             StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().ErrorMessages.Single());
             Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
         }
@@ -97,7 +96,6 @@ namespace FileShareService.DesktopClient.CoreTests
             var result = new JobsParser().Parse(sr.ReadToEnd());
 
             Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.First());
-            StringAssert.StartsWith("Duplicate job 'appendAcl - Sample 2' found in config file", result.jobs.First().ErrorMessages.Single());
         }
     }
 }
