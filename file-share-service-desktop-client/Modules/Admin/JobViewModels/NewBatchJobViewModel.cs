@@ -271,7 +271,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         {
                                             logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name ,batchHandle.BatchId);
                                         }
-                                    }).ContinueWith(_ => openRead.Dispose());                            
+                                    },
+                                    newBatchFilesViewModel.Attributes.ToArray()).ContinueWith(_ => openRead.Dispose());                            
                             }).ToArray());
                     //cleaning up file progress as all uploaded
                     FileUploadProgress.Clear();
@@ -433,6 +434,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             SearchPath = expandMacros(newBatchFile.SearchPath);
             var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
+            
 
             Files = (directory != null && directory.Exists)
                     ? GetFiles(directory, searchFileInfo.Name)
