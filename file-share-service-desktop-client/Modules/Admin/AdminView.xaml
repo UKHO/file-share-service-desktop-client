@@ -124,10 +124,10 @@
                                                   AutoGenerateColumns="False">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Search Path" Binding="{Binding SearchPath}" />
-                                                <DataGridTextColumn Header="Expected" Width="100" 
+                                                <DataGridTextColumn Header="Expected" Width="85" 
                                                                     Binding="{Binding ExpectedFileCount}" 
                                                                     />
-                                                <DataGridTemplateColumn Header="Files" Width="550">
+                                                <DataGridTemplateColumn Header="Files" Width="380">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <DataGrid ItemsSource="{Binding  Files}"
@@ -136,32 +136,43 @@
                                                                       IsManipulationEnabled="False"
                                                                       IsEnabled="False"
                                                                       SelectionMode="Single"
-                                                                      HeadersVisibility="None">
+                                                                      HeadersVisibility="None"
+                                                                      ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                                                                 <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="Filename" Width="275" Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="File Size" Width="100"  Binding="{Binding Length}" />
-                                                                    <DataGridTextColumn Header="Last Modified Date" Width="150"  Binding="{Binding LastWriteTime}" />
+                                                                    <DataGridTextColumn Header="Filename" Width="200" Binding="{Binding Name}" />
+                                                                    <DataGridTextColumn Header="File Size" Width="40"  Binding="{Binding Length}" />
+                                                                    <DataGridTextColumn Header="Last Modified Date" Width="140"  Binding="{Binding LastWriteTime}" />
                                                                 </DataGrid.Columns>
                                                             </DataGrid>
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
-                                                <DataGridTemplateColumn Header="Attributes" Width="200">
+                                                <DataGridTemplateColumn Header="Attributes" Width="180">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <DataGrid ItemsSource="{Binding  Attributes}"
-                                                                      AutoGenerateColumns="False" 
+                                                                      AutoGenerateColumns="False"
                                                                       IsReadOnly="True"
                                                                       IsManipulationEnabled="False"
                                                                       IsEnabled="False" 
                                                                       SelectionMode="Single"
                                                                       HeadersVisibility="None"
-                                                                      ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                                                                      ScrollViewer.HorizontalScrollBarVisibility="Hidden" >
                                                                 <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="Key" Width="120" Binding="{Binding Key}" />
-                                                                    <DataGridTextColumn Header="Value" Width="80"  Binding="{Binding Value}" />
+                                                                    <DataGridTextColumn Header="Key" Width="110" Binding="{Binding Key, StringFormat={}{0} :}"  />
+                                                                    <DataGridTextColumn Header="Value" Width="70"  Binding="{Binding Value}" />
                                                                 </DataGrid.Columns>
                                                             </DataGrid>
+                                                            <!--<ItemsControl ItemsSource="{Binding Attributes}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate DataType="generic:KeyValuePair">
+                                                                        <StackPanel Orientation="Horizontal">
+                                                                            <TextBlock Text="{Binding Key, StringFormat={}{0} :}" />
+                                                                            <TextBlock Text="{Binding Value, StringFormat={} {0} }"/>
+                                                                        </StackPanel>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>-->
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
@@ -174,7 +185,7 @@
                                         <ItemsControl Grid.Row="6" Grid.Column="1" ItemsSource="{Binding ReadUsers}" />
 
                                         <Label Grid.Row="7" Content="Read Groups:" Margin="15 0" />
-                                        <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />     
+                                        <ItemsControl Grid.Row="7" Grid.Column="1" ItemsSource="{Binding ReadGroups}" />
 
                                         <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
@@ -188,8 +199,8 @@
 
                                             <ItemsControl ItemsSource="{Binding ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>                                                                               
-                                            
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
                                         </StackPanel>
 
                                         <views:Spinner
@@ -374,7 +385,7 @@
 
                                         </Border>
                                     </Grid>
-                                    
+
                                 </Border>
 
                             </DataTemplate>
