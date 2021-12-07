@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
@@ -465,10 +466,10 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var addFileToBatchTcs = new TaskCompletionSource();
             var commitBatchTcs = new TaskCompletionSource();
 
-            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored))
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None))
                 .Returns(createBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+                A<string>.Ignored, A<string>.Ignored, CancellationToken.None)).Returns(addFileToBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed});
 
@@ -556,10 +557,10 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var commitBatchTcs = new TaskCompletionSource();
 
 
-            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored))
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None))
                 .Returns(createBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+                A<string>.Ignored, A<string>.Ignored, CancellationToken.None)).Returns(addFileToBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored))
                 .Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
