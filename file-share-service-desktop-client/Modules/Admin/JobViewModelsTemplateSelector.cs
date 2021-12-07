@@ -23,11 +23,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                                          throw new ArgumentNullException(
                                              $"{nameof(AppendAclTemplate)} property has not been set",
                                              nameof(AppendAclTemplate)),
+                ReplaceAclJobViewModel => ReplaceAclTemplate ??
+                                        throw new ArgumentNullException(
+                                            $"{nameof(ReplaceAclTemplate)} property has not been set",
+                                            nameof(ReplaceAclTemplate)),
                 ErrorDeserializingJobsJobViewModel => ErrorTemplate ??
                                                       throw new ArgumentNullException(
                                                           $"{nameof(ErrorTemplate)} property has not been set",
                                                           nameof(ErrorTemplate)),
-                _ => throw new ArgumentException("Unsupported item:" + item, nameof(item))
+               _ => throw new ArgumentException("Unsupported item:" + item, nameof(item))
             };
         }
 
@@ -37,5 +41,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
 
         public DataTemplate? NewBatchTemplate { get; set; }
         public DataTemplate? ErrorTemplate { get; set; }
+
+        public DataTemplate? ReplaceAclTemplate { get; set; }
     }
 }

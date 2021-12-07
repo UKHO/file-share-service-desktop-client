@@ -1,0 +1,56 @@
+{
+  "jobs": [
+    {
+      "action": "newBatch",
+      "displayName": "Upload DVDs",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "distributors",
+            "vars"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(21))",
+        "files": [
+          {
+            "searchPath": "D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.iso",
+            "expectedFileCount": 2,
+            "mimeType": "application/x-raw-disk-image"
+          }
+          {
+            "searchPath": "D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.SHA1",
+            "expectedFileCount": 2,
+            "mimeType": "text/plain"
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Sample 2, change ACL later to make the batch public",
+      "action": "appendAcl",
+      "actionParams": {
+        "batchId": "64c954fe-cb20-46e1-b990-51dfb9711fdc",
+        "readUsers": [ "c95464fe-cb20-46e1-b990-51dfb9711fdc" ],
+        "readGroups": [
+          "public"
+        ]
+      }
+    },
+    {
+      "displayName": "Sample 3, change the Expiry Date later.",
+      "action": "setExpiryDate",
+      "actionParams": {
+        "batchId": "64c954fe-cb20-46e1-b990-51dfb9711fdc",
+        "expiryDate": "2021-04-01T00:00:00Z"
+      }
+    }
+  ]
+}
