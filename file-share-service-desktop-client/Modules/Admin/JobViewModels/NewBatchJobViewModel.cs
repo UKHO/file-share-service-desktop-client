@@ -270,7 +270,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 try
                 {
                     logger.LogInformation("File Share Service batch create started.");
-                    
+
                     batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel, cancellationToken);
                     cancellationToken.ThrowIfCancellationRequested();
                     logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", batchHandle.BatchId);                    
@@ -304,7 +304,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         }, cancellationToken).ContinueWith(_ => openRead.Dispose());
                                 }).ToArray());                       
                         //cleaning up file progress as all uploaded
-                        FileUploadProgress.Clear();                        
+                        FileUploadProgress.Clear();
                         cancellationToken.ThrowIfCancellationRequested();
 
                         logger.LogInformation("File Share Service batch commit started for batch ID:{BatchId}.",batchHandle.BatchId);
@@ -312,21 +312,20 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         IsCommitting = !IsCanceled;
                         IsCommittingOnCancel = true;    
 
-                        await Task.Run(async()=> { await fileShareClient.CommitBatch(batchHandle); }, cancellationToken);                        
-
-                        logger.LogInformation("File Share Service batch commit completed for batch ID:{BatchId}.", batchHandle.BatchId);
+                        await Task.Run(async()=> { await fileShareClient.CommitBatch(batchHandle); }, cancellationToken);
 
                         if (!IsCanceled)
-                        {                          
+                        {
+                            logger.LogInformation("File Share Service batch commit completed for batch ID:{BatchId}.", batchHandle.BatchId);
+                                                 
                             ExecutionResult = !await CheckBatchIsCommitted(fileShareClient, batchHandle, MaxBatchCommitWaitTime)
                                 ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
-                                : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";                                                                                   
+                                : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";                                                                                                           
+
+                            logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
                         }
-
-                        logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
-
-                        if (cancellationToken.IsCancellationRequested)                        
-                            cancellationToken.ThrowIfCancellationRequested();
+                       
+                        cancellationToken.ThrowIfCancellationRequested();
                         
                     }
                     catch (OperationCanceledException ex)
@@ -336,10 +335,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     catch (Exception e)
                     {
                         logger.LogError(e.Message);
-                        logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);
-                        // CancellationTokenSource can only be used once. Therefore dispose and create new instance
-                        CancellationTokenSource.Dispose();
-                        CancellationTokenSource = new CancellationTokenSource();
+                        logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);                        
+                        CancellationTokenSource.Dispose();                        
                         await fileShareClient.RollBackBatchAsync(batchHandle);
                         logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle.BatchId);
                         ExecutionResult = e.ToString();
@@ -347,8 +344,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     }
                 }
                 catch (OperationCanceledException ex)
-                {
-                    ExecutionResult = await HandleCanceledOperationsAsync(batchHandle, IsCommittingOnCancel, fileShareClient, ex, cancellationToken);                              
+                {                                      
+                    ExecutionResult = await HandleCanceledOperationsAsync(batchHandle, IsCommittingOnCancel, fileShareClient, ex, cancellationToken);                                        
                 }
             }
             finally
@@ -366,9 +363,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private void OnCancelJobCommand()
         {
             IsCanceled = false;
-            string batchId = batchHandle != null && batchHandle.BatchId != null ? batchHandle.BatchId : "";
-            logger.LogInformation("Cancel job execution started for batch ID: {BatchId}.", batchId);
-
             string msg = batchHandle == null? "Are you sure you want to cancel this job?" : string.Format("Are you sure you want to cancel this job batch ID: {0}?", batchHandle.BatchId);            
             MessageBoxResult result = MessageBox.Show(msg, "Cancel Job Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
@@ -377,21 +371,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 {
                     IsCanceled = true;
                     IsCommitting = false;                                                               
-                    CancellationTokenSource.Cancel();                    
-                    logger.LogInformation("Cancel job execution confirmed for batch ID: {BatchId} .", batchId);
+                    CancellationTokenSource.Cancel();                                        
                 } 
-            }
-            else
-            {
-                logger.LogInformation("Cancel job execution canceled for batch ID: {BatchId} .", batchId);
             }
         }
 
         private async Task<string> HandleCanceledOperationsAsync(IBatchHandle batchHandle, bool IsCommitting, IFileShareApiAdminClient fileShareClient, OperationCanceledException e, CancellationToken cancellationToken)
         {
-            string ExecutionResult = string.Empty;
-            if (cancellationToken.IsCancellationRequested && e.CancellationToken == cancellationToken)
+            if (batchHandle != null && cancellationToken.IsCancellationRequested && e.CancellationToken == cancellationToken)
             {
+                logger.LogInformation("Cancel job execution started for batch ID: {BatchId} .", batchHandle.BatchId);
                 if (IsCommitting)
                 {
                     logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
@@ -400,7 +389,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
                 }
                 else
-                {                    
+                {
                     try
                     {
                         logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);
@@ -413,19 +402,24 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         {
                             logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
                             string expiryDateString = DateTime.UtcNow.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
-                            var response = await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
+                            await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
                             logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
                         }
                         else
                         {
+                            ExecutionResult = ex.ToString();
                             throw;
                         }
                     }
                 }
                 ExecutionResult = string.Format("Canceled job is completed for batch ID:{0}.", batchHandle.BatchId);
-                logger.LogInformation("Cancel job execution completed for batch ID: {BatchId} .", batchHandle.BatchId);                
+                logger.LogInformation("Cancel job execution completed for batch ID: {BatchId} .", batchHandle.BatchId);
+                return ExecutionResult;
             }
-            return ExecutionResult;
+            else {
+                logger.LogInformation("Batch execution canceled for this batch before creation");
+                return "Canceled job is completed for this batch.";
+            }
         }
 
         public async Task<bool> CheckBatchIsCommitted(IFileShareApiAdminClient fileShareClient,IBatchHandle batchHandle, double waitTimeInMinutes)
