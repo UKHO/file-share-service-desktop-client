@@ -260,6 +260,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         protected internal override async Task OnExecuteCommand()
         {
             IsExecuting = true;
+            IsCanceled = false;
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = CancellationTokenSource.Token;
             try
@@ -268,8 +269,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();                
                 logger.LogInformation("File Share Service batch create started.");
-                batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel, CancellationToken.None);                   
-                logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", batchHandle.BatchId);                    
+                batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel, CancellationToken.None); 
+                logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", batchHandle.BatchId);
                 FileUploadProgress.Clear();
                 try
                 {
@@ -298,7 +299,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                             logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
                                         }
                                     }, cancellationToken).ContinueWith(_ => openRead.Dispose());
-                            }).ToArray());                       
+                            }).ToArray());
                     //cleaning up file progress as all uploaded
                     FileUploadProgress.Clear();
                     cancellationToken.ThrowIfCancellationRequested();
