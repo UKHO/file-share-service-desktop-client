@@ -47,18 +47,27 @@
             "attributes": [
               {
                 "key": "",
-                "value": "Value1"
+                "value": "AVCS"
+              },
+              {
+                "key": "Exchange Set Type",
+                "value": "Base"
+              },
+              {
+                "key": "Media Type",
+                "value": ""
               }
             ]
           },
           {
             "searchPath": "D:\\SampleFilesTooling\\test2.txt",
+            //"searchPath": "D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.iso",
             "expectedFileCount": 1,
             "mimeType": "text/plain",
             "attributes": [
               {
-                "key": "Key2",
-                "value": "value2"
+                "key": "S63 Version",
+                "value": "1.2"
               }
             ]
           }

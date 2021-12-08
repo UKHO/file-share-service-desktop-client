@@ -99,5 +99,17 @@ namespace FileShareService.DesktopClient.CoreTests
             Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.First());
             StringAssert.StartsWith("Duplicate job 'appendAcl - Sample 2' found in config file", result.jobs.First().ErrorMessages.Single());
         }
+
+        [Test]
+        public void TestErrorBlankFileAttributesWhenParseFileAttributes()
+        {
+            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithFileAttributes.json")!;
+            using var sr = new StreamReader(s);
+            var result = new JobsParser().Parse(sr.ReadToEnd());
+
+            Assert.IsInstanceOf<NewBatchJob>(result.jobs.First());
+            StringAssert.StartsWith("File attribute key cannot be blank", result.jobs.First().ErrorMessages.First());
+            StringAssert.StartsWith("File attribute value cannot be blank", result.jobs.First().ErrorMessages.Last());
+        }
     }
 }

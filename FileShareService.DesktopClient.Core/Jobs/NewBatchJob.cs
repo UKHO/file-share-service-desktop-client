@@ -78,31 +78,30 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                         //Check for batch attribute key and value
                         foreach (JToken? fileAttribute in fileAttributeToken)
                         {
-                            if (fileAttribute.SelectToken("key")?.Type != JTokenType.String)
-                            {
-                                ErrorMessages.Add($"File attribute key is missing or is invalid for the file. searchPath:" + searchPath);
-                            }
-
-                            if (fileAttribute.SelectToken("value")?.Type != JTokenType.String)
-                            {
-                                ErrorMessages.Add($"File attribute value is missing or is invalid for the file. searchPath:" + searchPath);
-                            }
-
                             JToken? fileKeyToken = fileAttribute.SelectToken("key");
                             string fileKey = fileKeyToken?.Type == JTokenType.String ?
                                 Convert.ToString(fileKeyToken) : string.Empty;
 
-                            if (string.IsNullOrWhiteSpace(fileKey))
+                            if (fileAttribute.SelectToken("key")?.Type != JTokenType.String)
                             {
-                                ErrorMessages.Add($"File attribute key cannot be blank. searchPath:" + searchPath);
+                                ErrorMessages.Add($"File attribute key is missing or is invalid for the file. searchPath:" + searchPath);
                             }
+                            else if (string.IsNullOrWhiteSpace(fileKey))
+                            {
+                                ErrorMessages.Add($"File attribute key cannot be blank. searchPath : " + searchPath);
+                            }
+
 
                             JToken? fileValueToken = fileAttribute.SelectToken("value");
                             string fileValue = fileValueToken?.Type == JTokenType.String ?
                                 Convert.ToString(fileValueToken) : string.Empty;
-                            if (string.IsNullOrWhiteSpace(fileValue))
+                            if (fileAttribute.SelectToken("value")?.Type != JTokenType.String)
                             {
-                                ErrorMessages.Add($"File attribute value cannot be blank. searchPath:" + searchPath);
+                                ErrorMessages.Add($"File attribute value is missing or is invalid for the file. searchPath : " + searchPath);
+                            }
+                            else if (string.IsNullOrWhiteSpace(fileValue))
+                            {
+                                ErrorMessages.Add($"File attribute value cannot be blank. searchPath : " + searchPath);
                             }
                         }
                     }
