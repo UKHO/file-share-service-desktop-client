@@ -169,8 +169,8 @@
                                                                 <ItemsControl.ItemTemplate>
                                                                     <DataTemplate DataType="generic:KeyValuePair">
                                                                         <StackPanel Orientation="Horizontal">
-                                                                            <TextBlock Text="{Binding Key, StringFormat={}{0} :}" />
-                                                                            <TextBlock Text="{Binding Value, StringFormat={} {0} }"/>
+                                                                            <TextBlock Text="{Binding Key, StringFormat={}{0} :}"  FontFamily="Normal"/>
+                                                                            <TextBlock Text="{Binding Value, StringFormat={} {0}}"  FontFamily="Normal"/>
                                                                         </StackPanel>
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
