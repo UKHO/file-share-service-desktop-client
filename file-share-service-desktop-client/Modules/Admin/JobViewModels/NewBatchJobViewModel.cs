@@ -307,9 +307,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     logger.LogInformation("File Share Service batch commit started for batch ID:{BatchId}.",batchHandle.BatchId);
                     ExecutionResult = $"Files uploaded, batch commit in progress. New batch ID: {batchHandle.BatchId}";
                     IsCommitting = !IsCanceled;
-                    IsCommittingOnCancel = true;    
-
-                    await Task.Run(async()=> { await fileShareClient.CommitBatch(batchHandle); }, cancellationToken);
+                    IsCommittingOnCancel = true;
+                    
+                    await fileShareClient.CommitBatch(batchHandle);
 
                     if (!IsCanceled)
                     {
