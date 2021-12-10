@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -236,17 +237,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         protected internal override async Task OnExecuteCommand()
         {
             IsExecuting = true;
+            IBatchHandle? batchHandle = null;
             try
             {
                 logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .",Action,DisplayName);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
-                logger.LogInformation("File Share Service batch create started.");
-                var batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel);
-                logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", batchHandle.BatchId);
-                FileUploadProgress.Clear();
                 try
                 {
+                    logger.LogInformation("File Share Service batch create started.");
+                   batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel);
+                logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", batchHandle.BatchId);
+                FileUploadProgress.Clear();
+               
                    
                     await Task.WhenAll(
                         Files.SelectMany(f => f.Files.Select(file => (f, file)))
@@ -272,7 +275,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                             logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name ,batchHandle.BatchId);
                                         }
                                     },
-                                    newBatchFilesViewModel.Attributes.ToArray()).ContinueWith(_ => openRead.Dispose());                            
+                                    newBatchFilesViewModel.Attributes.ToArray()).ContinueWith(t => { if (t.Exception != null) { throw t.Exception; } openRead.Dispose(); });                            
                             }).ToArray());
                     //cleaning up file progress as all uploaded
                     FileUploadProgress.Clear();
@@ -291,12 +294,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e.Message);
-                    logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);
-                    await fileShareClient.RollBackBatchAsync(batchHandle);
-                    logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle.BatchId);
-                    ExecutionResult = e.ToString();
-                    throw;
+                    logger.LogError(e.ToString());
+
+                    if (batchHandle != null)
+                    {
+                        logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle?.BatchId);
+                        await fileShareClient.RollBackBatchAsync(batchHandle);
+                        logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle?.BatchId);
+                    }
+
+                    ExecutionResult = ((System.Net.Http.HttpRequestException)e).StatusCode == HttpStatusCode.BadRequest
+                        ? "Invalid Configuration file details."
+                        : "Internal Server Error. Please try after sometime or contact support team.";
                 }
             }
             finally
