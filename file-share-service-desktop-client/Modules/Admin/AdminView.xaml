@@ -99,7 +99,7 @@
                                         <TextBlock Grid.Row="2" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="ExpiryDate:" Name="lbl_expiryDate" />
                                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                                             <TextBox Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=ExpiryDate, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expiryDate}" />
-                                            <TextBox FontWeight="ExtraLight" Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=RawExpiryDate, StringFormat= Raw: {0}, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expiryDate}" />
+                                            <TextBox FontWeight="ExtraLight" Style="{StaticResource ReadOnlyTextboxStyle}" FontSize="14" Text="{Binding Path=RawExpiryDate, StringFormat= Raw: {0}, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expiryDate}" />
                                         </StackPanel>
 
 
@@ -325,7 +325,7 @@
                                         <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding ReadUsers}" >
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <TextBox Text="{Binding Path=.}" Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName= lbl_additionalUsers}"></TextBox>
+                                                    <TextBox Text="{Binding Path=.}" FontWeight="Medium"  Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName= lbl_additionalUsers}"></TextBox>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -334,7 +334,7 @@
                                         <ItemsControl Grid.Row="3" Grid.Column="1" ItemsSource="{Binding ReadGroups}" >
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <TextBox Text="{Binding Path=.}" Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_additionalGroups}"></TextBox>
+                                                    <TextBox Text="{Binding Path=.}" FontWeight="Medium"  Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_additionalGroups}"></TextBox>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -431,10 +431,10 @@
                                             BorderBrush="{StaticResource AccentColorBrush}"
                                             Grid.ColumnSpan="2" />
                                         <TextBlock Grid.Row="1" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Batch ID:" Name="lbl_setExpirybatchId" />
-                                        <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=BatchId, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_setExpirybatchId}" />
+                                        <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Medium" Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=BatchId, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_setExpirybatchId}" />
 
                                         <TextBlock Grid.Row="2" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Expiry Date:" Name="lbl_expirydate" />
-                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=ExpiryDate, Mode=OneWay}" Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expirydate}" />
+                                        <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Medium" Text="{Binding Path=ExpiryDate, Mode=OneWay}" Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expirydate}" />
 
                                         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
@@ -506,19 +506,34 @@
                                             BorderBrush="{StaticResource AccentColorBrush}"
                                             Grid.ColumnSpan="2" />
 
-                                        <Label Grid.Row="0" Grid.Column="0" FontSize="21" Content="Replace ACL:" />
-                                        <Label Grid.Row="0" Grid.Column="1" FontWeight="Medium"
-                                               Content="{Binding DisplayName}" />
+                                        <TextBlock Grid.Row="0" Grid.Column="0" FontSize="21" Text="Replace ACL:" Name="lblReplaceAcl" Style="{StaticResource LabelTextBolckStyle}" />
+                                        <TextBox Grid.Row="0" Grid.Column="1" FontWeight="Medium" Style="{StaticResource ReadOnlyTextboxStyle}"
+                                               Text="{Binding Path=DisplayName, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lblReplaceAcl}" />
+                                        <Border
+                                            BorderThickness="0 0 0 1 "
+                                            BorderBrush="{StaticResource AccentColorBrush}"
+                                            Grid.ColumnSpan="2" />
+                                        
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Batch ID:" Name="lblRbatchId" Style="{StaticResource LabelTextBolckStyle}" />
+                                        <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Medium" Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=BatchId, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lblRbatchId}" />
 
-                                        <Label Grid.Row="1" Grid.Column="0" Content="Batch ID:" />
-                                        <Label Grid.Row="1" Grid.Column="1" Content="{Binding BatchId}" />
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Additional Users:" Name="lblrAdditionalUsers" Style="{StaticResource LabelTextBolckStyle}" />
+                                        <ItemsControl Grid.Row="2" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadUsers}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBox Text="{Binding Path=.}" FontWeight="Medium"  Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=lblrAdditionalUsers}"></TextBox>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
 
-                                        <Label Grid.Row="2" Grid.Column="0" Content="Additional Users:" />
-                                        <ItemsControl Grid.Row="2" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadUsers}" />
-
-                                        <Label Grid.Row="3" Grid.Column="0" Content="Additional Groups:" />
-                                        <ItemsControl Grid.Row="3" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadGroups}" />
-
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Additional Groups:" Name="lblrAdditinalGroups" Style="{StaticResource LabelTextBolckStyle}" />
+                                        <ItemsControl Grid.Row="3" Grid.Column="1" FontSize="17" FontWeight="Medium" ItemsSource="{Binding ReadGroups}" >
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                    <TextBox Text="{Binding Path=.}" FontWeight="Medium" Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=lblrAdditinalGroups}"></TextBox>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                         <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
                                             Content="Execute Job"
