@@ -60,7 +60,6 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             }
 
             //Check for file attributes
-            //int fileCount = JArray.FromObject(jsonToken.SelectToken("actionParams.files")).Count;
 
             foreach (JToken fileObj in jsonToken.SelectToken("actionParams.files"))
             {

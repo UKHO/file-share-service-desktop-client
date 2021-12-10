@@ -152,19 +152,6 @@
                                                 <DataGridTemplateColumn Header="Attributes" Width="180">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
-                                                            <!--<DataGrid ItemsSource="{Binding  Attributes}"
-                                                                      AutoGenerateColumns="False"
-                                                                      IsReadOnly="True"
-                                                                      IsManipulationEnabled="False"
-                                                                      IsEnabled="False" 
-                                                                      SelectionMode="Single"
-                                                                      HeadersVisibility="None"
-                                                                      ScrollViewer.HorizontalScrollBarVisibility="Hidden" >
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="Key" Width="110" Binding="{Binding Key, StringFormat={}{0} :}"  />
-                                                                    <DataGridTextColumn Header="Value" Width="70"  Binding="{Binding Value}" />
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>-->
                                                             <ItemsControl ItemsSource="{Binding Attributes}">
                                                                 <ItemsControl.ItemTemplate>
                                                                     <DataTemplate DataType="generic:KeyValuePair">
