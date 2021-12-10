@@ -9,12 +9,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 {
     public class ErrorDeserializingJobsJobViewModel : BaseBatchJobViewModel
     {
-        private readonly ErrorDeserializingJobsJob job;
         private readonly ILogger<ErrorDeserializingJobsJobViewModel> logger;
         private readonly List<IJob>? jobs;
 
-        public ErrorDeserializingJobsJobViewModel(List<IJob>? jobs, ILogger<ErrorDeserializingJobsJobViewModel> logger) 
-            : base(new ErrorDeserializingJobsJob(), logger)
+        public ErrorDeserializingJobsJobViewModel(ErrorDeserializingJobsJob job,  List<IJob>? jobs, ILogger<ErrorDeserializingJobsJobViewModel> logger) 
+            : base(job, logger)
         {
             this.jobs = jobs;
             this.logger = logger;

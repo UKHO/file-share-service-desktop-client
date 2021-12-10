@@ -74,7 +74,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         public DelegateCommand OpenFileCommand { get; }
 
         private void OnOpenFile()
-        {        
+        {
             var openFileDialog = new OpenFileDialog
             {
                 ShowReadOnly = true,
@@ -111,7 +111,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl, () => fileShareApiAdminClientFactory.Build(), aLogger),
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, sLogger, () => fileShareApiAdminClientFactory.Build(), dateTimeValidator),
                 ReplaceAclJob replaceAcl => new ReplaceAclJobViewModel(replaceAcl, () => fileShareApiAdminClientFactory.Build(), rLogger),
-                ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
+                ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(errorDeserializingJobs,
                     jobsParser.ErrorJobs, eLogger),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())
             };

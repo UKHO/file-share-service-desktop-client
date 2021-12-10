@@ -7,9 +7,9 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
     public class ErrorDeserializingJobsJob : IJob
     {
-        public string Action { get; set; }
-        public string DisplayName { get; set; }
-        public Exception Exception { get; }
+        public string Action { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public Exception? Exception { get; } 
         public List<string> ErrorMessages { get; set; } = new List<string>();
 
         public ErrorDeserializingJobsJob()

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Prism.Commands;
 using System;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
-using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Helper;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -65,24 +63,22 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 var fileShareClient = fileShareClientFactory();
                 var batchExpiryModel = BuildBatchExpiryModel();
 
-                var response = await fileShareClient.SetExpiryDateAsync(BatchId, batchExpiryModel, CancellationToken.None);
+                var result = await fileShareClient.SetExpiryDateAsync(BatchId, batchExpiryModel, CancellationToken.None);
 
-                if (response.IsSuccessStatusCode)
+                if(result.IsSuccess)
                 {
-                    ExecutionResult = $"Job successfully completed for batch ID: {BatchId}";
+                    ExecutionResult = $"File Share Service set expiry date completed for batch ID: {BatchId}";
                 }
                 else
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
-
-                    ExecutionResult = errorMessage != null ? string.Join(Environment.NewLine, errorMessage.Errors.Select(e => e.Description)) :
-                        $"Job failed for batch id: {BatchId} with {(int)response.StatusCode} - {response.ReasonPhrase}";
+                    ExecutionResult = (result.Errors != null && result.Errors.Any()) ? 
+                        string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)) :
+                        $"File Share Service set expiry date failed for batch ID:{BatchId} with status: {result.StatusCode}.";
 
                     logger.LogError("File Share Service set expiry date failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
                         DisplayName, BatchId, ExecutionResult);
-                }
 
+                }
                 logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.",
                     SetExpiryDateJob.JOB_ACTION, DisplayName, BatchId);
             }
@@ -97,14 +93,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 IsExecuting = false;
                 IsExecutingComplete = true;
             }
-        }
-
-        public DelegateCommand CloseExecutionCommand { get; }
-
-        private void OnCloseExecutionCommand()
-        {
-            ExecutionResult = string.Empty;
-            IsExecutingComplete = false;
         }
 
         private BatchExpiryModel BuildBatchExpiryModel()

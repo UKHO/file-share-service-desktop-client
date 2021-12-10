@@ -1,20 +1,16 @@
 ﻿using FakeItEasy;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
+using UKHO.FileShareAdminClient.Models.Response;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
-using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Helper;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 
@@ -59,11 +55,17 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.AreEqual("Test - Set expiry date", vm.DisplayName);
             Assert.AreEqual(expiryDateString, vm.RawExpiryDate);
 
-            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
+            Result<SetExpiryDateResponse> result = new Result<SetExpiryDateResponse>
+            {
+                IsSuccess = true,
+                StatusCode = 204
+            };
+
+            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, CancellationToken.None))
+                .Returns(result);
 
             await vm.OnExecuteCommand();
-            StringAssert.StartsWith("Job successfully completed for batch ID:", vm.ExecutionResult);
+            StringAssert.StartsWith("File Share Service set expiry date completed for batch ID:", vm.ExecutionResult);
         }
 
         [Test]
@@ -79,17 +81,15 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 }
             }, fakeLogger, () => fakeFileShareApiAdminClient, dateTimeValidator);
 
-            ErrorDescriptionModel content = new ErrorDescriptionModel
+            Result<SetExpiryDateResponse> result = new Result<SetExpiryDateResponse>
             {
+                IsSuccess = false,
+                StatusCode = 400,
                 Errors = new List<Error> { new Error { Source = "source", Description = "Bad Error" } }
             };
 
-            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, A<CancellationToken>.Ignored))
-            .Returns(new HttpResponseMessage
-            {
-                StatusCode = HttpStatusCode.BadRequest,
-                Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json")
-            });
+            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, CancellationToken.None))
+            .Returns(result);
 
             await vm.OnExecuteCommand();
             Assert.AreEqual("Bad Error", vm.ExecutionResult);
@@ -108,11 +108,18 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 },
             }, fakeLogger, () => fakeFileShareApiAdminClient, dateTimeValidator);
 
-            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, A<CancellationToken>.Ignored))
-            .Returns(new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError });
+            Result<SetExpiryDateResponse> result = new Result<SetExpiryDateResponse>
+            {
+                IsSuccess = false,
+                StatusCode = 500,
+                Errors = null
+            };
+
+            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, CancellationToken.None))
+            .Returns(result);
 
             await vm.OnExecuteCommand();
-            Assert.AreEqual("Job failed for batch id: batch_id with 500 - Internal Server Error", vm.ExecutionResult);
+            Assert.AreEqual("File Share Service set expiry date failed for batch ID:batch_id with status: 500.", vm.ExecutionResult);
         }
 
         [Test]

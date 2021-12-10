@@ -93,14 +93,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public List<string> ReadUsers => job.ActionParams.Acl.ReadUsers;
         public List<string> ReadGroups => job.ActionParams.Acl.ReadGroups;
 
-        public DelegateCommand CloseExecutionCommand { get; }
-
-        private void OnCloseExecutionCommand()
-        {
-            ExecutionResult = string.Empty;
-            IsExecutingComplete = false;
-        }
-
         public ObservableCollection<FileUploadProgressViewModel> FileUploadProgress { get; } = new();
 
         protected internal override async Task OnExecuteCommand()
@@ -219,7 +211,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             {
                 foreach (var file in Files)
                 {
-                    string directory = Path.GetDirectoryName(file.RawSearchPath);
+                    string? directory = Path.GetDirectoryName(file.RawSearchPath);
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {

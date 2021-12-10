@@ -1,16 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
-using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 {
@@ -19,9 +16,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly ReplaceAclJob job;
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
         private readonly ILogger<ReplaceAclJobViewModel> logger;
-        private bool isExecutingComplete;
-        private string executionResult = string.Empty;
-        private string responseMessage = string.Empty;
 
         public ReplaceAclJobViewModel(ReplaceAclJob job, Func<IFileShareApiAdminClient> fileShareClientFactory, ILogger<ReplaceAclJobViewModel> logger) : base(job, logger)
         {
@@ -32,8 +26,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         }
 
         public string BatchId => job.ActionParams.BatchId;
-        public List<string> ReadUsers => (List<string>)job.ActionParams.ReadUsers;
-        public List<string> ReadGroups => (List<string>)job.ActionParams.ReadGroups;
+        public List<string> ReadUsers => job.ActionParams.ReadUsers;
+        public List<string> ReadGroups => job.ActionParams.ReadGroups;
 
 
         protected internal override async Task OnExecuteCommand()
@@ -45,29 +39,23 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 logger.LogInformation("Execute job started for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", ReplaceAclJob.JOB_ACTION, DisplayName, BatchId);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
-                var response = await fileShareClient.ReplaceAclAsync(BatchId, buildBatchModel.Acl, CancellationToken.None);
+                var result = await fileShareClient.ReplaceAclAsync(BatchId, buildBatchModel.Acl, CancellationToken.None);
 
-                if(response.StatusCode != HttpStatusCode.NoContent)
+                if (result.IsSuccess)
                 {
-                    
-                    var content = await response.Content.ReadAsStringAsync();
-                    if(string.IsNullOrWhiteSpace(content))
-                    {
-                        responseMessage = $"File Share Service replace Access Control List failed for batch ID:{BatchId} with status: {(int)response.StatusCode} {response.StatusCode}.";
-                    }
-                    else
-                    {
-                        var errorMessage = JsonConvert.DeserializeObject<ErrorDescriptionModel>(content);
-                        responseMessage = string.Join(Environment.NewLine, errorMessage!.Errors.Select(e => e.Description));
-                    }
-                    
-                    logger.LogError("File Share Service replace Access Control List failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.", DisplayName, BatchId, responseMessage);
+                    ExecutionResult = $"File Share Service replace Access Control List completed for batch ID: {BatchId}";
                 }
-                  ExecutionResult = response.StatusCode != HttpStatusCode.NoContent
-                        ? responseMessage!
-                        : $"File Share Service replace Access Control List completed for batch ID: {BatchId}";
+                else
+                {
+                    ExecutionResult = (result.Errors != null && result.Errors.Any()) ? 
+                        string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)) :
+                        $"File Share Service replace Access Control List failed for batch ID:{BatchId} with status: {result.StatusCode}.";
 
-                logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", ReplaceAclJob.JOB_ACTION, DisplayName, BatchId);
+                    logger.LogError("File Share Service replace Access Control List failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
+                        DisplayName, BatchId, ExecutionResult);
+                }
+                logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", 
+                    ReplaceAclJob.JOB_ACTION, DisplayName, BatchId);
             }
             catch (Exception e)
             {
@@ -93,40 +81,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ReadUsers = ReadUsers
                 },
             };
-        }
-
-        public bool IsExecutingComplete
-        {
-            get => isExecutingComplete;
-            set
-            {
-                if (isExecutingComplete != value)
-                {
-                    isExecutingComplete = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string ExecutionResult
-        {
-            get => executionResult;
-            set
-            {
-                if (executionResult != value)
-                {
-                    executionResult = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public DelegateCommand CloseExecutionCommand { get; }
-
-        private void OnCloseExecutionCommand()
-        {
-            ExecutionResult = string.Empty;
-            IsExecutingComplete = false;
         }
     }
 }
