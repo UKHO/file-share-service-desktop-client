@@ -109,7 +109,8 @@ namespace FileShareService.DesktopClient.CoreTests
 
             Assert.IsInstanceOf<NewBatchJob>(result.jobs.First());
             StringAssert.StartsWith("File attribute key cannot be blank", result.jobs.First().ErrorMessages.First());
-            StringAssert.StartsWith("File attribute value cannot be blank", result.jobs.First().ErrorMessages.Last());
+            StringAssert.StartsWith("File attribute value cannot be blank", result.jobs.First().ErrorMessages.ElementAt(1));
+            StringAssert.StartsWith("Invalid file attribute", result.jobs.First().ErrorMessages.Last());
         }
     }
 }

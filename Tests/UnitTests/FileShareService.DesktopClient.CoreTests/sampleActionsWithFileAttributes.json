@@ -61,15 +61,9 @@
           },
           {
             "searchPath": "D:\\SampleFilesTooling\\test2.txt",
-            //"searchPath": "D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.iso",
             "expectedFileCount": 1,
             "mimeType": "text/plain",
-            "attributes": [
-              {
-                "key": "S63 Version",
-                "value": "1.2"
-              }
-            ]
+            "attributes": null
           }
         ]
       }
