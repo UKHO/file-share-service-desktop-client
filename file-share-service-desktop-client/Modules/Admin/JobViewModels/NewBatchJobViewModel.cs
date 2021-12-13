@@ -43,7 +43,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             ICurrentDateTimeProvider currentDateTimeProvider
            ) : base(job,logger)
         {
-            CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
+            CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);            
             this.job = job;
             this.fileSystem = fileSystem;
             this.fileShareClientFactory = fileShareClientFactory;
@@ -53,7 +53,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, ExpandMacros)).ToList() 
                     : new List<NewBatchFilesViewModel>();
 
-            CancelJobExecutionCommand = new DelegateCommand(OnCancelJobCommand, () => CanExecute() && !IsCanceled);
+            CancelJobExecutionCommand = new DelegateCommand(OnCancelJobCommand, () => !IsCanceled);
         }
 
         public DelegateCommand CancelJobExecutionCommand { get; }
