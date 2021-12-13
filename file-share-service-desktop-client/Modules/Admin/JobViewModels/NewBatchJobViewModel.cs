@@ -310,11 +310,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     IsCommittingOnCancel = true;
                     
                     await fileShareClient.CommitBatch(batchHandle);
-
+                    logger.LogInformation("File Share Service batch commit completed for batch ID:{BatchId}.", batchHandle.BatchId);
                     if (!IsCanceled)
-                    {
-                        logger.LogInformation("File Share Service batch commit completed for batch ID:{BatchId}.", batchHandle.BatchId);
-                                                 
+                    {                                                                        
                         ExecutionResult = !await CheckBatchIsCommitted(fileShareClient, batchHandle, MaxBatchCommitWaitTime)
                             ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
                             : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";                                                                                                           
