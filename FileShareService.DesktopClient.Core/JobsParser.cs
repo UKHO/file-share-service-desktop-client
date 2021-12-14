@@ -32,6 +32,9 @@ namespace UKHO.FileShareService.DesktopClient.Core
         {
             try
             {
+                //Clear error job collection
+                ErrorJobs?.Clear();
+
                 if (string.IsNullOrEmpty(jobs))
                 {
                     throw new JsonReaderException("Configuration file formatted incorrectly. Unable to find a job to process.");
@@ -63,9 +66,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     }
 
                     List<IJob> jobCollection = new List<IJob>();
-
-                    //Clear error job collection
-                    ErrorJobs?.Clear();
 
                     // Deserialize each job and validate
                     foreach (JToken batchJob in batchJobs)
@@ -131,7 +131,9 @@ namespace UKHO.FileShareService.DesktopClient.Core
             }
             catch (Exception e)
             {
-                return new Jobs.Jobs() { jobs = new[] { new ErrorDeserializingJobsJob(e) { ErrorMessages = new List<string>() { e.Message } } } };
+                IJob errorJob =  new ErrorDeserializingJobsJob(e) { ErrorMessages = new List<string>() { e.Message } } ;
+                ErrorJobs?.Add(errorJob!);
+                return new Jobs.Jobs() { jobs = ErrorJobs! };
             }
         }
 

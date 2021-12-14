@@ -71,31 +71,37 @@ namespace FileShareService.DesktopClient.CoreTests
         [Test]
         public void TestErrorDeserializingJobs()
         {
-            var result = new JobsParser().Parse("BadJson");
+            var jobParser = new JobsParser();
+            var result = jobParser.Parse("BadJson");
             Assert.IsInstanceOf<IJob>(result.jobs.Single());
             StringAssert.StartsWith("Unexpected character encountered while parsing", result.jobs.Single().ErrorMessages.Single());
             Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+            Assert.AreEqual(1, jobParser.ErrorJobs?.Count);
         }
 
         [Test]
         public void TestErrorDeserializingJobsWhenParseInvalidFormatFile()
         {
+            var jobParser = new JobsParser();
             var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithInvalidFormat.json")!;
             using var sr = new StreamReader(s);
-            var result = new JobsParser().Parse(sr.ReadToEnd());
+            var result = jobParser.Parse(sr.ReadToEnd());
 
             Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
             Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+            Assert.AreEqual(1, jobParser.ErrorJobs?.Count);
         }
 
         [Test]
         public void TestErrorDeserializingJobsWhenParseInvalidActions()
         {
+            var jobParser = new JobsParser();
             var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithDuplicateJobs.json")!;
             using var sr = new StreamReader(s);
-            var result = new JobsParser().Parse(sr.ReadToEnd());
+            var result = jobParser.Parse(sr.ReadToEnd());
 
             Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.First());
+            Assert.AreEqual(1, jobParser.ErrorJobs?.Count);
         }
     }
 }
