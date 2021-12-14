@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -521,7 +522,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None))
                 .Returns(createBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+                A<string>.Ignored, A<string>.Ignored, CancellationToken.None)).Returns(addFileToBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
 
@@ -612,7 +613,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None))
                 .Returns(createBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+                A<string>.Ignored, A<string>.Ignored, CancellationToken.None)).Returns(addFileToBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored))
                 .Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
@@ -631,5 +632,82 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
             StringAssert.StartsWith("Test validation error", vm.ValidationErrors[0]);
         }
+
+        [Test]
+        public void TestCancelNewBatchJobWithRollBack()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                        }
+                }
+            },
+            fileSystem, fakeLoggerNewBatchJobVM,
+            () => fakeFileShareApiAdminClient,
+            fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+
+            var batchHandle = A.Fake<IBatchHandle>();
+            bool IsCommitting = false;
+
+            MethodInfo? methodInfo = typeof(NewBatchJobViewModel).GetMethod("HandleCanceledOperationsAsync", BindingFlags.NonPublic | BindingFlags.Instance);
+            object[] parameters = { batchHandle, IsCommitting, fakeFileShareApiAdminClient };
+            if (methodInfo != null)
+            {
+                methodInfo.Invoke(vm, parameters);
+                A.CallTo(() => fakeFileShareApiAdminClient.RollBackBatchAsync(batchHandle)).MustHaveHappened();
+                Assert.AreEqual("Canceled job is completed for batch ID:", vm.ExecutionResult);
+            }
+        }
+
+        [Test]
+        public void TestCancelNewBatchJobWithSetExpiry()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+
+            var batchHandle = A.Fake<IBatchHandle>();
+            bool IsCommitting = true;
+
+            MethodInfo? methodInfo = typeof(NewBatchJobViewModel).GetMethod("HandleCanceledOperationsAsync", BindingFlags.NonPublic | BindingFlags.Instance);
+            object[] parameters = { batchHandle, IsCommitting, fakeFileShareApiAdminClient };
+            if (methodInfo != null)
+            {
+                methodInfo.Invoke(vm, parameters);
+                A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(batchHandle.BatchId, A<BatchExpiryModel>.Ignored, CancellationToken.None)).MustHaveHappened();
+                Assert.AreEqual("Canceled job is completed for batch ID:", vm.ExecutionResult);
+            }
+        }
+
     }
 }
