@@ -126,7 +126,7 @@
                                                   AutoGenerateColumns="False">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Search Path" Binding="{Binding SearchPath}" />
-                                                <DataGridTextColumn Header="Expected" Width="85" 
+                                                <DataGridTextColumn Header="Expected" Width="83" 
                                                                     Binding="{Binding ExpectedFileCount}" 
                                                                     />
                                                 <DataGridTemplateColumn Header="Files" Width="380">

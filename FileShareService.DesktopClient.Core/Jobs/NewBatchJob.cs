@@ -28,14 +28,30 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                 //Check for batch attribute key and value
                 foreach (var batchAttribute in batchAttributeToken)
                 {
+                    JToken? batchKeyToken = batchAttribute.SelectToken("key");
+                    string batchKey = batchKeyToken?.Type == JTokenType.String ?
+                               Convert.ToString(batchKeyToken) : string.Empty;
+
                     if (batchAttribute.SelectToken("key")?.Type != JTokenType.String)
                     {
                         ErrorMessages.Add($"Batch attribute key is missing or is invalid for the batch.");
                     }
+                    else if (string.IsNullOrWhiteSpace(batchKey))
+                    {
+                        ErrorMessages.Add($"Batch attribute key cannot be blank.");
+                    }
+
+                    JToken? batchValueToken = batchAttribute.SelectToken("value");
+                    string batchValue = batchValueToken?.Type == JTokenType.String ?
+                        Convert.ToString(batchValueToken) : string.Empty;
 
                     if (batchAttribute.SelectToken("value")?.Type != JTokenType.String)
                     {
                         ErrorMessages.Add($"Batch attribute value is missing or is invalid for the batch.");
+                    }
+                    else if (string.IsNullOrWhiteSpace(batchValue))
+                    {
+                        ErrorMessages.Add($"Batch attribute value cannot be blank.");
                     }
                 }
             }

@@ -57,5 +57,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string Action => job.Action;
 
         public List<string> ValidationErrors { get; set; } = new List<string>();
+
+        public bool IsVisibleValidationErrorsArea => ValidationErrors.Any();
     }
 }

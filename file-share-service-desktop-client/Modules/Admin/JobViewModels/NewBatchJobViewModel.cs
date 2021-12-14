@@ -65,8 +65,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        public IEnumerable<KeyValuePair<string, string>> Attributes =>
-            job.ActionParams.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, ExpandMacros(kv.Value)));
+        public IEnumerable<KeyValuePair<string, string>>? Attributes =>
+            job.ActionParams.Attributes?.Select(kv => new KeyValuePair<string, string>(kv.Key, ExpandMacros(kv.Value)));
 
         private string ExpandMacros(string value)
         {
@@ -275,7 +275,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                             logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name ,batchHandle.BatchId);
                                         }
                                     },
-                                    newBatchFilesViewModel.Attributes.ToArray()).ContinueWith(t => { if (t.Exception != null) { throw t.Exception; } openRead.Dispose(); });                            
+                                    newBatchFilesViewModel.Attributes?.ToArray()).ContinueWith(_ => openRead.Dispose());                            
                             }).ToArray());
                     //cleaning up file progress as all uploaded
                     FileUploadProgress.Clear();
@@ -342,14 +342,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ReadGroups = ReadGroups,
                     ReadUsers = ReadUsers
                 },
-                Attributes = Attributes.ToList(),
+                Attributes = Attributes?.ToList(),
                 ExpiryDate = ExpiryDate
             };
         }
 
         private void ValidateFiles()
         {
-
             if (Files.Any())
             {
                 foreach (var file in Files)
@@ -457,9 +456,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string MimeType => newBatchFile.MimeType;
 
         public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
-        public IEnumerable<KeyValuePair<string, string>> Attributes =>
+        public IEnumerable<KeyValuePair<string, string>>? Attributes =>
         //newBatchFile.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, ExpandMacros(kv.Value)));
-        newBatchFile.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value));
+        newBatchFile.Attributes?.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value));
         private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
         {
             try
