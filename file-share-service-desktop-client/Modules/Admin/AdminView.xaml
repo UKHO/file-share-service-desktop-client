@@ -164,6 +164,13 @@
                                             VerticalAlignment="Top"
                                             Command="{Binding ExcecuteJobCommand}" Margin="10 0"/>
 
+                                            <Button 
+	                                        Content="Cancel Job" 
+	                                        HorizontalAlignment="Left" 
+	                                        VerticalAlignment="Top"                                                
+	                                        Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+	                                        Command="{Binding CancelJobExecutionCommand}" Margin="15 0"/>
+
                                             <Label  HorizontalAlignment="Left" Content="Validation errors:" Margin="20 0" 
                                                     Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
@@ -177,14 +184,14 @@
                                             Grid.Row="0" 
                                             Grid.Column="0"
                                             Grid.ColumnSpan="2"
-                                            Grid.RowSpan="9"
+                                            Grid.RowSpan="8"
                                             Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
 
                                             ></views:Spinner>
                                         <ItemsControl  Grid.Row="0" 
                                                Grid.Column="0"
                                                Grid.ColumnSpan="2"
-                                               Grid.RowSpan="9"
+                                               Grid.RowSpan="8"
                                                Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                ItemsSource="{Binding FileUploadProgress}"
                                                VerticalContentAlignment="Center"
