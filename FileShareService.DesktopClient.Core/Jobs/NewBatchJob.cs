@@ -82,18 +82,16 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                 JToken? fileAttributeToken = fileObj.SelectToken("attributes");
                 var searchPath = fileObj.SelectToken("searchPath");
 
-                if (fileAttributeToken == null) continue;
-                else
+                if (fileAttributeToken != null)
                 {
                     if (fileAttributeToken?.Type != JTokenType.Array)
                     {
                         ErrorMessages.Add("Invalid file attribute. searchPath:" + searchPath);
                         continue;
                     }
-                    if (!fileAttributeToken.HasValues) continue;
-                    else
+                    if (fileAttributeToken.HasValues)
                     {
-                        //Check for batch attribute key and value
+                        //Check for file attribute key and value
                         foreach (JToken? fileAttribute in fileAttributeToken)
                         {
                             JToken? fileKeyToken = fileAttribute.SelectToken("key");
