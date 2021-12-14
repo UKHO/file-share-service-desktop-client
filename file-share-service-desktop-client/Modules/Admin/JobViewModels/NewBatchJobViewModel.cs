@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -323,7 +324,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     cancellationToken.ThrowIfCancellationRequested();
                         
                 }
-                catch (OperationCanceledException ex)
+                catch (OperationCanceledException)
                 {
                     ExecutionResult = await HandleCanceledOperationsAsync(batchHandle, IsCommittingOnCancel, fileShareClient);                       
                 }
@@ -374,43 +375,46 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         private async Task<string> HandleCanceledOperationsAsync(IBatchHandle batchHandle, bool IsCommitting, IFileShareApiAdminClient fileShareClient)
         {            
-            logger.LogInformation("Cancel job execution started for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);               
-            if (IsCommitting)
+            logger.LogInformation("Cancel job execution started for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
+            try
             {
-                logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
-                string expiryDateString = DateTime.UtcNow.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
-                await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
-                logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
-            }
-            else
-            {
-                try
+                if (IsCommitting)
                 {
-                    logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);
-                    await fileShareClient.RollBackBatchAsync(batchHandle);
-                    logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle.BatchId);
+                    await SetBatchExpiry(batchHandle, fileShareClient);
                 }
-                catch (Exception ex)
+                else
                 {
-                    if (((System.Net.Http.HttpRequestException)ex).StatusCode.Equals(HttpStatusCode.Conflict))
+                    try
+                    {
+                        logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);
+                        await fileShareClient.RollBackBatchAsync(batchHandle);
+                        logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle.BatchId);
+                    }
+                    catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.Conflict)
                     {
                         logger.LogInformation("File Share Service batch rollback attempted but got conflict and hence setting expiry for batch ID:{BatchId}.", batchHandle.BatchId);
-                        logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
-                        string expiryDateString = DateTime.UtcNow.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
-                        await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
-                        logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
-                    }
-                    else
-                    {
-                        ExecutionResult = ex.ToString();
-                        throw;
+                        await SetBatchExpiry(batchHandle, fileShareClient);
                     }
                 }
+                ExecutionResult = string.Format("Canceled job is completed for batch ID:{0}", batchHandle.BatchId);
+                logger.LogInformation("Cancel job execution completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
             }
-            ExecutionResult = string.Format("Canceled job is completed for batch ID:{0}", batchHandle.BatchId);                
-            logger.LogInformation("Cancel job execution completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
+            catch (Exception ex)
+            {
+                ExecutionResult = ex.ToString();
+                logger.LogError("Cancel Job Error : {Error} for Action : {Action}, displayName:{displayName}. ", ex.Message, Action, DisplayName);
+                throw;
+            }
            
             return ExecutionResult;
+        }
+
+        private async Task SetBatchExpiry(IBatchHandle batchHandle, IFileShareApiAdminClient fileShareClient)
+        {
+            logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
+            string expiryDateString = DateTime.UtcNow.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
+            await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
+            logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
         }
 
         public async Task<bool> CheckBatchIsCommitted(IFileShareApiAdminClient fileShareClient,IBatchHandle batchHandle, double waitTimeInMinutes)
