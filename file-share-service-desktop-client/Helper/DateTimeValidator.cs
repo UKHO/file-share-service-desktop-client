@@ -14,9 +14,9 @@ namespace UKHO.FileShareService.DesktopClient.Helper
             this.macroTransformer = macroTransformer;
         }
 
-        public DateTime? ValidateExpiryDate(bool isExpiryDateKeyExist, string[] validFormats, string rawDateTime, List<string> errorMessages)
+        public DateTime? ValidateExpiryDate(bool expiryDateKeyExists, string[] validFormats, string rawDateTime, List<string> errorMessages)
         {
-            if (isExpiryDateKeyExist && rawDateTime is not null)
+            if (expiryDateKeyExists && rawDateTime is not null)
             {
                 //This check is for empty string or white space.                
                 if(rawDateTime.All(char.IsWhiteSpace))

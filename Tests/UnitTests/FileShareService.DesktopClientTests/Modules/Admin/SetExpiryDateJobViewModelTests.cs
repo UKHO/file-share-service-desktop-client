@@ -154,7 +154,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 BatchId = "batch_id",
                 ExpiryDate = invalidExpiryDate
             };
-            typeof(SetExpiryDateJob).GetProperty(nameof(setBatchExpiryJob.IsExpiryDateKeyExist))?.SetValue(setBatchExpiryJob, true, null);
+            typeof(SetExpiryDateJob).GetProperty(nameof(setBatchExpiryJob.ExpiryDateKeyExists))?.SetValue(setBatchExpiryJob, true, null);
 
             var vm = new SetExpiryDateJobViewModel(setBatchExpiryJob, fakeLogger, () => fakeFileShareApiAdminClient, dateTimeValidator);
 
@@ -184,7 +184,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 BatchId = "batch_id",
                 ExpiryDate = invalidExpiryDate
             };
-            typeof(SetExpiryDateJob).GetProperty(nameof(setBatchExpiryJob.IsExpiryDateKeyExist))?.SetValue(setBatchExpiryJob, true, null);
+            typeof(SetExpiryDateJob).GetProperty(nameof(setBatchExpiryJob.ExpiryDateKeyExists))?.SetValue(setBatchExpiryJob, true, null);
 
             var vm = new SetExpiryDateJobViewModel(setBatchExpiryJob, fakeLogger, () => fakeFileShareApiAdminClient, dateTimeValidator);
 
@@ -210,7 +210,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ExpiryDate = validExpiryDate
             };
 
-            typeof(SetExpiryDateJob).GetProperty(nameof(setBatchExpiryJob.IsExpiryDateKeyExist))?.SetValue(setBatchExpiryJob, true, null);
+            typeof(SetExpiryDateJob).GetProperty(nameof(setBatchExpiryJob.ExpiryDateKeyExists))?.SetValue(setBatchExpiryJob, true, null);
 
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
                 .Returns(DateTime.UtcNow);

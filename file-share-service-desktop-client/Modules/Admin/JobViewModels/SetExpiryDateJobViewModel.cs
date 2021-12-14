@@ -31,7 +31,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         }
 
         public string BatchId => job.ActionParams.BatchId;
-        public bool IsExpiryDateKeyExist => job.IsExpiryDateKeyExist;
+        public bool ExpiryDateKeyExists => job.ExpiryDateKeyExists;
 
         public string RawExpiryDate => job.ActionParams.ExpiryDate;
 
@@ -43,7 +43,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             {
                 if (!expiryDate.HasValue)
                 {
-                    expiryDate = dateTimeValidator.ValidateExpiryDate(IsExpiryDateKeyExist, RFC3339_FORMATS, RawExpiryDate, job.ErrorMessages);
+                    expiryDate = dateTimeValidator.ValidateExpiryDate(ExpiryDateKeyExists, RFC3339_FORMATS, RawExpiryDate, job.ErrorMessages);
                 }
 
                 return expiryDate.HasValue ?

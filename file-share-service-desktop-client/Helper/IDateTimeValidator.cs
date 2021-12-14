@@ -5,6 +5,6 @@ namespace UKHO.FileShareService.DesktopClient.Helper
 {
     public interface IDateTimeValidator
     {
-        DateTime? ValidateExpiryDate(bool isExpiryDateKeyExist, string[] validFormats, string rawDateTime, List<string> errorMessages);
+        DateTime? ValidateExpiryDate(bool expiryDateKeyExists, string[] validFormats, string rawDateTime, List<string> errorMessages);
     }
 }
