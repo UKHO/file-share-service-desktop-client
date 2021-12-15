@@ -440,7 +440,7 @@
                                         <TextBlock Grid.Row="1" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Batch ID:" Name="lbl_setExpirybatchId" />
                                         <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Medium" Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=BatchId, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_setExpirybatchId}" />
 
-                                        <TextBlock Grid.Row="2" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Expiry Date:" Name="lbl_expirydate" />
+                                        <TextBlock Grid.Row="2" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Expiry Date:" Name="lbl_expiryDate" />
                                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                                             <TextBox Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=ExpiryDate, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expiryDate}" />
                                             <TextBox FontWeight="ExtraLight" Style="{StaticResource ReadOnlyTextboxStyle}" FontSize="14" Text="{Binding Path=RawExpiryDate, StringFormat= Raw: {0}, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expiryDate}" />
