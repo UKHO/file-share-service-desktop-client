@@ -6,10 +6,13 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     public class NewBatchJob : IJob
     {
         public const string JOB_ACTION = "newBatch";
-        public string DisplayName { get; set; }
-        public string Action { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
         public NewBatchJobParams ActionParams { get; set; } = new NewBatchJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
+        
+        // To hold whether expiry date is specified in config or not.
+        public bool IsExpiryDateKeyExist { get; private set; }
 
         public void Validate(JToken jsonToken)
         {
@@ -53,10 +56,14 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
             //Check for files
             if (jsonToken.SelectToken("actionParams.files") != null && 
-                jsonToken.SelectToken("actionParams.files").Type != JTokenType.Array)
+                jsonToken.SelectToken("actionParams.files")?.Type != JTokenType.Array)
             {
                 ErrorMessages.Add($"Invalid file object.");
             }
+
+            JToken? expiryDateToken = jsonToken.SelectToken("actionParams.expiryDate");
+            //Set value if key exists
+            IsExpiryDateKeyExist = expiryDateToken != null;
             #endregion
 
             #region Post deserialize validations
@@ -78,22 +85,22 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
     public class NewBatchJobParams
     {
-        public string BusinessUnit { get; set; }
+        public string BusinessUnit { get; set; } = string.Empty;
 
         public IEnumerable<KeyValuePair<string, string>> Attributes { get; set; } =
             new List<KeyValuePair<string, string>>();
 
         public Acl Acl { get; set; } = new Acl();
-        public string ExpiryDate { get; set; }
+        public string ExpiryDate { get; set; } = string.Empty;
 
         public List<NewBatchFiles> Files { get; set; } = new List<NewBatchFiles>();
     }
 
     public class NewBatchFiles
     {
-        public string SearchPath { get; set; }
+        public string SearchPath { get; set; } = string.Empty;
         public int ExpectedFileCount { get; set; }
-        public string MimeType { get; set; }
+        public string MimeType { get; set; } = string.Empty;
     }
 
     public class Acl

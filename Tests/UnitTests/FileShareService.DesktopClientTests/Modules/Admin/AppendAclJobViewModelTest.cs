@@ -1,16 +1,12 @@
 ﻿using FakeItEasy;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
-using UKHO.FileShareAdminClient.Models;
+using UKHO.FileShareAdminClient.Models.Response;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
-using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 using AdminClientModell = UKHO.FileShareAdminClient.Models;
 
@@ -45,11 +41,17 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 }
             },
             () => fakeFileShareApiAdminClient,
-            fakeLoggerAppendAclJobVM); 
+            fakeLoggerAppendAclJobVM);
+
+            Result<AppendAclResponse> result = new Result<AppendAclResponse>
+            {
+                IsSuccess = true,
+                StatusCode = 204
+            };
 
             Assert.AreEqual("Append Acl", vm.DisplayName);
             A.CallTo(() => fakeFileShareApiAdminClient.AppendAclAsync(A<string>.Ignored, A<AdminClientModell.Acl>.Ignored, CancellationToken.None))
-            .Returns(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.NoContent }); 
+            .Returns(result);
             await vm.OnExecuteCommand();
             Assert.AreEqual("File Share Service append Access Control List completed for batch ID: Batch_Id", vm.ExecutionResult);
         }
@@ -66,16 +68,19 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                     ReadUsers = new List<string> { "public" }
                 }
             }, () => fakeFileShareApiAdminClient,
-            fakeLoggerAppendAclJobVM); 
-            
-            ErrorDescriptionModel content = new ErrorDescriptionModel
+            fakeLoggerAppendAclJobVM);
+
+            Result<AppendAclResponse> result = new Result<AppendAclResponse>
             {
+                IsSuccess = false,
+                StatusCode = 400,
                 Errors = new List<Error> { new Error { Source = "source", Description = "Bad Request" } }
             };
+
             Assert.AreEqual("Append Acl", vm.DisplayName);
-          
-            A.CallTo(() => fakeFileShareApiAdminClient.AppendAclAsync(A<string>.Ignored, A<AdminClientModell.Acl>.Ignored,CancellationToken.None ))
-            .Returns(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.BadRequest, Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json") }); 
+
+            A.CallTo(() => fakeFileShareApiAdminClient.AppendAclAsync(A<string>.Ignored, A<AdminClientModell.Acl>.Ignored, CancellationToken.None))
+            .Returns(result);
             await vm.OnExecuteCommand();
            
             Assert.AreEqual("Bad Request", vm.ExecutionResult);

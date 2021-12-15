@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
@@ -8,12 +7,9 @@ using UKHO.FileShareAdminClient;
 using AdminClientModell = UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
-using System.Net.Http;
-using UKHO.FileShareService.DesktopClient.Core.Models;
-using Newtonsoft.Json;
-using System.Text;
 using System;
 using System.Threading;
+using UKHO.FileShareAdminClient.Models.Response;
 
 namespace FileShareService.DesktopClientTests.Modules.Admin
 {
@@ -49,9 +45,14 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
             Assert.AreEqual("Replace Acl", vm.DisplayName);
 
-            
+            Result<ReplaceAclResponse> result = new Result<ReplaceAclResponse>
+            {
+                IsSuccess = true,
+                StatusCode = 204
+            };
+
             A.CallTo(() => fakeFileShareApiAdminClient.ReplaceAclAsync(A<string>.Ignored, A<AdminClientModell.Acl>.Ignored, CancellationToken.None))
-                             .Returns(new HttpResponseMessage { StatusCode= System.Net.HttpStatusCode.NoContent });
+                             .Returns(result);
 
             await vm.OnExecuteCommand();
             Assert.AreEqual($"File Share Service replace Access Control List completed for batch ID: {vm.BatchId}", vm.ExecutionResult);
@@ -73,17 +74,17 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             () => fakeFileShareApiAdminClient,
             fakeLoggerReplaceAclJobVM);
 
-            ErrorDescriptionModel content = new ErrorDescriptionModel
+            Result<ReplaceAclResponse> result = new Result<ReplaceAclResponse>
             {
+                IsSuccess = false,
+                StatusCode = 400,
                 Errors = new List<Error> { new Error { Source = "source", Description = "Bad Request" } }
             };
 
-            
             Assert.AreEqual("Replace Acl", vm.DisplayName);
 
-
             A.CallTo(() => fakeFileShareApiAdminClient.ReplaceAclAsync(A<string>.Ignored, A<AdminClientModell.Acl>.Ignored, CancellationToken.None))
-                             .Returns(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.BadRequest, Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8,"application/json")});
+                             .Returns(result);
 
             await vm.OnExecuteCommand();
             Assert.AreEqual("Bad Request", vm.ExecutionResult);

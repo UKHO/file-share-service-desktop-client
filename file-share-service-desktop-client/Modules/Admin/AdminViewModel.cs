@@ -8,6 +8,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Helper;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin
@@ -19,6 +20,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private readonly IJobsParser jobsParser;
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
+        private readonly IMacroTransformer macroTransformer;
+        private readonly IDateTimeValidator dateTimeValidator;
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
         private readonly ILogger<AdminViewModel> logger;
         private readonly ILogger<NewBatchJobViewModel> Nlogger;
@@ -32,6 +35,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             IJobsParser jobsParser,
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
             ICurrentDateTimeProvider currentDateTimeProvider,
+            IMacroTransformer macroTransformer,
+            IDateTimeValidator dateTimeValidator,
             IEnvironmentsManager environmentsManager,
             ILogger<AdminViewModel> logger,
             ILogger<NewBatchJobViewModel> Nlogger,
@@ -45,6 +50,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             this.jobsParser = jobsParser;
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.currentDateTimeProvider = currentDateTimeProvider;
+            this.macroTransformer = macroTransformer;
+            this.dateTimeValidator = dateTimeValidator;
             this.logger = logger;
             this.Nlogger = Nlogger;
             this.aLogger = aLogger;
@@ -54,8 +61,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             OpenFileCommand = new DelegateCommand(OnOpenFile);
 
             environmentsManager.PropertyChanged += OnEnvironmentsManagerPropertyChanged;
-            
-            logger.LogInformation("Admin Module selected.");           
+
+            logger.LogInformation("Admin Module selected.");
         }
 
         private void OnEnvironmentsManagerPropertyChanged(object? sender,
@@ -67,7 +74,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         public DelegateCommand OpenFileCommand { get; }
 
         private void OnOpenFile()
-        {        
+        {
             var openFileDialog = new OpenFileDialog
             {
                 ShowReadOnly = true,
@@ -100,12 +107,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             {
                 NewBatchJob newBatch => new NewBatchJobViewModel(newBatch, fileSystem,Nlogger,
                     () => fileShareApiAdminClientFactory.Build(),
-                    currentDateTimeProvider),
+                    currentDateTimeProvider, macroTransformer, dateTimeValidator),
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl, () => fileShareApiAdminClientFactory.Build(), aLogger),
-                SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, sLogger),
+                SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, sLogger, () => fileShareApiAdminClientFactory.Build(), dateTimeValidator),
                 ReplaceAclJob replaceAcl => new ReplaceAclJobViewModel(replaceAcl, () => fileShareApiAdminClientFactory.Build(), rLogger),
-                ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(
-                    errorDeserializingJobs, eLogger),
+                ErrorDeserializingJobsJob errorDeserializingJobs => new ErrorDeserializingJobsJobViewModel(errorDeserializingJobs,
+                    jobsParser.ErrorJobs, eLogger),
                 _ => throw new ArgumentException("Not implemented for job " + job.GetType())
             };
         }
