@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using UKHO.FileShareAdminClient.Models;
 using System.Linq;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs

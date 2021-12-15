@@ -7,11 +7,9 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
     public class ErrorDeserializingJobsJob : IJob
     {
-        private const string Display_Name = "Error deserializing jobs from file:";
-
-        public string Action { get; set; }
-        public Exception Exception { get; }
-
+        public string Action { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public Exception? Exception { get; } 
         public List<string> ErrorMessages { get; set; } = new List<string>();
 
         public ErrorDeserializingJobsJob()
@@ -22,14 +20,6 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public ErrorDeserializingJobsJob(Exception exception)
         {
             Exception = exception;
-        }
-
-        public string DisplayName
-        {
-            //
-            get => Display_Name;
-            [ExcludeFromCodeCoverage]
-            set { }
         }
 
         [ExcludeFromCodeCoverage]
