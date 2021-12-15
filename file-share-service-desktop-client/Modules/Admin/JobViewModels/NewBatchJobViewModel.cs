@@ -126,7 +126,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsCanceled = false;
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = CancellationTokenSource.Token;
-            IBatchHandle? batchHandle = null;
+            
             try
             {
                 logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .",Action,DisplayName);
@@ -203,9 +203,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle?.BatchId);
                     }
 
-                    ExecutionResult = ((System.Net.Http.HttpRequestException)e).StatusCode == HttpStatusCode.BadRequest
-                        ? "Invalid Configuration file details."
-                        : "Internal Server Error. Please try after sometime or contact support team.";
+                    ExecutionResult = e.Message;    
                 }
             }
             finally
@@ -416,11 +414,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             SearchPath = expandMacros(newBatchFile.SearchPath);
             var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
-            
+
 
             Files = (directory != null && directory.Exists)
                     ? GetFiles(directory, searchFileInfo.Name)
                     : Enumerable.Empty<IFileSystemInfo>();
+
+            Attributes = newBatchFile.Attributes?.Select(kv => new KeyValuePair<string, string>(kv.Key, expandMacros(kv.Value)));
         }
 
         public string RawSearchPath => newBatchFile.SearchPath;
@@ -430,9 +430,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string MimeType => newBatchFile.MimeType;
 
         public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
-        public IEnumerable<KeyValuePair<string, string>>? Attributes =>
-        //newBatchFile.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, ExpandMacros(kv.Value)));
-        newBatchFile.Attributes?.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value));
+        public IEnumerable<KeyValuePair<string, string>>? Attributes { get; }
+       
         private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
         {
             try
