@@ -14,6 +14,7 @@ using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Helper;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 using UKHO.WeekNumberUtils;
@@ -65,13 +66,13 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"},
-                            {"YearMacro1", input},
-                            {"YearMacro2", "Padding " + input},
-                            {"YearMacro3", $"Padding {input} and Right Padding"}
-                        },
+                    Attributes = new List<KeyValueAttribute>
+                    {
+                        new KeyValueAttribute("BatchAttribute1", "Value1"),
+                        new KeyValueAttribute("YearMacro1", input),
+                        new KeyValueAttribute("YearMacro2", "Padding " + input),
+                        new KeyValueAttribute("YearMacro3", $"Padding {input} and Right Padding")
+                    },
                     Files =
                         {
                             new NewBatchFiles
@@ -87,7 +88,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
-            var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
+            var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
 
             var expectedYear = DateTime.UtcNow.Year.ToString();
             if (input.Contains("Year2"))
@@ -128,14 +129,14 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"},
-                            {"WeekMacro1", input},
-                            {"WeekMacro2", "Padding " + input},
-                            {"WeekMacro3", $"Padding {input} and Right Padding"},
-                            {"MultiWeekMacro", $"Padding {input} and {input} with Right Padding"}
-                        },
+                    Attributes = new List<KeyValueAttribute>
+                    {
+                        new KeyValueAttribute("BatchAttribute1", "Value1"),
+                        new KeyValueAttribute("WeekMacro1", input),
+                        new KeyValueAttribute("WeekMacro2", "Padding " + input),
+                        new KeyValueAttribute("WeekMacro3", $"Padding {input} and Right Padding"),
+                        new KeyValueAttribute("MultiWeekMacro", $"Padding {input} and {input} with Right Padding")
+                    },
                     Files =
                         {
                             new NewBatchFiles
@@ -151,7 +152,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
-            var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
+            var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekNumber = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Week.ToString();
 
             Assert.AreEqual(expectedWeekNumber, expandedAttributes["WeekMacro1"]);
@@ -179,14 +180,14 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"},
-                            {"WeekYearMacro1", input},
-                            {"WeekYearMacro2", "Padding " + input},
-                            {"WeekYearMacro3", $"Padding {input} and Right Padding"},
-                            {"MultiWeekYearMacro", $"Padding {input} and {input} with Right Padding"}
-                        },
+                    Attributes = new List<KeyValueAttribute>
+                    {
+                        new KeyValueAttribute("BatchAttribute1", "Value1"),
+                        new KeyValueAttribute("WeekYearMacro1", input),
+                        new KeyValueAttribute("WeekYearMacro2", "Padding " + input),
+                        new KeyValueAttribute("WeekYearMacro3", $"Padding {input} and Right Padding"),
+                        new KeyValueAttribute("MultiWeekYearMacro", $"Padding {input} and {input} with Right Padding")
+                    },
                     Files =
                         {
                             new NewBatchFiles
@@ -202,7 +203,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
-            var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
+            var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekYear = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Year.ToString();
             if (input.Contains("Year2"))
             {
@@ -240,10 +241,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"}
-                        },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -284,10 +282,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                    {
-                        { "BatchAttribute1", "Value1" }
-                    },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                     {
                         new NewBatchFiles
@@ -329,7 +324,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -379,7 +374,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -419,7 +414,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -459,7 +454,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -495,7 +490,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -557,8 +552,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>()
-                        ,
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute(null!, null!) },
+
                     Files =
                         {
                             new NewBatchFiles
@@ -642,7 +637,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -680,7 +675,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -721,7 +716,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -729,7 +724,11 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                                 ExpectedFileCount = 1,
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName,
-                                Attributes = new Dictionary<string, string> {{  "Product Type","AVCS"}, {"Exchange Set Type", "Base" }}
+                                Attributes = new List<KeyValueAttribute> 
+                                { 
+                                    new KeyValueAttribute("Product Type","AVCS"),
+                                    new KeyValueAttribute("Exchange Set Type", "Base")
+                                },
                             }
                         }
                 }

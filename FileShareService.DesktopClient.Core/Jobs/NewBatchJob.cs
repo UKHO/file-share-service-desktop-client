@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
@@ -152,8 +153,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     {
         public string BusinessUnit { get; set; } = string.Empty;
 
-        public IEnumerable<KeyValuePair<string, string>> Attributes { get; set; } =
-        new List<KeyValuePair<string, string>>();
+        public List<KeyValueAttribute> Attributes { get; set; } = new List<KeyValueAttribute>();
 
         public Acl Acl { get; set; } = new Acl();
         public string ExpiryDate { get; set; } = string.Empty;
@@ -167,8 +167,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public string SearchPath { get; set; } = string.Empty;
         public int ExpectedFileCount { get; set; }
         public string MimeType { get; set; }
-        public IEnumerable<KeyValuePair<string, string>> Attributes { get; set; } =
-        new List<KeyValuePair<string, string>>();
+        public List<KeyValueAttribute> Attributes { get; set; } = new List<KeyValueAttribute>();
     }
 
     public class Acl
