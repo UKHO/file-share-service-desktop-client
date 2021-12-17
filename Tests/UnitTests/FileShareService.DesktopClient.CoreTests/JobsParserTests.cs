@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace FileShareService.DesktopClient.CoreTests
 {
@@ -35,6 +36,7 @@ namespace FileShareService.DesktopClient.CoreTests
 
             Assert.AreEqual("Upload DVDs", newBatchJob.DisplayName);
             Assert.AreEqual("ADDS", newBatchJob.ActionParams.BusinessUnit);
+
             CollectionAssert.AreEquivalent(new KeyValuePair<string, string>[]
             {
                 new("Product Type", "AVCS"),
@@ -43,7 +45,8 @@ namespace FileShareService.DesktopClient.CoreTests
                 new("S63 Version", "1.2"),
                 new("Exchange Set Type", "Base"),
                 new("Media Type", "DVD")
-            }, newBatchJob.ActionParams.Attributes);
+            }, newBatchJob.ActionParams.Attributes.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)));
+
             CollectionAssert.IsEmpty(newBatchJob.ActionParams.Acl.ReadUsers);
             CollectionAssert.AreEquivalent(new[] {"distributors", "vars"}, newBatchJob.ActionParams.Acl.ReadGroups);
             Assert.AreEqual("$(now.AddDays(21))", newBatchJob.ActionParams.ExpiryDate);
@@ -102,6 +105,19 @@ namespace FileShareService.DesktopClient.CoreTests
 
             Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.First());
             Assert.AreEqual(1, jobParser.ErrorJobs?.Count);
+        }
+
+        [Test]
+        public void TestErrorBlankFileAttributesWhenParseFileAttributes()
+        {
+            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithFileAttributes.json")!;
+            using var sr = new StreamReader(s);
+            var result = new JobsParser().Parse(sr.ReadToEnd());
+
+            Assert.IsInstanceOf<NewBatchJob>(result.jobs.First());
+            StringAssert.StartsWith("File attribute key cannot be blank", result.jobs.First().ErrorMessages.First());
+            StringAssert.StartsWith("File attribute value cannot be blank", result.jobs.First().ErrorMessages.ElementAt(1));
+            StringAssert.StartsWith("Invalid file attribute", result.jobs.First().ErrorMessages.Last());
         }
     }
 }

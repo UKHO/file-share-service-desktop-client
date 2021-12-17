@@ -14,6 +14,7 @@ using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Helper;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 using UKHO.WeekNumberUtils;
@@ -26,7 +27,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private MockFileSystem fileSystem = null!;
         private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
         private ICurrentDateTimeProvider fakeCurrentDateTimeProvider = null!;
-        private  ILogger<NewBatchJobViewModel> fakeLoggerNewBatchJobVM =null!;
+        private ILogger<NewBatchJobViewModel> fakeLoggerNewBatchJobVM = null!;
         private IMacroTransformer macroTransformer = null!;
         private IDateTimeValidator dateTimeValidator = null!;
 
@@ -60,19 +61,19 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
 
             var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
                 {
-                    DisplayName = "Create new Batch 123",
-                    ActionParams = new NewBatchJobParams
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute>
                     {
-                        BusinessUnit = "TestBU1",
-                        Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"},
-                            {"YearMacro1", input},
-                            {"YearMacro2", "Padding " + input},
-                            {"YearMacro3", $"Padding {input} and Right Padding"}
-                        },
-                        Files =
+                        new KeyValueAttribute("BatchAttribute1", "Value1"),
+                        new KeyValueAttribute("YearMacro1", input),
+                        new KeyValueAttribute("YearMacro2", "Padding " + input),
+                        new KeyValueAttribute("YearMacro3", $"Padding {input} and Right Padding")
+                    },
+                    Files =
                         {
                             new NewBatchFiles
                             {
@@ -81,20 +82,20 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                                 SearchPath = file1FullFileName
                             }
                         }
-                    }
-                },
+                }
+            },
                 fileSystem, fakeLoggerNewBatchJobVM,
-                () => fakeFileShareApiAdminClient, 
+                () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
-            var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
-            
+            var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
+
             var expectedYear = DateTime.UtcNow.Year.ToString();
             if (input.Contains("Year2"))
             {
                 expectedYear = expectedYear.Substring(2, 2);
-            }            
-            
+            }
+
             Assert.AreEqual(expectedYear, expandedAttributes["YearMacro1"]);
             Assert.AreEqual("Padding " + expectedYear, expandedAttributes["YearMacro2"]);
             Assert.AreEqual("Padding " + expectedYear + " and Right Padding", expandedAttributes["YearMacro3"]);
@@ -128,14 +129,14 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"},
-                            {"WeekMacro1", input},
-                            {"WeekMacro2", "Padding " + input},
-                            {"WeekMacro3", $"Padding {input} and Right Padding"},
-                            {"MultiWeekMacro", $"Padding {input} and {input} with Right Padding"}
-                        },
+                    Attributes = new List<KeyValueAttribute>
+                    {
+                        new KeyValueAttribute("BatchAttribute1", "Value1"),
+                        new KeyValueAttribute("WeekMacro1", input),
+                        new KeyValueAttribute("WeekMacro2", "Padding " + input),
+                        new KeyValueAttribute("WeekMacro3", $"Padding {input} and Right Padding"),
+                        new KeyValueAttribute("MultiWeekMacro", $"Padding {input} and {input} with Right Padding")
+                    },
                     Files =
                         {
                             new NewBatchFiles
@@ -149,9 +150,9 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer,dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
-            var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
+            var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekNumber = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Week.ToString();
 
             Assert.AreEqual(expectedWeekNumber, expandedAttributes["WeekMacro1"]);
@@ -179,14 +180,14 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"},
-                            {"WeekYearMacro1", input},
-                            {"WeekYearMacro2", "Padding " + input},
-                            {"WeekYearMacro3", $"Padding {input} and Right Padding"},
-                            {"MultiWeekYearMacro", $"Padding {input} and {input} with Right Padding"}
-                        },
+                    Attributes = new List<KeyValueAttribute>
+                    {
+                        new KeyValueAttribute("BatchAttribute1", "Value1"),
+                        new KeyValueAttribute("WeekYearMacro1", input),
+                        new KeyValueAttribute("WeekYearMacro2", "Padding " + input),
+                        new KeyValueAttribute("WeekYearMacro3", $"Padding {input} and Right Padding"),
+                        new KeyValueAttribute("MultiWeekYearMacro", $"Padding {input} and {input} with Right Padding")
+                    },
                     Files =
                         {
                             new NewBatchFiles
@@ -202,7 +203,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
 
-            var expandedAttributes = vm.Attributes.ToDictionary(kv => kv.Key, kv => kv.Value);
+            var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekYear = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Year.ToString();
             if (input.Contains("Year2"))
             {
@@ -240,10 +241,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                        {
-                            {"BatchAttribute1", "Value1"}
-                        },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -284,10 +282,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>
-                    {
-                        { "BatchAttribute1", "Value1" }
-                    },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                     {
                         new NewBatchFiles
@@ -329,7 +324,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -379,7 +374,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -419,7 +414,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -459,7 +454,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -495,7 +490,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -557,8 +552,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string>()
-                        ,
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute(null!, null!) },
+
                     Files =
                         {
                             new NewBatchFiles
@@ -642,7 +637,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -680,7 +675,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 ActionParams = new NewBatchJobParams
                 {
                     BusinessUnit = "TestBU1",
-                    Attributes = new Dictionary<string, string> { { "BatchAttribute1", "Value1" } },
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
                     Files =
                         {
                             new NewBatchFiles
@@ -709,5 +704,73 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             }
         }
 
+        [Test]
+        public async Task TestSimpleExceuteNewBatchJobWhenFileAttributesAdded()
+        {
+            var file1FullFileName = @"c:/data/files/f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 1,
+                                MimeType = "text/plain",
+                                SearchPath = file1FullFileName,
+                                Attributes = new List<KeyValueAttribute> 
+                                { 
+                                    new KeyValueAttribute("Product Type","AVCS"),
+                                    new KeyValueAttribute("Exchange Set Type", "Base")
+                                },
+                            }
+                        }
+                }
+            },
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+
+            Assert.AreEqual("Create new Batch 123", vm.DisplayName);
+
+            var batchHandle = A.Fake<IBatchHandle>();
+
+            var createBatchTcs = new TaskCompletionSource<IBatchHandle>();
+            var addFileToBatchTcs = new TaskCompletionSource();
+            var commitBatchTcs = new TaskCompletionSource();
+
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None))
+               .Returns(createBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored,
+                A<string>.Ignored, A<string>.Ignored)).Returns(addFileToBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored)).Returns(commitBatchTcs.Task);
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
+
+            var executeTask = vm.OnExecuteCommand();
+            vm.ExcecuteJobCommand.Execute();
+            Assert.IsTrue(vm.IsExecuting);
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+
+            createBatchTcs.SetResult(batchHandle);
+            addFileToBatchTcs.SetResult();
+            commitBatchTcs.SetResult();
+
+
+            await executeTask;
+            Assert.IsFalse(vm.IsExecuting);
+            Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
+            Assert.IsTrue(vm.IsExecutingComplete);
+            Assert.IsFalse(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(batchHandle)).MustHaveHappened();
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(batchHandle)).MustHaveHappened();
+            vm.CloseExecutionCommand.Execute();
+            Assert.IsFalse(vm.IsExecutingComplete);
+        }
     }
 }

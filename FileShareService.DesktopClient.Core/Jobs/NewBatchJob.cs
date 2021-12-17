@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 {
@@ -10,7 +12,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public string Action { get; set; } = string.Empty;
         public NewBatchJobParams ActionParams { get; set; } = new NewBatchJobParams();
         public List<string> ErrorMessages { get; private set; } = new List<string>();
-        
+
         // To hold whether expiry date is specified in config or not.
         public bool IsExpiryDateKeyExist { get; private set; }
 
@@ -30,14 +32,30 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                 //Check for batch attribute key and value
                 foreach (var batchAttribute in batchAttributeToken)
                 {
+                    JToken? batchKeyToken = batchAttribute.SelectToken("key");
+                    string batchKey = batchKeyToken?.Type == JTokenType.String ?
+                    Convert.ToString(batchKeyToken) : string.Empty;
+
                     if (batchAttribute.SelectToken("key")?.Type != JTokenType.String)
                     {
                         ErrorMessages.Add($"Batch attribute key is missing or is invalid for the batch.");
                     }
+                    else if (string.IsNullOrWhiteSpace(batchKey))
+                    {
+                        ErrorMessages.Add($"Batch attribute key cannot be blank.");
+                    }
+
+                    JToken? batchValueToken = batchAttribute.SelectToken("value");
+                    string batchValue = batchValueToken?.Type == JTokenType.String ?
+                    Convert.ToString(batchValueToken) : string.Empty;
 
                     if (batchAttribute.SelectToken("value")?.Type != JTokenType.String)
                     {
                         ErrorMessages.Add($"Batch attribute value is missing or is invalid for the batch.");
+                    }
+                    else if (string.IsNullOrWhiteSpace(batchValue))
+                    {
+                        ErrorMessages.Add($"Batch attribute value cannot be blank.");
                     }
                 }
             }
@@ -55,8 +73,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             }
 
             //Check for files
-            if (jsonToken.SelectToken("actionParams.files") != null && 
-                jsonToken.SelectToken("actionParams.files")?.Type != JTokenType.Array)
+            if (jsonToken.SelectToken("actionParams.files") != null &&
+            jsonToken.SelectToken("actionParams.files")?.Type != JTokenType.Array)
             {
                 ErrorMessages.Add($"Invalid file object.");
             }
@@ -64,6 +82,54 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
             JToken? expiryDateToken = jsonToken.SelectToken("actionParams.expiryDate");
             //Set value if key exists
             IsExpiryDateKeyExist = expiryDateToken != null;
+
+            //Check for file attributes
+
+            foreach (JToken fileObj in jsonToken.SelectToken("actionParams.files"))
+            {
+                JToken? fileAttributeToken = fileObj.SelectToken("attributes");
+                var searchPath = fileObj.SelectToken("searchPath");
+
+                if (fileAttributeToken == null) continue;
+
+                if (fileAttributeToken?.Type != JTokenType.Array)
+                {
+                    ErrorMessages.Add("Invalid file attribute. searchPath:" + searchPath);
+                    continue;
+                }
+
+                if (!fileAttributeToken.HasValues) continue;
+
+                //Check for file attribute key and value
+                foreach (JToken? fileAttribute in fileAttributeToken)
+                {
+                    JToken? fileKeyToken = fileAttribute.SelectToken("key");
+                    string fileKey = fileKeyToken?.Type == JTokenType.String ?
+                        Convert.ToString(fileKeyToken) : string.Empty;
+
+                    if (fileAttribute.SelectToken("key")?.Type != JTokenType.String)
+                    {
+                        ErrorMessages.Add($"File attribute key is missing or is invalid for the file. searchPath:" + searchPath);
+                    }
+                    else if (string.IsNullOrWhiteSpace(fileKey))
+                    {
+                        ErrorMessages.Add($"File attribute key cannot be blank. searchPath : " + searchPath);
+                    }
+
+
+                    JToken? fileValueToken = fileAttribute.SelectToken("value");
+                    string fileValue = fileValueToken?.Type == JTokenType.String ?
+                        Convert.ToString(fileValueToken) : string.Empty;
+                    if (fileAttribute.SelectToken("value")?.Type != JTokenType.String)
+                    {
+                        ErrorMessages.Add($"File attribute value is missing or is invalid for the file. searchPath : " + searchPath);
+                    }
+                    else if (string.IsNullOrWhiteSpace(fileValue))
+                    {
+                        ErrorMessages.Add($"File attribute value cannot be blank. searchPath : " + searchPath);
+                    }
+                }
+            }
             #endregion
 
             #region Post deserialize validations
@@ -87,20 +153,21 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     {
         public string BusinessUnit { get; set; } = string.Empty;
 
-        public IEnumerable<KeyValuePair<string, string>> Attributes { get; set; } =
-            new List<KeyValuePair<string, string>>();
+        public List<KeyValueAttribute> Attributes { get; set; } = new List<KeyValueAttribute>();
 
         public Acl Acl { get; set; } = new Acl();
         public string ExpiryDate { get; set; } = string.Empty;
 
         public List<NewBatchFiles> Files { get; set; } = new List<NewBatchFiles>();
+
     }
 
     public class NewBatchFiles
     {
         public string SearchPath { get; set; } = string.Empty;
         public int ExpectedFileCount { get; set; }
-        public string MimeType { get; set; } = string.Empty;
+        public string MimeType { get; set; }
+        public List<KeyValueAttribute> Attributes { get; set; } = new List<KeyValueAttribute>();
     }
 
     public class Acl

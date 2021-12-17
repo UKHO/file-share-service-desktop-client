@@ -23,7 +23,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             new List<string>() { NewBatchJob.JOB_ACTION, AppendAclJob.JOB_ACTION,
                                  SetExpiryDateJob.JOB_ACTION, ReplaceAclJob.JOB_ACTION };
 
-        private List<string> jobIdCollection = new List<string>();
+        private List<string> jobIdCollection = null!;
 
         //This ErrorJobs collection will be used in error job view model to display errors and add details in logger. 
         public List<IJob>? ErrorJobs { get; } = new List<IJob>();
@@ -34,6 +34,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
             {
                 //Clear error job collection
                 ErrorJobs?.Clear();
+
+                jobIdCollection = new List<string>();
 
                 if (string.IsNullOrEmpty(jobs))
                 {
