@@ -16,6 +16,7 @@ using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
+using UKHO.FileShareService.DesktopClient.Core.Models;
 using UKHO.FileShareService.DesktopClient.Helper;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
@@ -59,6 +60,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         public DelegateCommand CancelJobExecutionCommand { get; }
 
+        public List<KeyValueAttribute>? Attributes => job.ActionParams.Attributes?
+            .Where(att => att != null)?
+            .Select(k => new KeyValueAttribute(k.Key, macroTransformer.ExpandMacros(k.Value)))?
+            .ToList();
+
         public string BusinessUnit => job.ActionParams.BusinessUnit;
 
         public bool IsExpiryDateKeyExist => job.IsExpiryDateKeyExist;
@@ -80,9 +86,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ConvertToRFC3339Format(expiryDate.Value.ToUniversalTime()) : null;
             }
         }
-
-        public IEnumerable<KeyValuePair<string, string>> Attributes =>
-            job.ActionParams.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, macroTransformer.ExpandMacros(kv.Value)));
 
         protected override bool CanExecute()
         {
@@ -126,6 +129,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsCanceled = false;
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = CancellationTokenSource.Token;
+            
             try
             {
                 logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .",Action,DisplayName);
@@ -161,7 +165,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         {
                                             logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
                                         }
-                                    }, cancellationToken).ContinueWith(_ => openRead.Dispose());
+                                    }, cancellationToken, newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray()).ContinueWith(_ => openRead.Dispose());
                             }).ToArray());
                     //cleaning up file progress as all uploaded
                     FileUploadProgress.Clear();
@@ -192,13 +196,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e.Message);
-                    logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);                        
-                    CancellationTokenSource.Dispose();                        
-                    await fileShareClient.RollBackBatchAsync(batchHandle);
-                    logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle.BatchId);
-                    ExecutionResult = e.ToString();
-                    throw;
+                    logger.LogError(e.ToString());
+
+                    if (batchHandle != null)
+                    {
+                        logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle?.BatchId);
+                        CancellationTokenSource.Dispose();
+                        await fileShareClient.RollBackBatchAsync(batchHandle);
+                        logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle?.BatchId);
+                    }
+
+                    ExecutionResult = e.Message;    
                 }
             }
             finally
@@ -305,7 +313,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ReadGroups = ReadGroups,
                     ReadUsers = ReadUsers
                 },
-                Attributes = Attributes.ToList(),
+                Attributes = Attributes?.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value))?.ToList(),
                 ExpiryDate = expiryDate
             };
         }
@@ -362,7 +370,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         }
                         job.ErrorMessages.Add($"{fileCountMismatchErrorMessage}");
                     }
-                }
+               }
             }
         }
         private string GetAccessibleDirectoryName(string? directory)
@@ -410,9 +418,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
 
+
             Files = (directory != null && directory.Exists)
                     ? GetFiles(directory, searchFileInfo.Name)
                     : Enumerable.Empty<IFileSystemInfo>();
+
+            Attributes = this.newBatchFile.Attributes?
+                .Where(att => att != null)?
+                .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
+                .ToList();
         }
 
         public string RawSearchPath => newBatchFile.SearchPath;
@@ -422,7 +436,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string MimeType => newBatchFile.MimeType;
 
         public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
-        
+        public List<KeyValueAttribute>? Attributes { get; }
+
         private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
         {
             try
