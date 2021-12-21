@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
@@ -788,6 +789,105 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(batchHandle)).MustHaveHappened();
             vm.CloseExecutionCommand.Execute();
             Assert.IsFalse(vm.IsExecutingComplete);
+        }
+
+        [Test]
+        public void TestExceuteNewBatchJobWhenNoDuplicateBatchFound()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+            
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 0 });
+            var executeTask = vm.OnExecuteCommand();           
+            Assert.IsTrue(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();          
+        }
+
+        [Test]
+        public void TestExceuteNewBatchJobWhenDuplicateBatchesfoundAndNoResponse()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 2 });
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored,A<MessageBoxButton>.Ignored,A<MessageBoxImage>.Ignored )).Returns(MessageBoxResult.No);
+            var executeTask = vm.OnExecuteCommand();
+            Assert.AreEqual("File Share Service create new batch cancelled to execute the job. ", vm.ExecutionResult);
+            Assert.IsFalse(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExceuteNewBatchJobWhenDuplicateBatchesfoundAndYesResponse()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 2 });
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
+            var executeTask = vm.OnExecuteCommand();
+            Assert.IsTrue(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();       
         }
     }
 }
