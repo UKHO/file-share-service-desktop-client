@@ -94,6 +94,9 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
         public string SearchPath { get; set; }
         public int ExpectedFileCount { get; set; }
         public string MimeType { get; set; }
+
+        public IEnumerable<KeyValuePair<string, string>> Attributes { get; set; } =
+            new List<KeyValuePair<string, string>>();
     }
 
     public class Acl

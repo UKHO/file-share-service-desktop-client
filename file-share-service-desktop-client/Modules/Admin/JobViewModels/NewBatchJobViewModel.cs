@@ -271,12 +271,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
                 BatchSearchResponse batchSearchResponse = await SearchBatch();
-                logger.LogInformation($"{ batchSearchResponse.Count} duplicate batches found.");
-                if (batchSearchResponse.Count >0 && MessageBox.Show($"{batchSearchResponse.Count} duplicate batches found. Do you still want to create batch with same configuration?",
-                                      "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.Cancel)
+                logger.LogInformation($"{ batchSearchResponse.Count} duplicate batches found for action: {Action} and displayName: {DisplayName}.");
+                if (batchSearchResponse.Total > 0 && MessageBox.Show($"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?", 
+                      $"Confirmation for displayName: {DisplayName}", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
-                    logger.LogInformation("File Share Service create new batch job cancelled.");
-                    ExecutionResult = $"File Share Service batch create job cancelled for {batchSearchResponse.Count} duplicate batches found. ";
+                    logger.LogInformation($"File Share Service create new batch job cancelled for action: {Action} and displayName: {DisplayName}, because {batchSearchResponse.Count} duplicate batches found.");
+                    ExecutionResult = $"File Share Service create new batch cancelled to execute the job. ";
                 }
                 else
                 {
@@ -310,7 +310,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                             {
                                                 logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
                                             }
-                                        }, cancellationToken).ContinueWith(_ => openRead.Dispose());
+                                        }, cancellationToken, newBatchFilesViewModel.Attributes.ToArray()).ContinueWith(_ => openRead.Dispose());
                                 }).ToArray());
                         //cleaning up file progress as all uploaded
                         FileUploadProgress.Clear();
@@ -569,11 +569,22 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var filesSystem = Files.SelectMany(f => f.Files);
             if (filesSystem.Count() > 0)
             {
-                string subqueryFileSystemName = string.Join(" or ", filesSystem.Select(f => $"filename eq '{f.Name}'"));
+                string subqueryFileSystemName = string.Join(" or ",
+                                            filesSystem.Select(f => $"(filename eq '{f.Name}' and filesize  eq {f.GetType().GetProperty("Length").GetValue(f)})"));
                 
+               //these brackets are to separate fileSystem Info from other filter attributes 
                 queryBuilder.Append(" and " + "(" + subqueryFileSystemName + ")");
             }
-           
+
+            var filesAttributes = Files.SelectMany(f => f.Attributes);
+            if (filesAttributes.Count() > 0)
+            {
+                string subqueryFileAttributes = string.Join(" and ", 
+                                             filesAttributes.Select(k => $"$file({k.Key}) eq '{k.Value}'"));
+
+                queryBuilder.Append(" and " +subqueryFileAttributes);
+            }
+
             return queryBuilder.ToString();
         }
     }
@@ -603,6 +614,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string MimeType => newBatchFile.MimeType;
 
         public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
+
+        public IEnumerable<KeyValuePair<string, string>> Attributes =>
+              newBatchFile.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value));
 
         private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
         {
