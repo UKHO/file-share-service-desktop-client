@@ -91,8 +91,7 @@ namespace UKHO.FileShareService.DesktopClient
             containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
 
             containerRegistry.Register<IMacroTransformer, MacroTransformer>();
-            containerRegistry.Register<IDateTimeValidator, DateTimeValidator>();
-            containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+            containerRegistry.Register<IDateTimeValidator, DateTimeValidator>();         
             containerRegistry.Register<IMessageBoxService, MessageBoxService>();
         }
 
