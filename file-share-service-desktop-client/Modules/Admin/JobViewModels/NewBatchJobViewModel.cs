@@ -36,13 +36,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private bool IsCommittingOnCancel = false;
         CancellationTokenSource? CancellationTokenSource;
         private readonly IDateTimeValidator dateTimeValidator;
+        private readonly IMessageBoxService messageBoxService;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
              ILogger<NewBatchJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,   
             ICurrentDateTimeProvider currentDateTimeProvider,
             IMacroTransformer macroTransformer,
-            IDateTimeValidator dateTimeValidator) : base(job, logger)
+            IDateTimeValidator dateTimeValidator,           
+            IMessageBoxService messageBoxService
+           ) : base(job,logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);            
             this.job = job;
@@ -52,6 +55,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.macroTransformer = macroTransformer;
             this.dateTimeValidator = dateTimeValidator;
+            this.messageBoxService = messageBoxService;
             Files = job.ActionParams.Files != null ? 
                 job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, macroTransformer.ExpandMacros)).ToList() 
                     : new List<NewBatchFilesViewModel>();
@@ -138,8 +142,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 var buildBatchModel = BuildBatchModel();
                 BatchSearchResponse batchSearchResponse = await SearchBatch();
                 logger.LogInformation($"{ batchSearchResponse.Count} duplicate batches found for action: {Action} and displayName: {DisplayName}.");
-                if (batchSearchResponse.Total > 0 && MessageBox.Show($"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?",
-                      $"Confirmation for displayName: {DisplayName}", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                if (batchSearchResponse.Total > 0 && messageBoxService.ShowMessageBox($"Confirmation for displayName: {DisplayName}", $"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?",
+                      MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
                     logger.LogInformation($"File Share Service create new batch job cancelled for action: {Action} and displayName: {DisplayName}, because {batchSearchResponse.Count} duplicate batches found.");
                     ExecutionResult = $"File Share Service create new batch cancelled to execute the job. ";
@@ -150,7 +154,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel, CancellationToken.None);
                     logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", batchHandle.BatchId);
                     FileUploadProgress.Clear();
-                    try
+                    try 
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         await Task.WhenAll(

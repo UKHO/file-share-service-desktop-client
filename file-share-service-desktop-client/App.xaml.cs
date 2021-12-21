@@ -92,6 +92,8 @@ namespace UKHO.FileShareService.DesktopClient
 
             containerRegistry.Register<IMacroTransformer, MacroTransformer>();
             containerRegistry.Register<IDateTimeValidator, DateTimeValidator>();
+            containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+            containerRegistry.Register<IMessageBoxService, MessageBoxService>();
         }
 
         protected override Window CreateShell()

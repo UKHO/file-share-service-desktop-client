@@ -22,6 +22,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
         private readonly IMacroTransformer macroTransformer;
         private readonly IDateTimeValidator dateTimeValidator;
+        private readonly IMessageBoxService messageBoxService;
         private IEnumerable<IBatchJobViewModel> batchJobs = new List<IBatchJobViewModel>();
         private readonly ILogger<AdminViewModel> logger;
         private readonly ILogger<NewBatchJobViewModel> Nlogger;
@@ -29,6 +30,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         private readonly ILogger<SetExpiryDateJobViewModel> sLogger;
         private readonly ILogger<ReplaceAclJobViewModel> rLogger;
         private readonly ILogger<ErrorDeserializingJobsJobViewModel> eLogger;
+       
 
         public AdminViewModel(IFileSystem fileSystem,
             IKeyValueStore keyValueStore,
@@ -43,7 +45,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
              ILogger<AppendAclJobViewModel> aLogger,
             ILogger<SetExpiryDateJobViewModel> sLogger,
             ILogger<ReplaceAclJobViewModel> rLogger,
-            ILogger<ErrorDeserializingJobsJobViewModel> eLogger)
+            ILogger<ErrorDeserializingJobsJobViewModel> eLogger,
+            IMessageBoxService messageBoxService
+            )
         {
             this.fileSystem = fileSystem;
             this.keyValueStore = keyValueStore;
@@ -52,12 +56,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.macroTransformer = macroTransformer;
             this.dateTimeValidator = dateTimeValidator;
+            this.messageBoxService = messageBoxService;
             this.logger = logger;
             this.Nlogger = Nlogger;
             this.aLogger = aLogger;
             this.sLogger = sLogger;
             this.rLogger = rLogger;
             this.eLogger = eLogger;
+            
             OpenFileCommand = new DelegateCommand(OnOpenFile);
 
             environmentsManager.PropertyChanged += OnEnvironmentsManagerPropertyChanged;
@@ -107,7 +113,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             {
                 NewBatchJob newBatch => new NewBatchJobViewModel(newBatch, fileSystem,Nlogger,
                     () => fileShareApiAdminClientFactory.Build(),
-                    currentDateTimeProvider, macroTransformer, dateTimeValidator),
+                    currentDateTimeProvider, macroTransformer, dateTimeValidator, messageBoxService),                   
                 AppendAclJob appendAcl => new AppendAclJobViewModel(appendAcl, () => fileShareApiAdminClientFactory.Build(), aLogger),
                 SetExpiryDateJob setExpiryDate => new SetExpiryDateJobViewModel(setExpiryDate, sLogger, () => fileShareApiAdminClientFactory.Build(), dateTimeValidator),
                 ReplaceAclJob replaceAcl => new ReplaceAclJobViewModel(replaceAcl, () => fileShareApiAdminClientFactory.Build(), rLogger),
