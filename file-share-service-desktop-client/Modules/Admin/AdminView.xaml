@@ -274,7 +274,7 @@
                                                 Opacity="0.9"
                                                 Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                 Padding="24"
-                                                >
+                                                IsVisibleChanged="pnlExecutionComplete_IsVisibleChanged" Name="pnlExecutionComplete">
 
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -288,7 +288,7 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBox Text="{Binding ExecutionResult}" 
-                                                               FontSize="22"
+                                                               FontSize="22" Name="txtBatchCommitResponse"
                                                                Grid.ColumnSpan="3"
                                                                IsReadOnly="true"
                                                                VerticalAlignment="Center"
@@ -301,13 +301,14 @@
 
                                         </Border>
                                         <TextBox Text="{Binding ExecutionResult}" 
-                                                               FontSize="22"
+                                                               FontSize="22" Name="txtBatchCommitInProgressResponse"
                                                                Grid.Row="5"
                                                                Grid.ColumnSpan="3"
                                                                IsReadOnly="true"
                                                                VerticalAlignment="Center"
                                                                HorizontalAlignment="Center"
-                                                                Visibility="{Binding IsCommitting, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                                Visibility="{Binding IsCommitting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                 IsVisibleChanged="txtBatchCommitInProgressResponse_IsVisibleChanged"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
