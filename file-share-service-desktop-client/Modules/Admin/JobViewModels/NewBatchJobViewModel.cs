@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,7 +17,8 @@ using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
-using UKHO.WeekNumberUtils;
+using UKHO.FileShareService.DesktopClient.Core.Models;
+using UKHO.FileShareService.DesktopClient.Helper;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 {
@@ -30,20 +29,20 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly IFileSystem fileSystem;
         private readonly Func<IFileShareApiAdminClient> fileShareClientFactory;
         private readonly ICurrentDateTimeProvider currentDateTimeProvider;
-        private bool isExecutingComplete;
-        private string executionResult = string.Empty;
-        private bool isCommitting;
+        private readonly IMacroTransformer macroTransformer;
         private readonly ILogger<NewBatchJobViewModel> logger;
         private IBatchHandle? batchHandle;
         private bool isCanceled;
         private bool IsCommittingOnCancel = false;
         CancellationTokenSource? CancellationTokenSource;
+        private readonly IDateTimeValidator dateTimeValidator;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
              ILogger<NewBatchJobViewModel> logger,
             Func<IFileShareApiAdminClient> fileShareClientFactory,   
-            ICurrentDateTimeProvider currentDateTimeProvider
-           ) : base(job,logger)
+            ICurrentDateTimeProvider currentDateTimeProvider,
+            IMacroTransformer macroTransformer,
+            IDateTimeValidator dateTimeValidator) : base(job, logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);            
             this.job = job;
@@ -51,8 +50,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             this.fileShareClientFactory = fileShareClientFactory;
             this.logger = logger;
             this.currentDateTimeProvider = currentDateTimeProvider;
+            this.macroTransformer = macroTransformer;
+            this.dateTimeValidator = dateTimeValidator;
             Files = job.ActionParams.Files != null ? 
-                job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, ExpandMacros)).ToList() 
+                job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, macroTransformer.ExpandMacros)).ToList() 
                     : new List<NewBatchFilesViewModel>();
 
             CancelJobExecutionCommand = new DelegateCommand(OnCancelJobCommand, () => !IsCanceled);
@@ -60,127 +61,38 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         public DelegateCommand CancelJobExecutionCommand { get; }
 
+        public List<KeyValueAttribute>? Attributes => job.ActionParams.Attributes?
+            .Where(att => att != null)?
+            .Select(k => new KeyValueAttribute(k.Key, macroTransformer.ExpandMacros(k.Value)))?
+            .ToList();
+
         public string BusinessUnit => job.ActionParams.BusinessUnit;
+
+        public bool IsExpiryDateKeyExist => job.IsExpiryDateKeyExist;
 
         public string RawExpiryDate => job.ActionParams.ExpiryDate;
 
-        public DateTime? ExpiryDate
+        private DateTime? expiryDate = null;
+
+        public string? ExpiryDate
         {
             get
             {
-                var expandedDateTime = ExpandMacros(RawExpiryDate);
-                if (DateTime.TryParse(expandedDateTime, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal,
-                    out var result))
-                    return result;
-                return null;
-            }
-        }
-
-        public IEnumerable<KeyValuePair<string, string>> Attributes =>
-            job.ActionParams.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, ExpandMacros(kv.Value)));
-
-        private string ExpandMacros(string value)
-        {
-            Func<Match, string> now_Year = (match) =>
-            {                
-                return currentDateTimeProvider.CurrentDateTime.Year.ToString();
-            };
-            Func<Match, string> nowAddDays_Year = (match) =>
-            {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
-                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).Year.ToString();
-            };
-            Func<Match, string> now_WeekNumber = (match) =>
-            {
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Week.ToString();
-            };
-            Func<Match, string> now_WeekNumberYear = (match) =>
-            {
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Year.ToString();
-            };
-            Func<Match, string> now_WeekNumberPlusWeeks = (match) =>
-            {                
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset * 7)).Week.ToString();                
-            };
-            Func<Match, string> now_WeekNumberPlusWeeksYear = (match) =>
-            {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset * 7)).Year.ToString();
-            };
-            Func<Match, string> nowAddDays_Week = (match) =>
-            {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)).Week.ToString();
-            };
-            Func<Match, string> nowAddDays_WeekYear = (match) =>
-            {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)).Year.ToString();
-            };
-            Func<Match, string> nowAddDays_Date = (match) =>
-            {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
-                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)
-                    .ToString(CultureInfo.InvariantCulture);
-            };
-            Func<Match, string> now_Date = (match) =>
-            {
-                return currentDateTimeProvider.CurrentDateTime.ToString(CultureInfo.InvariantCulture);
-            };
-
-
-            var replacementExpressions = new Dictionary<string, Func<Match, string>>
-            {
-                {@"\$\(\s*now\.Year\s*\)", now_Year },
-                {@"\$\(\s*now\.Year2\s*\)", (match) => now_Year(match).Substring(2,2) },
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year\s*\)", nowAddDays_Year},
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year2\s*\)", (match) => nowAddDays_Year(match).Substring(2,2)},
-                {@"\$\(\s*now\.WeekNumber\s*\)",now_WeekNumber },
-                {@"\$\(\s*now\.WeekNumber\.Year\s*\)", now_WeekNumberYear },
-                {@"\$\(\s*now\.WeekNumber\.Year2\s*\)", (match) => now_WeekNumberYear(match).Substring(2,2) },
-                {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\)", now_WeekNumberPlusWeeks },
-                {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year\)", now_WeekNumberPlusWeeksYear},                
-                {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year2\)", (match) => now_WeekNumberPlusWeeksYear(match).Substring(2,2) },                   
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\s*\)",nowAddDays_Week },                    
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year\s*\)", nowAddDays_WeekYear },
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year2\s*\)", (match) => nowAddDays_WeekYear(match).Substring(2,2)},
-                {@"\$\(now.AddDays\(\s*([+-]?\s*\d+)\s*\)\)", nowAddDays_Date },
-                {@"\$\(now\)", now_Date}
-            };
-
-            if (string.IsNullOrEmpty(value))
-                return value;
-
-            return replacementExpressions.Aggregate(value,
-                (input, kv) =>
+                if (!expiryDate.HasValue)
                 {
-                    var match = Regex.Match(input, kv.Key);
-                    while (match.Success)
-                    {
-                        var end = Math.Min(match.Index + match.Length, input.Length);
-                        input = input[..match.Index] +
-                                match.Result(kv.Value(match)) +
-                                input[end..];
+                    expiryDate = dateTimeValidator.ValidateExpiryDate(IsExpiryDateKeyExist, RFC3339_FORMATS, RawExpiryDate, job.ErrorMessages);
+                }
 
-                        match = Regex.Match(input, kv.Key);
-                    }
-
-                    return input;
-                });
+                return expiryDate.HasValue ?
+                    ConvertToRFC3339Format(expiryDate.Value.ToUniversalTime()) : null;
+            }
         }
 
         protected override bool CanExecute()
         {
             ValidationErrors.Clear();
-            //Validate files
-            ValidateFiles();
+            //Validate view model
+            ValidateViewModel();
 
             ValidationErrors = job.ErrorMessages;
             for (int i = 0; i < ValidationErrors.Count; i++)
@@ -196,45 +108,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public List<string> ReadUsers => job.ActionParams.Acl.ReadUsers;
         public List<string> ReadGroups => job.ActionParams.Acl.ReadGroups;
 
-        public bool IsExecutingComplete
-        {
-            get => isExecutingComplete;
-            set
-            {
-                if (isExecutingComplete != value)
-                {
-                    isExecutingComplete = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public bool IsCommitting
-        {
-            get => isCommitting;
-            set
-            {
-                if (isCommitting != value)
-                {
-                    isCommitting = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string ExecutionResult
-        {
-            get => executionResult;
-            set
-            {
-                if (executionResult != value)
-                {
-                    executionResult = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
         public bool IsCanceled
         {
             get => isCanceled;
@@ -244,17 +117,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 {
                     isCanceled = value;
                     RaisePropertyChanged();
-                    CancelJobExecutionCommand.RaiseCanExecuteChanged(); 
+                    CancelJobExecutionCommand.RaiseCanExecuteChanged();
                 }
             }
-        }       
-
-        public DelegateCommand CloseExecutionCommand { get; }
-
-        private void OnCloseExecutionCommand()
-        {
-            ExecutionResult = string.Empty;
-            IsExecutingComplete = false;
         }
 
         public ObservableCollection<FileUploadProgressViewModel> FileUploadProgress { get; } = new();
@@ -265,6 +130,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsCanceled = false;
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = CancellationTokenSource.Token;
+            
             try
             {
                 logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .",Action,DisplayName);
@@ -272,7 +138,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 var buildBatchModel = BuildBatchModel();
                 BatchSearchResponse batchSearchResponse = await SearchBatch();
                 logger.LogInformation($"{ batchSearchResponse.Count} duplicate batches found for action: {Action} and displayName: {DisplayName}.");
-                if (batchSearchResponse.Total > 0 && MessageBox.Show($"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?", 
+                if (batchSearchResponse.Total > 0 && MessageBox.Show($"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?",
                       $"Confirmation for displayName: {DisplayName}", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
                     logger.LogInformation($"File Share Service create new batch job cancelled for action: {Action} and displayName: {DisplayName}, because {batchSearchResponse.Count} duplicate batches found.");
@@ -310,7 +176,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                             {
                                                 logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
                                             }
-                                        }, cancellationToken, newBatchFilesViewModel.Attributes.ToArray()).ContinueWith(_ => openRead.Dispose());
+                                        }, cancellationToken, newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray()).ContinueWith(_ => openRead.Dispose());
                                 }).ToArray());
                         //cleaning up file progress as all uploaded
                         FileUploadProgress.Clear();
@@ -341,16 +207,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     }
                     catch (Exception e)
                     {
-                        logger.LogError(e.Message);
-                        logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);
-                        CancellationTokenSource.Dispose();
-                        await fileShareClient.RollBackBatchAsync(batchHandle);
-                        logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle.BatchId);
-                        ExecutionResult = e.ToString();
-                        throw;
+                        logger.LogError(e.ToString());
+
+                        if (batchHandle != null)
+                        {
+                            logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle?.BatchId);
+                            CancellationTokenSource.Dispose();
+                            await fileShareClient.RollBackBatchAsync(batchHandle);
+                            logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle?.BatchId);
+                        }
+
+                        ExecutionResult = e.Message;
                     }
                 }
-               
             }
             finally
             {
@@ -425,7 +294,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private async Task SetBatchExpiry(IBatchHandle batchHandle, IFileShareApiAdminClient fileShareClient)
         {
             logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
-            string expiryDateString = DateTime.UtcNow.AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
+            string expiryDateString = ConvertToRFC3339Format(DateTime.UtcNow.AddDays(-7));
             await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
             logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
         }
@@ -456,19 +325,24 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ReadGroups = ReadGroups,
                     ReadUsers = ReadUsers
                 },
-                Attributes = Attributes.ToList(),
-                ExpiryDate = ExpiryDate
+                Attributes = Attributes?.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value))?.ToList(),
+                ExpiryDate = expiryDate
             };
         }
 
-        private void ValidateFiles()
+        private void ValidateViewModel()
         {
+            // Add validations for expiry date.
+            if (expiryDate.HasValue && DateTime.Compare(expiryDate.Value.ToUniversalTime(), DateTime.UtcNow) <= 0)
+            {
+                job.ErrorMessages.Add("Expiry date cannot be a past date.");
+            }
 
             if (Files.Any())
             {
                 foreach (var file in Files)
                 {
-                    string directory = Path.GetDirectoryName(file.RawSearchPath);
+                    string? directory = Path.GetDirectoryName(file.RawSearchPath);
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {
@@ -508,10 +382,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         }
                         job.ErrorMessages.Add($"{fileCountMismatchErrorMessage}");
                     }
-                }
+               }
             }
         }
-
         private string GetAccessibleDirectoryName(string? directory)
         {
            if(!string.IsNullOrWhiteSpace(directory))
@@ -530,7 +403,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
             return string.Empty;
         }
-
 
         private bool IsDirectoryExist(string directory)
         {
@@ -601,11 +473,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
 
+
             Files = (directory != null && directory.Exists)
                     ? GetFiles(directory, searchFileInfo.Name)
                     : Enumerable.Empty<IFileSystemInfo>();
 
-    }
+            Attributes = this.newBatchFile.Attributes?
+                .Where(att => att != null)?
+                .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
+                .ToList();
+        }
 
         public string RawSearchPath => newBatchFile.SearchPath;
         public string SearchPath { get; }
@@ -614,9 +491,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string MimeType => newBatchFile.MimeType;
 
         public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
-
-        public IEnumerable<KeyValuePair<string, string>> Attributes =>
-              newBatchFile.Attributes.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value));
+        public List<KeyValueAttribute>? Attributes { get; }
 
         private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
         {
@@ -625,13 +500,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return directory.EnumerateFileSystemInfos(filePathName);
 
             }
-            catch(DirectoryNotFoundException )
+            catch(DirectoryNotFoundException)
             {
                 return Enumerable.Empty<IFileSystemInfo>();
             }
         }
-
     }
-
-    
 }

@@ -1,0 +1,91 @@
+{
+  "jobs": [
+    {
+      "action": "newBatch",
+      "displayName": "Upload DVDs",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          },
+          {
+            "key": "Year",
+            "value": "$(now.Year)" //2021, My need to be careful here because files being uploaded are probably for "next" week which may be in next year.
+          },
+          {
+            "key": "Week Number",
+            "value": "12" // Need to be careful here because files being uploaded are probably for "next" week.
+          },
+          {
+            "key": "S63 Version",
+            "value": "1.2"
+          },
+          {
+            "key": "Exchange Set Type",
+            "value": "Base"
+          },
+          {
+            "key": "Media Type",
+            "value": "DVD"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": [
+            "distributors",
+            "vars"
+          ]
+        },
+        "expiryDate": "$(now.AddDays(21))",
+        "files": [
+          {
+            "searchPath": "D:\\SampleFilesTooling\\test1.txt",
+            "expectedFileCount": 1,
+            "mimeType": "application/x-raw-disk-image",
+            "attributes": [
+              {
+                "key": "",
+                "value": "AVCS"
+              },
+              {
+                "key": "Exchange Set Type",
+                "value": "Base"
+              },
+              {
+                "key": "Media Type",
+                "value": ""
+              }
+            ]
+          },
+          {
+            "searchPath": "D:\\SampleFilesTooling\\test2.txt",
+            "expectedFileCount": 1,
+            "mimeType": "text/plain",
+            "attributes": null
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Sample 2, change ACL later to make the batch public",
+      "action": "appendAcl",
+      "actionParams": {
+        "batchId": "64c954fe-cb20-46e1-b990-51dfb9711fdc",
+        "readUsers": [ "c95464fe-cb20-46e1-b990-51dfb9711fdc" ],
+        "readGroups": [
+          "public"
+        ]
+      }
+    },
+    {
+      "displayName": "Sample 3, change the Expiry Date later.",
+      "action": "setExpiryDate",
+      "actionParams": {
+        "batchId": "64c954fe-cb20-46e1-b990-51dfb9711fdc",
+        "expiryDate": "2021-04-01T00:00:00Z"
+      }
+    }
+  ]
+}

@@ -134,13 +134,15 @@
                                                   SelectionMode="Single"
                                                   BorderBrush="{StaticResource AccentColorBrush}"
                                                   ItemsSource="{Binding Files}"
+                                                  GridLinesVisibility="Horizontal"
+                                                  HorizontalGridLinesBrush="Gray"
                                                   AutoGenerateColumns="False">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Search Path" Binding="{Binding SearchPath}" />
-                                                <DataGridTextColumn Header="Expected" Width="100" 
+                                                <DataGridTextColumn Header="Expected" Width="83" 
                                                                     Binding="{Binding ExpectedFileCount}" 
                                                                     />
-                                                <DataGridTemplateColumn Header="Files" Width="600">
+                                                <DataGridTemplateColumn Header="Files" Width="380">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <DataGrid ItemsSource="{Binding  Files}"
@@ -149,13 +151,30 @@
                                                                       IsManipulationEnabled="False"
                                                                       IsEnabled="False"
                                                                       SelectionMode="Single"
-                                                                      HeadersVisibility="None">
+                                                                      HeadersVisibility="None"
+                                                                      ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                                                                 <DataGrid.Columns>
-                                                                    <DataGridTextColumn Header="Filename" Width="275" Binding="{Binding Name}" />
-                                                                    <DataGridTextColumn Header="File Size" Width="100"  Binding="{Binding Length}" />
-                                                                    <DataGridTextColumn Header="Last Modified Date" Width="150"  Binding="{Binding LastWriteTime}" />
+                                                                    <DataGridTextColumn Header="Filename" Width="200" Binding="{Binding Name}" />
+                                                                    <DataGridTextColumn Header="File Size" Width="40"  Binding="{Binding Length}" />
+                                                                    <DataGridTextColumn Header="Last Modified Date" Width="140"  Binding="{Binding LastWriteTime}" />
                                                                 </DataGrid.Columns>
                                                             </DataGrid>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTemplateColumn Header="Attributes" Width="180">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <ItemsControl ItemsSource="{Binding Attributes}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate DataType="generic:KeyValuePair">
+                                                                        <StackPanel Orientation="Horizontal">
+                                                                            <TextBlock Text="{Binding Key, StringFormat={}{0} :}"  FontFamily="Normal"/>
+                                                                            <TextBlock Text="{Binding Value, StringFormat={} {0}}"  FontFamily="Normal"/>
+                                                                        </StackPanel>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
                                                         </DataTemplate>
                                                     </DataGridTemplateColumn.CellTemplate>
                                                 </DataGridTemplateColumn>
@@ -201,8 +220,8 @@
 
                                             <ItemsControl ItemsSource="{Binding ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>                                                                               
-                                            
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
                                         </StackPanel>
 
                                         <views:Spinner
@@ -402,7 +421,7 @@
 
                                         </Border>
                                     </Grid>
-                                    
+
                                 </Border>
 
                             </DataTemplate>
@@ -440,8 +459,11 @@
                                         <TextBlock Grid.Row="1" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Batch ID:" Name="lbl_setExpirybatchId" />
                                         <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Medium" Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=BatchId, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_setExpirybatchId}" />
 
-                                        <TextBlock Grid.Row="2" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Expiry Date:" Name="lbl_expirydate" />
-                                        <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Medium" Text="{Binding Path=ExpiryDate, Mode=OneWay}" Style="{StaticResource ReadOnlyTextboxStyle}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expirydate}" />
+                                        <TextBlock Grid.Row="2" Style="{StaticResource LabelTextBolckStyle}" Grid.Column="0" Text="Expiry Date:" Name="lbl_expiryDate" />
+                                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                            <TextBox Style="{StaticResource ReadOnlyTextboxStyle}" Text="{Binding Path=ExpiryDate, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expiryDate}" />
+                                            <TextBox FontWeight="ExtraLight" Style="{StaticResource ReadOnlyTextboxStyle}" FontSize="14" Text="{Binding Path=RawExpiryDate, StringFormat= Raw: {0}, Mode=OneWay}" AutomationProperties.LabeledBy="{Binding ElementName=lbl_expiryDate}" />
+                                        </StackPanel>
 
                                         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
@@ -462,10 +484,53 @@
 
 
                                         </StackPanel>
+                                        <views:Spinner
+                                            Grid.Row="0" 
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="2"
+                                            Grid.RowSpan="9"
+                                            Visibility="{Binding IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}"
+
+                                            ></views:Spinner>
+                                        <Border Grid.Row="1" Grid.RowSpan="8" 
+                                                Grid.Column="0" Grid.ColumnSpan="2"
+                                                Background="Gray"
+                                                Opacity="0.9"
+                                                Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                Padding="24"
+                                                >
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition  Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBox Text="{Binding ExecutionResult}" 
+                                                               FontSize="22"
+                                                               Grid.ColumnSpan="3"
+                                                               IsReadOnly="true"
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"/>
+                                                <Button Command="{Binding CloseExecutionCommand}" 
+                                                            Grid.Row="1"
+                                                            Grid.Column="1"
+                                                            Content="Close"/>
+                                            </Grid>
+
+                                        </Border>                                      
+                                        
                                     </Grid>
                                 </Border>
+                                
                             </DataTemplate>
                         </local:JobViewModelsTemplateSelector.SetExpiryDateTemplate>
+                        
                         <local:JobViewModelsTemplateSelector.ErrorTemplate>
                             <DataTemplate DataType="jobViewModels:ErrorDeserializingJobsJobViewModel">
                                 <Border BorderThickness="2 " BorderBrush="Red">

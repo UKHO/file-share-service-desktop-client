@@ -15,6 +15,7 @@ using Prism.Unity;
 using Serilog;
 using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
+using UKHO.FileShareService.DesktopClient.Helper;
 using UKHO.FileShareService.DesktopClient.Modules.Admin;
 using UKHO.FileShareService.DesktopClient.Modules.Auth;
 using UKHO.FileShareService.DesktopClient.Modules.Search;
@@ -87,7 +88,10 @@ namespace UKHO.FileShareService.DesktopClient
 
             containerRegistry.Register<IFileShareApiAdminClientFactory, FileShareApiAdminClientFactory>();
             containerRegistry.Register<IVersionProvider, VersionProvider>();
-            containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();            
+            containerRegistry.Register<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+
+            containerRegistry.Register<IMacroTransformer, MacroTransformer>();
+            containerRegistry.Register<IDateTimeValidator, DateTimeValidator>();
         }
 
         protected override Window CreateShell()
