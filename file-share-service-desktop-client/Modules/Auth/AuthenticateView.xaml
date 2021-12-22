@@ -40,18 +40,19 @@
                     <ColumnDefinition Width="700"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
                 <ComboBox Grid.Row="0" Grid.Column="0"
-                Width="700" HorizontalAlignment="Left"
-                ItemsSource="{Binding Environments}"
-                DisplayMemberPath="Name"
-                FontSize="21" 
-                SelectedItem="{Binding CurrentEnvironment}"/>
+                          Width="700" 
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding Environments}"
+                          DisplayMemberPath="Name"
+                          FontSize="21"
+                          SelectedItem="{Binding CurrentEnvironment}"/>
 
-                <Button Grid.Row="0" Grid.Column="1" Margin="0" HorizontalAlignment="Right"
-                 Width="220" Command="{Binding LoginCommand}">Sign in</Button>
+                <Button Grid.Row="0" Grid.Column="1" 
+                        Margin="0"
+                        HorizontalAlignment="Right"
+                        Width="220"
+                        Command="{Binding LoginCommand}">Sign in</Button>
             </Grid>
         </StackPanel>
         <views:Spinner Visibility="{Binding IsAuthenticating, Converter={StaticResource BooleanToVisibilityConverter}}" />
