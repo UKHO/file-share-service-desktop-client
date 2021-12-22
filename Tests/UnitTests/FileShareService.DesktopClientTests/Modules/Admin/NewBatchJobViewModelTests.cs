@@ -474,8 +474,89 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             CollectionAssert.AreEqual(new[] { file1FullFileName },
                 vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
 
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+        }
+
+        [Test]
+        public void TestShowFilesAndDirectoriesInValidationErrorMessage()
+        {
+            var file1 = @"c:\data\files\f1.txt";
+            var file2 = @"c:\data\files\temp1.txt";
+            var file3 = @"c:\data\files\docs\doc1.txt";
+            fileSystem.AddFile(file1, new MockFileData("File 1 contents"));
+            fileSystem.AddFile(file2, new MockFileData("File 2 contents"));
+            fileSystem.AddFile(file3, new MockFileData("File 3 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                        }
+                }
+            },
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+
+            Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
+            CollectionAssert.AreEqual(new[] { file1 },
+                vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
 
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+
+            //Assert file names are exist in error message.
+            Assert.IsTrue(vm.ValidationErrors[0].Contains("f1.txt"));
+            Assert.IsTrue(vm.ValidationErrors[0].Contains("temp1.txt"));
+
+            //Assert directory name is exist in error message.
+            Assert.IsTrue(vm.ValidationErrors[0].Contains("docs"));
+        }
+
+        [Test]
+        public void TestNoDirectoryAndFileExistsInSpecifiedPath()
+        {
+            fileSystem.AddDirectory(@"c:\data\files");
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                        }
+                }
+            },
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+
+            Assert.AreEqual(1, vm.Files.Count);
+
+            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
+
+            //Assert no file name amd folder name are exist in error message.
+            Assert.IsTrue(vm.ValidationErrors[0].Contains(@"No directory exists in the path 'c:\data\files'"));
+            Assert.IsTrue(vm.ValidationErrors[0].Contains(@"No file exists in the path 'c:\data\files'"));
         }
 
         [Test]
