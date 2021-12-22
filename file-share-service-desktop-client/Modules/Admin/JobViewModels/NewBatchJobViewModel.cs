@@ -33,10 +33,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly ILogger<NewBatchJobViewModel> logger;
         private IBatchHandle? batchHandle;
         private bool isCanceled;
-        private bool IsCommittingOnCancel = false;
-        CancellationTokenSource? CancellationTokenSource;
+        private bool IsCommittingOnCancel = false;       
         private readonly IDateTimeValidator dateTimeValidator;
         private readonly IMessageBoxService messageBoxService;
+        public CancellationTokenSource? CancellationTokenSource;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
              ILogger<NewBatchJobViewModel> logger,
@@ -242,7 +242,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsCanceled = false;            
             logger.LogInformation("Cancel job requested for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle?.BatchId);
             string msg = batchHandle !=null ? string.Format("Are you sure you want to cancel this job batch ID: {0}?", batchHandle.BatchId): "Are you sure you want to cancel this job?";            
-            MessageBoxResult result = MessageBox.Show(msg, "Cancel Job Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult result = messageBoxService.ShowMessageBox("Cancel Job Confirmation" , msg , MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {               
                 if (CancellationTokenSource != null && !CancellationTokenSource.IsCancellationRequested)

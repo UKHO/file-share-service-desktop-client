@@ -645,6 +645,72 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         }
 
         [Test]
+        public void TestCancelNewBatchJobAndYesResponse()
+        {
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            vm.CancellationTokenSource = new CancellationTokenSource();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
+            vm.CancelJobExecutionCommand.Execute();
+            Assert.IsTrue(vm.IsCanceled);
+            Assert.IsTrue(vm.CancellationTokenSource.IsCancellationRequested);
+        }
+
+        [Test]
+        public void TestCancelNewBatchJobAndNoResponse()
+        {
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            vm.CancellationTokenSource = new CancellationTokenSource();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.No);
+            vm.CancelJobExecutionCommand.Execute();
+            Assert.IsFalse(vm.IsCanceled);
+            Assert.IsFalse(vm.CancellationTokenSource.IsCancellationRequested);
+        }
+
+        [Test]
         public void TestCancelNewBatchJobWithRollBack()
         {
             var vm = new NewBatchJobViewModel(new NewBatchJob
