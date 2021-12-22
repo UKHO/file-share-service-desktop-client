@@ -8,15 +8,6 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=auth:AuthenticateViewModel, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <Style TargetType="ComboBox" x:Key="DropBox">
-                <Setter Property="FontSize" Value="21"/>
-                <Setter Property="Width" Value="700"/>
-                <Setter Property="HorizontalAlignment" Value="left"/>
-            </Style>
-        </ResourceDictionary>
-    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -37,7 +28,7 @@
                        Margin="0 5">
                 The ADMIRALTY File Share Service allows you to search and download files.
             </TextBlock>
-            
+
             <Label FontSize="36"
                    FontWeight="Medium"
                    Margin="0 5">Sign in to access your files</Label>
@@ -46,22 +37,21 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition Width="700"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" Grid.Column="0" 
+                <ComboBox Grid.Row="0" Grid.Column="0"
                 Width="700" HorizontalAlignment="Left"
                 ItemsSource="{Binding Environments}"
                 DisplayMemberPath="Name"
                 FontSize="21" 
-                SelectedItem="{Binding CurrentEnvironment}" Grid.ColumnSpan="2" />
+                SelectedItem="{Binding CurrentEnvironment}"/>
 
                 <Button Grid.Row="0" Grid.Column="1" Margin="0" HorizontalAlignment="Right"
-                 Width="200" Command="{Binding LoginCommand}">Sign in</Button>
+                 Width="220" Command="{Binding LoginCommand}">Sign in</Button>
             </Grid>
         </StackPanel>
         <views:Spinner Visibility="{Binding IsAuthenticating, Converter={StaticResource BooleanToVisibilityConverter}}" />
