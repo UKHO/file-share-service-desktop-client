@@ -356,7 +356,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                             var directories = GetDirectories(accessibleDirectory);
 
                             string existingDirectoryNames = directories.Any() ?
-                                string.Concat($"{directoryNotFoundMessage} and available directories in '{accessibleDirectory}' are :\n\t\t", string.Join("\n\t\t", directories.Select(dir => dir.Name))) :
+                                string.Concat($" and available directories in are :\n\t\t", string.Join("\n\t\t", directories.Select(dir => dir.Name))) :
                                 $"\n\tNo directory exists in the path '{accessibleDirectory}'";
 
                             directoryNotFoundMessage = string.Concat(directoryNotFoundMessage, existingDirectoryNames);
