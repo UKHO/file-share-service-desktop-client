@@ -57,7 +57,7 @@
                 Width="700" HorizontalAlignment="Left"
                 ItemsSource="{Binding Environments}"
                 DisplayMemberPath="Name"
-                FontSize="21" IsDropDownOpen="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource self}, Mode=OneWay}"
+                FontSize="21" 
                 SelectedItem="{Binding CurrentEnvironment}" Grid.ColumnSpan="2" />
 
                 <Button Grid.Row="0" Grid.Column="1" Margin="0" HorizontalAlignment="Right"
