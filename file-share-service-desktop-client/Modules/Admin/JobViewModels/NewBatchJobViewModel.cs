@@ -442,27 +442,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 queryBuilder.Append(" and " + subqueryBatchAttributes);
             }
 
-            string subqueryFile = string.Join(" or ", Files.SelectMany(f => f.Files.Select(file => (f, file)))
-            .Select(f =>
-            {
-                var (newBatchFilesViewModel, file) = f;
-
-                if (file == null || newBatchFilesViewModel == null)
-                    return "";
-
-                string subqueryFileSystem = string.Join(" or ",
-                                           $"(filename eq '{file.Name}' and filesize  eq {file.GetType().GetProperty("Length").GetValue(file)}");
-
-                string subqueryFileAttributes = string.Join(" and ",
-                                                     newBatchFilesViewModel.Attributes.Select(k => $"$file({k.Key}) eq '{k.Value}'"));
-
-                return String.IsNullOrEmpty(subqueryFileAttributes) ? $"{subqueryFileSystem})" : $"{subqueryFileSystem} and {subqueryFileAttributes})";
-
-            })
-             .Where(s => !string.IsNullOrEmpty(s)));
-            // This bracket is to separate file filter 
-            queryBuilder.Append($" and ( {subqueryFile} )");
-
+            
             return queryBuilder.ToString();
         }
     }
