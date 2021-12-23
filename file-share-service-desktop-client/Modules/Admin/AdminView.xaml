@@ -227,15 +227,10 @@
                                             <Label  HorizontalAlignment="Left" Content="Validation errors:" Margin="20 0" 
                                                     Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                                            <ItemsControl ItemsSource="{Binding ValidationErrors}"
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBox Text="{Binding Path=.}"                                                                  
-                                                                 Style="{StaticResource TextBoxTextWrap}" />
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
+                                                          FontStyle="Normal" Foreground="Red" 
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>                                                                               
+                                            
                                         </StackPanel>
 
                                         <views:Spinner
