@@ -274,7 +274,7 @@
                                                 Opacity="0.9"
                                                 Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                 Padding="24"
-                                                >
+                                                IsVisibleChanged="pnlExecutionComplete_IsVisibleChanged" Name="pnlExecutionComplete">
 
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -288,7 +288,7 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBox Text="{Binding ExecutionResult}" 
-                                                               FontSize="22"
+                                                               FontSize="22" Name="txtBatchCommitResponse"
                                                                Grid.ColumnSpan="3"
                                                                IsReadOnly="true"
                                                                VerticalAlignment="Center"
@@ -300,14 +300,32 @@
                                             </Grid>
 
                                         </Border>
-                                        <TextBox Text="{Binding ExecutionResult}" 
-                                                               FontSize="22"
-                                                               Grid.Row="5"
+                                        <Border Grid.Row="1" Grid.RowSpan="7" 
+                                                Grid.Column="0" Grid.ColumnSpan="2"
+                                                Background="Gray"
+                                                Opacity="0.9"  Visibility="{Binding IsCommitting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                 IsVisibleChanged="pnlBatchCommitInProgressResponse_IsVisibleChanged">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBox Text="{Binding ExecutionResult}" 
+                                                               FontSize="22" Name="txtBatchCommitInProgressResponse"
+                                                               Grid.Row="1" 
                                                                Grid.ColumnSpan="3"
                                                                IsReadOnly="true"
                                                                VerticalAlignment="Center"
                                                                HorizontalAlignment="Center"
-                                                                Visibility="{Binding IsCommitting, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                               />
+                                            </Grid>
+                                        
+                                        </Border>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -393,7 +411,7 @@
                                                 Background="Gray"
                                                 Opacity="0.9"
                                                 Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Padding="24"
+                                                Padding="24" Name="pnlAppendAclExecutionComplete" IsVisibleChanged="pnlAppendAclExecutionComplete_IsVisibleChanged"
                                                 >
 
                                             <Grid>
@@ -408,7 +426,7 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBox Text="{Binding ExecutionResult}" 
-                                                               FontSize="22"
+                                                               FontSize="22" Name="txtAppendAclResponse"
                                                                Grid.ColumnSpan="3"
                                                                IsReadOnly="true"
                                                                VerticalAlignment="Center"
@@ -497,7 +515,7 @@
                                                 Background="Gray"
                                                 Opacity="0.9"
                                                 Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Padding="24"
+                                                Padding="24" Name="pnlsetExpiryAclExecutionComplete" IsVisibleChanged="pnlsetExpiryAclExecutionComplete_IsVisibleChanged"
                                                 >
 
                                             <Grid>
@@ -512,7 +530,7 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBox Text="{Binding ExecutionResult}" 
-                                                               FontSize="22"
+                                                               FontSize="22" Name="txtSetExpiryDateResponse"
                                                                Grid.ColumnSpan="3"
                                                                IsReadOnly="true"
                                                                VerticalAlignment="Center"
@@ -634,7 +652,7 @@
                                                 Background="Gray"
                                                 Opacity="0.9"
                                                 Visibility="{Binding IsExecutingComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Padding="24"
+                                                Padding="24" Name="pnlReplaceAclExecutionComplete" IsVisibleChanged="pnlReplaceAclExecutionComplete_IsVisibleChanged"
                                                 >
 
                                             <Grid>
@@ -650,7 +668,7 @@
 
                                                 <TextBox Text="{Binding ExecutionResult}" 
                                                                FontSize="22"
-                                                               Grid.ColumnSpan="3"
+                                                               Grid.ColumnSpan="3" Name="txtReplaceAclResponse"
                                                                IsReadOnly="true"
                                                                VerticalAlignment="Center"
                                                                HorizontalAlignment="Center"/>

@@ -16,6 +16,7 @@
     <None Remove="Fonts\JOHNSTONITCSTD_LIGHTITA.OTF" />
     <None Remove="Fonts\JOHNSTONITCSTD_MEDIUM.OTF" />
     <None Remove="Fonts\JOHNSTONITCSTD_MEDIUMITA.OTF" />
+    <None Remove="Modules\Auth\image\resources\UKHO-1400x240.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +56,9 @@
     <Resource Include="Fonts\JOHNSTONITCSTD_LIGHTITA.OTF" />
     <Resource Include="Fonts\JOHNSTONITCSTD_MEDIUM.OTF" />
     <Resource Include="Fonts\JOHNSTONITCSTD_MEDIUMITA.OTF" />
+    <Resource Include="Modules\Auth\image\resources\UKHO-1400x240.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
