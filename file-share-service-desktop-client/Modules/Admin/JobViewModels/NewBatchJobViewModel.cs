@@ -145,8 +145,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 if (batchSearchResponse.Total > 0 && messageBoxService.ShowMessageBox($"Confirmation for displayName: {DisplayName}", $"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
-                    logger.LogInformation($"File Share Service create new batch job cancelled for action: {Action} and displayName: {DisplayName}, because {batchSearchResponse.Count} duplicate batches found.");
-                    ExecutionResult = $"File Share Service create new batch cancelled to execute the job. ";
+                    logger.LogInformation($"File Share Service create new batch cancelled for action: {Action} and displayName: {DisplayName}, because {batchSearchResponse.Count} duplicate batches found.");
+                    ExecutionResult = $"File Share Service create new batch cancelled. ";
                 }
                 else
                 {
@@ -224,6 +224,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         ExecutionResult = e.Message;
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e.ToString());
+                ExecutionResult = e.Message;
             }
             finally
             {
@@ -435,7 +440,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
             queryBuilder.Append($"businessunit eq '{BusinessUnit}'");
 
-            if (Attributes != null)
+            if (Attributes != null && Attributes.Any())
             {
                 string subqueryBatchAttributes = string.Join(" and ", Attributes.Select(k => $"$batch({k.Key}) eq '{k.Value}'"));
 
