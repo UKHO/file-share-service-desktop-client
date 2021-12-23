@@ -17,38 +17,51 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             InitializeComponent();
         }
 
-        private void pnlExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+
+        private void handleAlertFocus(Border border, string alertMessageTextBoxName)
         {
-            Border border = sender as Border;
-            TextBox txtBatchCommitResponse = border.FindName("txtBatchCommitResponse") as TextBox;
-            if (border.IsVisible && txtBatchCommitResponse != null)
+            TextBox txtAlertMessage = border.FindName(alertMessageTextBoxName) as TextBox;
+            if (border.IsVisible && txtAlertMessage != null)
             {
-                txtBatchCommitResponse.Dispatcher.BeginInvoke(
+                txtAlertMessage.Dispatcher.BeginInvoke(
                 new Action(
                 delegate
                 {
                     Keyboard.ClearFocus();
-                    Keyboard.Focus(txtBatchCommitResponse);
-                    bool flag = txtBatchCommitResponse.Focus();
+                    Keyboard.Focus(txtAlertMessage);
+                    bool flag = txtAlertMessage.Focus();
                 }));
             }
         }
 
-        private void txtBatchCommitInProgressResponse_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        private void pnlExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            TextBox txtBatchCommitInProgressResponse = sender as TextBox;
-            
-            if (txtBatchCommitInProgressResponse.IsVisible)
-            {
-                txtBatchCommitInProgressResponse.Dispatcher.BeginInvoke(
-                new Action(
-                delegate
-                {
-                    Keyboard.ClearFocus();
-                    Keyboard.Focus(txtBatchCommitInProgressResponse);
-                    bool flag = txtBatchCommitInProgressResponse.Focus();
-                }));
-            }
+            Border border = sender as Border;
+            handleAlertFocus(border, "txtBatchCommitResponse");
+        }
+
+        private void pnlBatchCommitInProgressResponse_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            Border border = sender as Border;
+            handleAlertFocus(border, "txtBatchCommitInProgressResponse");
+        }
+
+        private void pnlAppendAclExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            Border border = sender as Border;
+            handleAlertFocus(border, "txtAppendAclResponse");
+        }
+
+        private void pnlsetExpiryAclExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            Border border = sender as Border;
+            handleAlertFocus(border, "txtSetExpiryDateResponse");
+        }
+
+        private void pnlReplaceAclExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            Border border = sender as Border;
+            handleAlertFocus(border, "txtReplaceAclResponse");
         }
     }
 }
