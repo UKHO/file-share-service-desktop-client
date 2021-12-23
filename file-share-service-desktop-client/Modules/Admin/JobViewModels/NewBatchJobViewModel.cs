@@ -334,7 +334,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {
-                        job.ErrorMessages.Add($"Invalid directory specified - '{file.RawSearchPath}'");
+                        job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.RawSearchPath}'");
                         continue;
                     }
 
@@ -401,7 +401,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     if (fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent != null)
                     {
                         return GetAccessibleDirectoryName(Convert.ToString(fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent));
-                    }                    
+                    }   
                 }
             }
             return string.Empty;
@@ -478,7 +478,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return directory.EnumerateFileSystemInfos(filePathName);
 
             }
-            catch(DirectoryNotFoundException)
+            catch(Exception)
             {
                 return Enumerable.Empty<IFileSystemInfo>();
             }
