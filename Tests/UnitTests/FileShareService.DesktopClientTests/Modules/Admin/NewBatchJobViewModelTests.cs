@@ -918,7 +918,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 2 });
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored,A<MessageBoxButton>.Ignored,A<MessageBoxImage>.Ignored )).Returns(MessageBoxResult.No);
             var executeTask = vm.OnExecuteCommand();
-            Assert.AreEqual("File Share Service create new batch cancelled to execute the job. ", vm.ExecutionResult);
+            Assert.AreEqual("File Share Service create new batch cancelled. ", vm.ExecutionResult);
             Assert.IsFalse(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustNotHaveHappened();
         }
