@@ -519,7 +519,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
 
             Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1 },
@@ -560,7 +560,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
 
             Assert.AreEqual(1, vm.Files.Count);
 
