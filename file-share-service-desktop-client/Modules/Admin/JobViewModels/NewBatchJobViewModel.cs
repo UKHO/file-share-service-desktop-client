@@ -355,7 +355,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {
-                        job.ErrorMessages.Add($"Invalid directory specified - '{file.RawSearchPath}'");
+                        job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.RawSearchPath}'");
                         continue;
                     }
 
@@ -373,8 +373,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         if (!string.IsNullOrWhiteSpace(accessibleDirectory))
                         {
                             directoryNotFoundMessage = $"{directoryNotFoundMessage}\n\tThe level you can access is: '{accessibleDirectory}'";
-                        }
 
+                            var directories = GetDirectories(accessibleDirectory);
+
+                            string existingDirectoryNames = directories.Any() ?
+                                string.Concat($" and available directories are :\n\t\t", string.Join("\n\t\t", directories.Select(dir => dir.Name))) :
+                                $"\n\tNo directory exists in the path '{accessibleDirectory}'";
+
+                            directoryNotFoundMessage = string.Concat(directoryNotFoundMessage, existingDirectoryNames);
+                        }
 
                         job.ErrorMessages.Add(directoryNotFoundMessage);
                         continue;
@@ -384,12 +391,20 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     {
                         string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
 
-                        if (file.Files?.Count() > 0)
-                        {
-                            string existingFileNames = string.Join(", ", file.Files.Select(f => f.Name).ToArray());
-                            fileCountMismatchErrorMessage += $"\n\tThe existing files are: {existingFileNames}";
-                        }
-                        job.ErrorMessages.Add($"{fileCountMismatchErrorMessage}");
+                        var directories = GetDirectories(directory);
+                        var files = GetFiles(directory);
+
+                        string existingDirectoryNames = directories.Any() ?
+                            $"\n\tThe available directories in '{directory}' are:\n\t\t" + string.Join("\n\t\t", directories.Select(dir => dir.Name)) :
+                            $"\n\tNo directory exists in the path '{directory}'";
+
+                        string existingFileNames = files.Any() ?
+                            $"\n\tThe existing file(s) in directory '{directory}' are:\n\t\t" + string.Join("\n\t\t", files.Select(f => f.Name)) :
+                            $"\n\tNo file exists in the path '{directory}'";
+
+                        fileCountMismatchErrorMessage = string.Concat(fileCountMismatchErrorMessage, existingDirectoryNames, existingFileNames);
+
+                        job.ErrorMessages.Add(fileCountMismatchErrorMessage);
                     }
                 }
             }
@@ -450,6 +465,24 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             
             return queryBuilder.ToString();
         }
+
+        private IDirectoryInfo[] GetDirectories(string directory)
+        {
+            if(!string.IsNullOrWhiteSpace(directory))
+            {
+                return fileSystem.DirectoryInfo.FromDirectoryName(directory).GetDirectories();
+            }
+            return Array.Empty<IDirectoryInfo>();
+        }
+
+        private IFileInfo[] GetFiles(string directory)
+        {
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                return fileSystem.DirectoryInfo.FromDirectoryName(directory).GetFiles();
+            }
+            return Array.Empty<IFileInfo>();
+        }
     }
 
     public class NewBatchFilesViewModel
@@ -491,7 +524,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return directory.EnumerateFileSystemInfos(filePathName);
 
             }
-            catch (DirectoryNotFoundException)
+            catch(Exception)
             {
                 return Enumerable.Empty<IFileSystemInfo>();
             }
