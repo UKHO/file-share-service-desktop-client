@@ -6,12 +6,14 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareClient.Models;
+using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 using UKHO.FileShareService.DesktopClient.Core.Models;
@@ -30,6 +32,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private ILogger<NewBatchJobViewModel> fakeLoggerNewBatchJobVM = null!;
         private IMacroTransformer macroTransformer = null!;
         private IDateTimeValidator dateTimeValidator = null!;
+        private  IMessageBoxService fakeMessageBoxService = null!;
 
 
         [SetUp]
@@ -41,6 +44,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fakeLoggerNewBatchJobVM = A.Fake<ILogger<NewBatchJobViewModel>>();
             macroTransformer = new MacroTransformer(fakeCurrentDateTimeProvider);
             dateTimeValidator = new DateTimeValidator(macroTransformer);
+            fakeMessageBoxService = A.Fake<IMessageBoxService>();
         }
 
         [TestCase("$(now.Year)")]
@@ -86,7 +90,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                 
 
             var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
 
@@ -150,7 +155,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                
 
             var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekNumber = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Week.ToString();
@@ -201,7 +207,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                
 
             var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
             var expectedWeekYear = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Year.ToString();
@@ -260,7 +267,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new NewBatchJobViewModel(newJob,
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                
 
             Assert.AreEqual(input, vm.RawExpiryDate);
 
@@ -301,7 +309,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new NewBatchJobViewModel(newJob,
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator,fakeMessageBoxService);
 
             Assert.AreEqual("$(now.AddDays(-5))", vm.RawExpiryDate);
 
@@ -344,7 +352,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                
 
             Assert.AreEqual(2, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName, file2FullFileName },
@@ -394,7 +403,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+               
 
             Assert.AreEqual(2, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName, file2FullFileName },
@@ -434,7 +444,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                
 
             Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName },
@@ -468,7 +479,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                
 
             Assert.AreEqual(1, vm.Files.SelectMany(f => f.Files).Count());
             CollectionAssert.AreEqual(new[] { file1FullFileName },
@@ -504,7 +516,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+                
 
             Assert.AreEqual("Create new Batch 123", vm.DisplayName);
 
@@ -567,8 +580,10 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
             fileSystem, fakeLoggerNewBatchJobVM,
             () => fakeFileShareApiAdminClient,
-            fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+            fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
 
+            
+            
             // Testing method returns true when committed
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
             var result = await vm.CheckBatchIsCommitted(fakeFileShareApiAdminClient, batchHandle, 1);
@@ -593,7 +608,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new NewBatchJobViewModel(newBatchJob,
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+               
 
 
             Assert.AreEqual("Create new Batch", vm.DisplayName);
@@ -629,6 +645,72 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         }
 
         [Test]
+        public void TestCancelNewBatchJobAndYesResponse()
+        {
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            vm.CancellationTokenSource = new CancellationTokenSource();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
+            vm.CancelJobExecutionCommand.Execute();
+            Assert.IsTrue(vm.IsCanceled);
+            Assert.IsTrue(vm.CancellationTokenSource.IsCancellationRequested);
+        }
+
+        [Test]
+        public void TestCancelNewBatchJobAndNoResponse()
+        {
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            vm.CancellationTokenSource = new CancellationTokenSource();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.No);
+            vm.CancelJobExecutionCommand.Execute();
+            Assert.IsFalse(vm.IsCanceled);
+            Assert.IsFalse(vm.CancellationTokenSource.IsCancellationRequested);
+        }
+
+        [Test]
         public void TestCancelNewBatchJobWithRollBack()
         {
             var vm = new NewBatchJobViewModel(new NewBatchJob
@@ -651,7 +733,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
             fileSystem, fakeLoggerNewBatchJobVM,
             () => fakeFileShareApiAdminClient,
-            fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+            fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+           
 
             var batchHandle = A.Fake<IBatchHandle>();
             bool IsCommitting = false;
@@ -689,7 +772,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
              fileSystem, fakeLoggerNewBatchJobVM,
              () => fakeFileShareApiAdminClient,
-             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+            
 
             var batchHandle = A.Fake<IBatchHandle>();
             bool IsCommitting = true;
@@ -735,7 +819,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             },
                 fileSystem, fakeLoggerNewBatchJobVM,
                 () => fakeFileShareApiAdminClient,
-                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator);
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator,fakeMessageBoxService);
 
             Assert.AreEqual("Create new Batch 123", vm.DisplayName);
 
@@ -771,6 +855,105 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(batchHandle)).MustHaveHappened();
             vm.CloseExecutionCommand.Execute();
             Assert.IsFalse(vm.IsExecutingComplete);
+        }
+
+        [Test]
+        public void TestExceuteNewBatchJobWhenNoDuplicateBatchFound()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+            
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 0 });
+            var executeTask = vm.OnExecuteCommand();           
+            Assert.IsTrue(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();          
+        }
+
+        [Test]
+        public void TestExceuteNewBatchJobWhenDuplicateBatchesfoundAndNoResponse()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 2 });
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored,A<MessageBoxButton>.Ignored,A<MessageBoxImage>.Ignored )).Returns(MessageBoxResult.No);
+            var executeTask = vm.OnExecuteCommand();
+            Assert.AreEqual("File Share Service create new batch cancelled. ", vm.ExecutionResult);
+            Assert.IsFalse(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExceuteNewBatchJobWhenDuplicateBatchesfoundAndYesResponse()
+        {
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 2,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                         }
+                }
+            },
+             fileSystem, fakeLoggerNewBatchJobVM,
+             () => fakeFileShareApiAdminClient,
+             fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 2 });
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
+            var executeTask = vm.OnExecuteCommand();
+            Assert.IsTrue(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();       
         }
     }
 }
