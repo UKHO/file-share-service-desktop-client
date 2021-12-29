@@ -1,7 +1,6 @@
 ﻿using Prism.Commands;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,29 +12,29 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
     [ExcludeFromCodeCoverage]
     public partial class BatchDetailsView : UserControl
     {
+        private IMessageBoxService messageBoxService;
         public BatchDetailsView()
         {
             InitializeComponent();
-            this.DownloadExecutionCommand = new DelegateCommand(async () => await OnDownloadExecutionCommand());
+            
+            this.DownloadExecutionCommand = new DelegateCommand<string>(OnDownloadExecutionCommand);
         }
 
-        private async Task OnDownloadExecutionCommand()
+        private void OnDownloadExecutionCommand(string fileName)
         {
-            string fileName = "";
             var downloadLocation = GetDownloadLocation(fileName);
             downloadLocation = Path.Combine(downloadLocation, fileName);
 
         }
 
-        public DelegateCommand DownloadExecutionCommand { get; private set; }
-
-        public Stream Stream { get; set; }
-       
+        public DelegateCommand<string> DownloadExecutionCommand { get; private set; }
+               
         #region private methods
         //This should be helper class
         private static string GetDownloadLocation(string fileName)
         {
             string downloadLocation = string.Empty;
+            MessageBoxService messageBoxService = new MessageBoxService();  
 
             var dialog = new Microsoft.Win32.SaveFileDialog();
             dialog.InitialDirectory = downloadLocation; // Use current value for initial dir
@@ -54,13 +53,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     System.IO.Directory.CreateDirectory(path);
                 }
                 // Replace, if file already exists in selected directory
-                if (!File.Exists(fileName)  && MessageBox.Show($"Confirmation for fileName: {fileName}", $"{fileName} already exists in selected directory. Do you want to replace it ?",
+                if (File.Exists(fileName)  && messageBoxService.ShowMessageBox($"Confirmation for fileName: {fileName}", $"{fileName} already exists in selected directory. Do you want to replace it ?",
                     MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
                     return "";
                 }
                     // Our final value is in path
                     downloadLocation = path;
+                    File.Delete(fileName);
             }
 
             return downloadLocation;

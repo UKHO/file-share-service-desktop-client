@@ -101,8 +101,7 @@
                         <DataGridTemplateColumn Header="Download">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button x:Name="btnDwnld" Content="download" Command="{Binding Path=DownloadExecutionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
-                                    </Button>
+                                    <Button x:Name="btnDwnld" Content="download" Command="{Binding Path=DownloadExecutionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Filename}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
