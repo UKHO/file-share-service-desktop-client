@@ -72,61 +72,67 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                 ErrorMessages.Add($"Invalid read groups.");
             }
 
-            //Check for files
-            if (jsonToken.SelectToken("actionParams.files") != null &&
-            jsonToken.SelectToken("actionParams.files")?.Type != JTokenType.Array)
-            {
-                ErrorMessages.Add($"Invalid file object.");
-            }
-
             JToken? expiryDateToken = jsonToken.SelectToken("actionParams.expiryDate");
             //Set value if key exists
             IsExpiryDateKeyExist = expiryDateToken != null;
 
-            //Check for file attributes
+            var filesToken = jsonToken.SelectToken("actionParams.files");
 
-            foreach (JToken fileObj in jsonToken.SelectToken("actionParams.files"))
+            if(filesToken != null)
             {
-                JToken? fileAttributeToken = fileObj.SelectToken("attributes");
-                var searchPath = fileObj.SelectToken("searchPath");
-
-                if (fileAttributeToken == null) continue;
-
-                if (fileAttributeToken?.Type != JTokenType.Array)
+                //Check for files
+                if (filesToken.Type != JTokenType.Array)
                 {
-                    ErrorMessages.Add("Invalid file attribute. searchPath:" + searchPath);
-                    continue;
+                    ErrorMessages.Add($"Invalid file object.");
                 }
 
-                if (!fileAttributeToken.HasValues) continue;
-
-                //Check for file attribute key and value
-                foreach (JToken? fileAttribute in fileAttributeToken)
+                if (filesToken.Type == JTokenType.Array && filesToken.HasValues)
                 {
-                    JToken? fileKeyToken = fileAttribute.SelectToken("key");
-                    string fileKey = fileKeyToken?.Type == JTokenType.String ?
-                        Convert.ToString(fileKeyToken) : string.Empty;
+                    //Check for file attributes
+                    foreach (JToken fileObj in filesToken)
+                    {
+                        JToken? fileAttributeToken = fileObj.SelectToken("attributes");
+                        var searchPath = fileObj.SelectToken("searchPath");
 
-                    if (fileAttribute.SelectToken("key")?.Type != JTokenType.String)
-                    {
-                        ErrorMessages.Add($"File attribute key is missing or is invalid for the file. searchPath:" + searchPath);
-                    }
-                    else if (string.IsNullOrWhiteSpace(fileKey))
-                    {
-                        ErrorMessages.Add($"File attribute key cannot be blank. searchPath : " + searchPath);
-                    }
+                        if (fileAttributeToken == null) continue;
+
+                        if (fileAttributeToken?.Type != JTokenType.Array)
+                        {
+                            ErrorMessages.Add("Invalid file attribute. searchPath:" + searchPath);
+                            continue;
+                        }
+
+                        if (!fileAttributeToken.HasValues) continue;
+
+                        //Check for file attribute key and value
+                        foreach (JToken? fileAttribute in fileAttributeToken)
+                        {
+                            JToken? fileKeyToken = fileAttribute.SelectToken("key");
+                            string fileKey = fileKeyToken?.Type == JTokenType.String ?
+                                Convert.ToString(fileKeyToken) : string.Empty;
+
+                            if (fileAttribute.SelectToken("key")?.Type != JTokenType.String)
+                            {
+                                ErrorMessages.Add($"File attribute key is missing or is invalid for the file. searchPath:" + searchPath);
+                            }
+                            else if (string.IsNullOrWhiteSpace(fileKey))
+                            {
+                                ErrorMessages.Add($"File attribute key cannot be blank. searchPath : " + searchPath);
+                            }
 
 
-                    JToken? fileValueToken = fileAttribute.SelectToken("value");
-                    string fileValue = fileValueToken?.Type == JTokenType.String ?
-                        Convert.ToString(fileValueToken) : string.Empty;
-                    if (fileAttribute.SelectToken("value")?.Type != JTokenType.String)
-                    {
-                        ErrorMessages.Add($"File attribute value is missing or is invalid for the file. searchPath : " + searchPath);
-                    }
-                    else if (string.IsNullOrWhiteSpace(fileValue))
-                    {
-                        ErrorMessages.Add($"File attribute value cannot be blank. searchPath : " + searchPath);
+                            JToken? fileValueToken = fileAttribute.SelectToken("value");
+                            string fileValue = fileValueToken?.Type == JTokenType.String ?
+                                Convert.ToString(fileValueToken) : string.Empty;
+                            if (fileAttribute.SelectToken("value")?.Type != JTokenType.String)
+                            {
+                                ErrorMessages.Add($"File attribute value is missing or is invalid for the file. searchPath : " + searchPath);
+                            }
+                            else if (string.IsNullOrWhiteSpace(fileValue))
+                            {
+                                ErrorMessages.Add($"File attribute value cannot be blank. searchPath : " + searchPath);
+                            }
+                        }
                     }
                 }
             }

@@ -6,6 +6,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -33,15 +34,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private IBatchHandle? batchHandle;
         private bool isCanceled;
         private bool IsCommittingOnCancel = false;
-        CancellationTokenSource? CancellationTokenSource;
         private readonly IDateTimeValidator dateTimeValidator;
+        private readonly IMessageBoxService messageBoxService;
+        public CancellationTokenSource? CancellationTokenSource;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
-             ILogger<NewBatchJobViewModel> logger,
-            Func<IFileShareApiAdminClient> fileShareClientFactory,
-            ICurrentDateTimeProvider currentDateTimeProvider,
-            IMacroTransformer macroTransformer,
-            IDateTimeValidator dateTimeValidator) : base(job, logger)
+        ILogger<NewBatchJobViewModel> logger,
+        Func<IFileShareApiAdminClient> fileShareClientFactory,
+        ICurrentDateTimeProvider currentDateTimeProvider,
+        IMacroTransformer macroTransformer,
+        IDateTimeValidator dateTimeValidator,
+        IMessageBoxService messageBoxService
+        ) : base(job, logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
             this.job = job;
@@ -51,9 +55,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             this.currentDateTimeProvider = currentDateTimeProvider;
             this.macroTransformer = macroTransformer;
             this.dateTimeValidator = dateTimeValidator;
+            this.messageBoxService = messageBoxService;
             Files = job.ActionParams.Files != null ?
-                job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, macroTransformer.ExpandMacros)).ToList()
-                    : new List<NewBatchFilesViewModel>();
+            job.ActionParams.Files.Select(f => new NewBatchFilesViewModel(f, fileSystem, macroTransformer.ExpandMacros)).ToList()
+            : new List<NewBatchFilesViewModel>();
 
             CancelJobExecutionCommand = new DelegateCommand(OnCancelJobCommand, () => !IsCanceled);
         }
@@ -61,9 +66,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public DelegateCommand CancelJobExecutionCommand { get; }
 
         public List<KeyValueAttribute>? Attributes => job.ActionParams.Attributes?
-            .Where(att => att != null)?
-            .Select(k => new KeyValueAttribute(k.Key, macroTransformer.ExpandMacros(k.Value)))?
-            .ToList();
+        .Where(att => att != null)?
+        .Select(k => new KeyValueAttribute(k.Key, macroTransformer.ExpandMacros(k.Value)))?
+        .ToList();
 
         public string BusinessUnit => job.ActionParams.BusinessUnit;
 
@@ -83,7 +88,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 }
 
                 return expiryDate.HasValue ?
-                    ConvertToRFC3339Format(expiryDate.Value.ToUniversalTime()) : null;
+                ConvertToRFC3339Format(expiryDate.Value.ToUniversalTime()) : null;
             }
         }
 
@@ -135,68 +140,49 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .", Action, DisplayName);
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
-                logger.LogInformation("File Share Service batch create started.");
-                var createBatchResult = await fileShareClient.CreateBatchAsync(buildBatchModel, CancellationToken.None);
-                if (createBatchResult.IsSuccess)
+                BatchSearchResponse batchSearchResponse = await SearchBatch();
+                logger.LogInformation($"{ batchSearchResponse.Count} duplicate batches found for action: {Action} and displayName: {DisplayName}.");
+                if (batchSearchResponse.Total > 0 && messageBoxService.ShowMessageBox($"Confirmation for displayName: {DisplayName}", $"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
-                    batchHandle = createBatchResult.Data;
-                    ExecutionResult = $"File Share Service batch create completed for batch ID: {batchHandle.BatchId}";
-                    logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", createBatchResult.Data.BatchId);
-                    bool isAddFileToBatchError = false;
-
+                    logger.LogInformation($"File Share Service create new batch cancelled for action: {Action} and displayName: {DisplayName}, because {batchSearchResponse.Count} duplicate batches found.");
+                    ExecutionResult = $"File Share Service create new batch cancelled. ";
+                }
+                else
+                {
+                    logger.LogInformation("File Share Service batch create started.");
+                    batchHandle = await fileShareClient.CreateBatchAsync(buildBatchModel, CancellationToken.None);
+                    logger.LogInformation("File Share Service batch create completed for batch ID:{BatchId}.", batchHandle.BatchId);
                     FileUploadProgress.Clear();
                     try
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         await Task.WhenAll(
-                            Files.SelectMany(f => f.Files.Select(file => (f, file)))
-                                .Select(f =>
-                                {
-                                    logger.LogInformation("File Share Service upload files started for file:{file} and BatchId:{BatchId} .", f.file.Name, createBatchResult.Data.BatchId);
-                                    var fileUploadProgressViewModel = new FileUploadProgressViewModel(f.file.Name);
-                                    FileUploadProgress.Add(fileUploadProgressViewModel);
+                        Files.SelectMany(f => f.Files.Select(file => (f, file)))
+                        .Select(f =>
+                        {
+                            logger.LogInformation("File Share Service upload files started for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
+                            var fileUploadProgressViewModel = new FileUploadProgressViewModel(f.file.Name);
+                            FileUploadProgress.Add(fileUploadProgressViewModel);
 
-                                    var (newBatchFilesViewModel, file) = f;
-                                    var openRead = fileSystem.File.OpenRead(file.FullName);
-
-                                    return fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name,
-                                        newBatchFilesViewModel.MimeType,
-                                        progress =>
-                                        {
-                                            Application.Current.Dispatcher.Invoke(() =>
-                                            {
-                                                fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
-                                                fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
-                                            });
-                                            if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
-                                            {
-                                                logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
-                                            }
-                                        }, cancellationToken, newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray())
-                                    .ContinueWith(
-                                        res =>
-                                        {
-                                            if (res.Result.IsSuccess)
-                                            {
-                                                ExecutionResult = $"File Share Service add file to batch completed for file:{f.file.Name} and BatchId:{batchHandle.BatchId}";
-                                            }
-                                            else if (res.Result.Errors != null && res.Result.Errors.Any())
-                                            {                                                
-                                                ExecutionResult = (res.Result.Errors != null && res.Result.Errors.Any()) ?
-                        string.Join(Environment.NewLine, res.Result.Errors.Select(e => e.Description)) :
-                        $"File Share Service add file to batch failed for batch ID:{batchHandle.BatchId} with status: {res.Result.StatusCode}.";
-
-                                                logger.LogError("File Share Service add file to batch failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                                                    DisplayName, batchHandle.BatchId, ExecutionResult);
-
-                                                isAddFileToBatchError = true;
-                                                CancellationTokenSource.Cancel();
-                                            }
-                                        })
-                                    .ContinueWith(_ => openRead.Dispose());
-                                }).ToArray());
+                            var (newBatchFilesViewModel, file) = f;
+                            var openRead = fileSystem.File.OpenRead(file.FullName);
+                            return fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name,
+    newBatchFilesViewModel.MimeType,
+    progress =>
+    {
+                            Application.Current.Dispatcher.Invoke(() =>
+    {
+                            fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
+                            fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
+                        });
+                            if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
+                            {
+                                logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
+                            }
+                        }, cancellationToken, newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray()).ContinueWith(_ => openRead.Dispose());
+                        }).ToArray());
                         //cleaning up file progress as all uploaded
-
                         FileUploadProgress.Clear();
                         cancellationToken.ThrowIfCancellationRequested();
 
@@ -205,41 +191,23 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         IsCommitting = !IsCanceled;
                         IsCommittingOnCancel = true;
 
-                        var result = await fileShareClient.CommitBatch(batchHandle, CancellationToken.None);
-
-                        if (result.IsSuccess)
-                        {
-                            ExecutionResult = $"File Share Service batch commit completed for batch ID: {batchHandle.BatchId}";
-                        }
-                        else
-                        {
-                            ExecutionResult = (result.Errors != null && result.Errors.Any()) ?
-                                string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)) :
-                                $"File Share Service batch commit failed for batch ID:{batchHandle.BatchId} with status: {result.StatusCode}.";
-
-                            logger.LogError("File Share Service batch commit failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                                DisplayName, batchHandle.BatchId, ExecutionResult);
-                        }
-
+                        await fileShareClient.CommitBatch(batchHandle);
+                        logger.LogInformation("File Share Service batch commit completed for batch ID:{BatchId}.", batchHandle.BatchId);
                         if (!IsCanceled)
                         {
                             ExecutionResult = !await CheckBatchIsCommitted(fileShareClient, batchHandle, MaxBatchCommitWaitTime)
-                                ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
-                                : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
+                            ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle.BatchId}"
+                            : $"Batch uploaded. New batch ID: {batchHandle.BatchId}";
 
                             logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle.BatchId);
                         }
+
                         cancellationToken.ThrowIfCancellationRequested();
+
                     }
                     catch (OperationCanceledException)
                     {
-                        if (isAddFileToBatchError)
-                        {
-                            await RollBackBatch(batchHandle, fileShareClient);
-                            ExecutionResult = $"File Share Service - error while uploading files for batch ID: {batchHandle?.BatchId}";
-                        }
-                        else
-                            ExecutionResult = await HandleCanceledOperationsAsync(batchHandle, IsCommittingOnCancel, fileShareClient);
+                        ExecutionResult = await HandleCanceledOperationsAsync(batchHandle, IsCommittingOnCancel, fileShareClient);
                     }
                     catch (Exception e)
                     {
@@ -249,20 +217,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         {
                             logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle?.BatchId);
                             CancellationTokenSource.Dispose();
-                            await RollBackBatch(batchHandle, fileShareClient);                            
+                            await fileShareClient.RollBackBatchAsync(batchHandle);
+                            logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle?.BatchId);
                         }
+
                         ExecutionResult = e.Message;
                     }
                 }
-                else
-                {
-                    ExecutionResult = (createBatchResult.Errors != null && createBatchResult.Errors.Any()) ?
-                        string.Join(Environment.NewLine, createBatchResult.Errors.Select(e => e.Description)) :
-                        $"File Share Service batch create failed for batch ID:{createBatchResult.Data.BatchId} with status: {createBatchResult.StatusCode}.";
-
-                    logger.LogError("File Share Service batch create failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                        DisplayName, createBatchResult.Data.BatchId, ExecutionResult);
-                }
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e.ToString());
+                ExecutionResult = e.Message;
             }
             finally
             {
@@ -281,7 +247,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             IsCanceled = false;
             logger.LogInformation("Cancel job requested for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle?.BatchId);
             string msg = batchHandle != null ? string.Format("Are you sure you want to cancel this job batch ID: {0}?", batchHandle.BatchId) : "Are you sure you want to cancel this job?";
-            MessageBoxResult result = MessageBox.Show(msg, "Cancel Job Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult result = messageBoxService.ShowMessageBox("Cancel Job Confirmation", msg, MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
                 if (CancellationTokenSource != null && !CancellationTokenSource.IsCancellationRequested)
@@ -312,7 +278,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     try
                     {
                         logger.LogInformation("File Share Service batch rollback started for batch ID:{BatchId}.", batchHandle.BatchId);
-                        await RollBackBatch(batchHandle, fileShareClient);
+                        await fileShareClient.RollBackBatchAsync(batchHandle);
                         logger.LogInformation("File Share Service batch rollback completed for batch ID:{BatchId}.", batchHandle.BatchId);
                     }
                     catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.Conflict)
@@ -334,48 +300,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             return ExecutionResult;
         }
 
-        private async Task RollBackBatch(IBatchHandle batchHandle, IFileShareApiAdminClient fileShareClient)
-        {
-            logger.LogInformation("File Share Service RollBackBatchAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
-            //await fileShareClient.RollBackBatchAsync(batchHandle);
-            var rollBackBatchResult = await fileShareClient.RollBackBatchAsync(batchHandle, CancellationToken.None);
-            if (rollBackBatchResult.IsSuccess)
-            {
-                ExecutionResult = $"File Share Service rollback completed for batch ID: {batchHandle?.BatchId}";
-            }
-            else
-            {
-                ExecutionResult = (rollBackBatchResult.Errors != null && rollBackBatchResult.Errors.Any()) ?
-                    string.Join(Environment.NewLine, rollBackBatchResult.Errors.Select(e => e.Description)) :
-                    $"File Share Service rollback failed for batch ID:{batchHandle?.BatchId} with status: {rollBackBatchResult.StatusCode}.";
-
-                logger.LogError("File Share Service rollback failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                    DisplayName, batchHandle?.BatchId, ExecutionResult);
-            }
-            logger.LogInformation("File Share Service RollBackBatchAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
-        }
-
         private async Task SetBatchExpiry(IBatchHandle batchHandle, IFileShareApiAdminClient fileShareClient)
         {
             logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
-            DateTime? expiryDateString = DateTime.UtcNow.AddDays(-7);
-            //await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
-            var setExpiryDateResult = await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
-
-            if (setExpiryDateResult.IsSuccess)
-            {
-                ExecutionResult = $"File Share Service set expiry date completed for batch ID: {batchHandle.BatchId}";
-            }
-            else
-            {
-                ExecutionResult = (setExpiryDateResult.Errors != null && setExpiryDateResult.Errors.Any()) ?
-                    string.Join(Environment.NewLine, setExpiryDateResult.Errors.Select(e => e.Description)) :
-                    $"File Share Service set expiry date failed for batch ID:{batchHandle.BatchId} with status: {setExpiryDateResult.StatusCode}.";
-
-                logger.LogError("File Share Service set expiry date failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                    DisplayName, batchHandle.BatchId, ExecutionResult);
-
-            }
+            string expiryDateString = ConvertToRFC3339Format(DateTime.UtcNow.AddDays(-7));
+            await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
             logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
         }
 
@@ -426,7 +355,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {
-                        job.ErrorMessages.Add($"Invalid directory specified - '{file.RawSearchPath}'");
+                        job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.RawSearchPath}'");
                         continue;
                     }
 
@@ -444,8 +373,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         if (!string.IsNullOrWhiteSpace(accessibleDirectory))
                         {
                             directoryNotFoundMessage = $"{directoryNotFoundMessage}\n\tThe level you can access is: '{accessibleDirectory}'";
-                        }
 
+                            var directories = GetDirectories(accessibleDirectory);
+
+                            string existingDirectoryNames = directories.Any() ?
+                                string.Concat($" and available directories are :\n\t\t", string.Join("\n\t\t", directories.Select(dir => dir.Name))) :
+                                $"\n\tNo directory exists in the path '{accessibleDirectory}'";
+
+                            directoryNotFoundMessage = string.Concat(directoryNotFoundMessage, existingDirectoryNames);
+                        }
 
                         job.ErrorMessages.Add(directoryNotFoundMessage);
                         continue;
@@ -455,12 +391,20 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     {
                         string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
 
-                        if (file.Files?.Count() > 0)
-                        {
-                            string existingFileNames = string.Join(", ", file.Files.Select(f => f.Name).ToArray());
-                            fileCountMismatchErrorMessage += $"\n\tThe existing files are: {existingFileNames}";
-                        }
-                        job.ErrorMessages.Add($"{fileCountMismatchErrorMessage}");
+                        var directories = GetDirectories(directory);
+                        var files = GetFiles(directory);
+
+                        string existingDirectoryNames = directories.Any() ?
+                            $"\n\tThe available directories in '{directory}' are:\n\t\t" + string.Join("\n\t\t", directories.Select(dir => dir.Name)) :
+                            $"\n\tNo directory exists in the path '{directory}'";
+
+                        string existingFileNames = files.Any() ?
+                            $"\n\tThe existing file(s) in directory '{directory}' are:\n\t\t" + string.Join("\n\t\t", files.Select(f => f.Name)) :
+                            $"\n\tNo file exists in the path '{directory}'";
+
+                        fileCountMismatchErrorMessage = string.Concat(fileCountMismatchErrorMessage, existingDirectoryNames, existingFileNames);
+
+                        job.ErrorMessages.Add(fileCountMismatchErrorMessage);
                     }
                 }
             }
@@ -496,6 +440,49 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return false;
             }
         }
+
+        private async Task<BatchSearchResponse> SearchBatch()
+        {
+            var filter = buildSearchQuery();
+            var fileShareClient = fileShareClientFactory();
+
+            return await fileShareClient.Search(filter, null, null);
+        }
+
+        private string buildSearchQuery()
+        {
+            var queryBuilder = new StringBuilder();
+
+            queryBuilder.Append($"businessunit eq '{BusinessUnit}'");
+
+            if (Attributes != null && Attributes.Any())
+            {
+                string subqueryBatchAttributes = string.Join(" and ", Attributes.Select(k => $"$batch({k.Key}) eq '{k.Value}'"));
+
+                queryBuilder.Append(" and " + subqueryBatchAttributes);
+            }
+
+            
+            return queryBuilder.ToString();
+        }
+
+        private IDirectoryInfo[] GetDirectories(string directory)
+        {
+            if(!string.IsNullOrWhiteSpace(directory))
+            {
+                return fileSystem.DirectoryInfo.FromDirectoryName(directory).GetDirectories();
+            }
+            return Array.Empty<IDirectoryInfo>();
+        }
+
+        private IFileInfo[] GetFiles(string directory)
+        {
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                return fileSystem.DirectoryInfo.FromDirectoryName(directory).GetFiles();
+            }
+            return Array.Empty<IFileInfo>();
+        }
     }
 
     public class NewBatchFilesViewModel
@@ -503,7 +490,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly NewBatchFiles newBatchFile;
 
         public NewBatchFilesViewModel(NewBatchFiles newBatchFile, IFileSystem fileSystem,
-            Func<string, string> expandMacros)
+        Func<string, string> expandMacros)
         {
             this.newBatchFile = newBatchFile;
             SearchPath = expandMacros(newBatchFile.SearchPath);
@@ -512,13 +499,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
 
             Files = (directory != null && directory.Exists)
-                    ? GetFiles(directory, searchFileInfo.Name)
-                    : Enumerable.Empty<IFileSystemInfo>();
+            ? GetFiles(directory, searchFileInfo.Name)
+            : Enumerable.Empty<IFileSystemInfo>();
 
             Attributes = this.newBatchFile.Attributes?
-                .Where(att => att != null)?
-                .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
-                .ToList();
+            .Where(att => att != null)?
+            .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
+            .ToList();
         }
 
         public string RawSearchPath => newBatchFile.SearchPath;
@@ -537,7 +524,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 return directory.EnumerateFileSystemInfos(filePathName);
 
             }
-            catch (DirectoryNotFoundException)
+            catch(Exception)
             {
                 return Enumerable.Empty<IFileSystemInfo>();
             }

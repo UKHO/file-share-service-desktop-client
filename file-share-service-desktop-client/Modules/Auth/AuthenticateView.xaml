@@ -16,33 +16,44 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel
-            VerticalAlignment="Center"
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Image Stretch="UniformToFill" StretchDirection="Both" Source="/Modules/Auth/image/resources/UKHO-1400x240.jpg" />
+        </StackPanel>
+        <StackPanel Margin=" 0 30"
+            VerticalAlignment="Bottom"
             HorizontalAlignment="Center">
             <TextBlock FontSize="28"
                        TextWrapping="Wrap"
-                       MaxWidth="700"
-                       Margin="0 15">
+                       MaxWidth="1000"
+                       Margin="0 5">
                 The ADMIRALTY File Share Service allows you to search and download files.
             </TextBlock>
-            <Image Source="../../Views/resized_0005_Web.jpg"></Image>
+
             <Label FontSize="36"
                    FontWeight="Medium"
-                   Margin="0 15">Sign in to access your files</Label>
+                   Margin="0 5">Sign in to access your files</Label>
             <Label FontSize="18"
-                   Margin="0 5 0 0">You need to sign in with your account access the File Share Service.</Label>
-            <ComboBox
-                Margin="0 8"
-                ItemsSource="{Binding Environments}"
-                DisplayMemberPath="Name"
-                FontSize="21"
-                SelectedItem="{Binding CurrentEnvironment}" />
+                   Margin="0 5">You need to sign in with your account access the File Share Service.</Label>
 
-            <Button
-                Margin="32 8"
-                Command="{Binding LoginCommand}">
-                Sign in
-            </Button>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="700"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Row="0" Grid.Column="0"
+                          Width="700" 
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding Environments}"
+                          DisplayMemberPath="Name"
+                          FontSize="21"
+                          SelectedItem="{Binding CurrentEnvironment}"/>
+
+                <Button Grid.Row="0" Grid.Column="1" 
+                        Margin="0"
+                        HorizontalAlignment="Right"
+                        Width="220"
+                        Command="{Binding LoginCommand}">Sign in</Button>
+            </Grid>
         </StackPanel>
         <views:Spinner Visibility="{Binding IsAuthenticating, Converter={StaticResource BooleanToVisibilityConverter}}" />
         <StackPanel Visibility="{Binding IsAuthenticating, Converter={StaticResource BooleanToVisibilityConverter}}"
