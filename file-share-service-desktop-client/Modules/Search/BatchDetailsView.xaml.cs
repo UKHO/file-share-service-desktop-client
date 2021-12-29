@@ -12,7 +12,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
     [ExcludeFromCodeCoverage]
     public partial class BatchDetailsView : UserControl
     {
-        private IMessageBoxService messageBoxService;
         public BatchDetailsView()
         {
             InitializeComponent();
