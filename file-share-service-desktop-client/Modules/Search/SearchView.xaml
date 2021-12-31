@@ -29,7 +29,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Margin="10">
+        <TextBlock Margin="10" Focusable="True">
             <Run FontSize="36" FontWeight="Medium">Search files</Run>
             <LineBreak />
             <Run FontSize="18">Refine your search results by changing inputs or adding new lines</Run>
@@ -51,7 +51,7 @@
                 Margin="32 8" />
 
         <ScrollViewer Grid.Row="4">
-            <TextBox
+            <TextBox IsReadOnly="True"
                 Text="{Binding SearchResultAsJson}"
                 MinHeight="100px"
                 TextWrapping="Wrap" />
@@ -68,8 +68,8 @@
         </ScrollViewer>
         <StackPanel Grid.Row="6" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
             <Label Content="{Binding SearchCountSummary}" FontSize="24" />
-            <Button Command="{Binding PreviousPageCommand}">&lt;</Button>
-            <Button Command="{Binding NextPageCommand}">&gt;</Button>
+            <Button Command="{Binding PreviousPageCommand}" AutomationProperties.Name="Previous">&lt;</Button>
+            <Button Command="{Binding NextPageCommand}" AutomationProperties.Name="Next">&gt;</Button>
         </StackPanel>
 
         <views:Spinner Grid.Row="5" Grid.RowSpan="2"

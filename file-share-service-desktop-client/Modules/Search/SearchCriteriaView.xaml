@@ -76,10 +76,10 @@
                 <ColumnDefinition Width="450" SharedSizeGroup="Value" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="1" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="And/Or" />
-            <Label Grid.Column="2" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="Field" />
-            <Label Grid.Column="3" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="Operator" />
-            <Label Grid.Column="4" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="Value" />
+            <Label Grid.Column="1" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="And/Or" Name="AndOr" />
+            <Label Grid.Column="2" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="Field" Name="Field" />
+            <Label Grid.Column="3" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="Operator" Name="Operator" />
+            <Label Grid.Column="4" Style="{StaticResource CriteriaGridColumnLabelStyle}" Content="Value" Name="Value" />
         </Grid>
         <ItemsControl Grid.Row="1"
                       ItemsSource="{Binding SearchCriteria}">
@@ -98,37 +98,45 @@
                             <Button
                                 Command="{Binding DataContext.AddRowCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}}"
                                 CommandParameter="{Binding .}"
-                                Foreground="Green"
+                                Foreground="Green"  AutomationProperties.Name="Add New Row"
                                 Style="{StaticResource AddRemoveCriteriaButtonsStyle}">
                                 +
                             </Button>
                             <Button
                                 Command="{Binding DataContext.DeleteRowCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}}"
                                 CommandParameter="{Binding .}"
-                                Foreground="Red"
+                                Foreground="Red"  AutomationProperties.Name="Delete Row"
                                 Style="{StaticResource AddRemoveCriteriaButtonsStyle}">
                                 🗙
                             </Button>
                         </StackPanel>
 
-                        <ComboBox Grid.Column="1"
+                        <ComboBox Grid.Column="1" AutomationProperties.LabeledBy="{Binding ElementName=AndOr}"
                                   SelectedItem="{Binding And, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding Source={StaticResource AndOr}}"
                                   Style="{StaticResource ComboBoxStyle}" />
 
                         <ComboBox
-                            Grid.Column="2"
+                            Grid.Column="2" AutomationProperties.LabeledBy="{Binding ElementName=Filed}"
                             SelectedItem="{Binding SelectedField, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSource="{Binding AvailableAttributes}"
                             DisplayMemberPath="DisplayName"
-                            Style="{StaticResource ComboBoxStyle}" />
+                            Style="{StaticResource ComboBoxStyle}" 
+                            IsDropDownOpen="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource self}, Mode=OneWay}">
+                            <ComboBox.ItemContainerStyle>
+                                <Style>
+                                    <Setter Property="AutomationProperties.Name" Value="{Binding Path=DisplayName}"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
 
-                        <ComboBox Grid.Column="3"
+                        <ComboBox Grid.Column="3" AutomationProperties.LabeledBy="{Binding ElementName=Operator}"
                                   SelectedItem="{Binding Operator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding AvailableOperators}"
-                                  Style="{StaticResource ComboBoxStyle}" />
+                                  Style="{StaticResource ComboBoxStyle}"
+                                  IsDropDownOpen="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource self}, Mode=OneWay}"/>
 
-                        <TextBox Grid.Column="4"
+                        <TextBox Grid.Column="4" AutomationProperties.LabeledBy="{Binding ElementName=Value}"
                                  Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource TextBoxStyle}" 
                                  />
