@@ -35,7 +35,16 @@
                 <Setter Property="Padding" Value="5"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
             </Style>
-
+            <Style TargetType="{x:Type TextBox}" x:Key="TextBoxTextWrap">
+                <Setter Property="FontStyle" Value="Normal" />
+                <Setter Property="Foreground" Value="Red" />
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="TextWrapping" Value="Wrap" />                
+                <Setter Property="IsReadOnly" Value="True"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Width" Value="650"/>
+                <Setter Property="MaxWidth" Value="650"/>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -220,8 +229,8 @@
 
                                             <ItemsControl ItemsSource="{Binding ValidationErrors}" 
                                                           FontStyle="Normal" Foreground="Red" 
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>                                                                               
+                                            
                                         </StackPanel>
 
                                         <views:Spinner
@@ -394,9 +403,16 @@
                                                    Content="Validation errors:" Margin="20 0" 
                                                    Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
-                                                          FontStyle="Normal" Foreground="Red" 
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}"
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox Text="{Binding Path=.}"                                                                  
+                                                                 Style="{StaticResource TextBoxTextWrap}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            
                                         </StackPanel>
                                         <views:Spinner
                                             Grid.Row="0" 
@@ -495,11 +511,15 @@
                                                     Margin="20 0" 
                                                     Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
-                                                          FontStyle="Normal" 
-                                                          Foreground="Red" 
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}"
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox Text="{Binding Path=.}"                                                                  
+                                                                 Style="{StaticResource TextBoxTextWrap}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
 
                                         </StackPanel>
                                         <views:Spinner
@@ -635,9 +655,16 @@
                                                    Content="Validation errors:" Margin="20 0" 
                                                    Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                                            <ItemsControl ItemsSource="{Binding ValidationErrors}" 
-                                                          FontStyle="Normal" Foreground="Red" 
-                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                            <ItemsControl ItemsSource="{Binding ValidationErrors}"
+                                                          Visibility="{Binding IsVisibleValidationErrorsArea, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBox Text="{Binding Path=.}"                                                                  
+                                                                 Style="{StaticResource TextBoxTextWrap}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            
                                         </StackPanel>
                                         <views:Spinner
                                             Grid.Row="0" 

@@ -29,6 +29,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         private ILogger<ErrorDeserializingJobsJobViewModel> fakeLoggerErrorDeserialisingVM = null!;
         private IMacroTransformer fakeMacroTransformer = null!;
         private IDateTimeValidator fakeDateTimeValidator = null!;
+        private IMessageBoxService fakeMessageBoxService = null!;
 
         [SetUp]
         public void Setup()
@@ -45,6 +46,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             fakeLoggerErrorDeserialisingVM = A.Fake<ILogger<ErrorDeserializingJobsJobViewModel>>();
             fakeMacroTransformer = A.Fake<IMacroTransformer>();
             fakeDateTimeValidator = A.Fake<DateTimeValidator>();
+            fakeMessageBoxService = A.Fake<IMessageBoxService>();
         }
 
         [Test]
@@ -55,7 +57,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 A.Fake<ICurrentDateTimeProvider>(),
                 fakeMacroTransformer, fakeDateTimeValidator,
                 fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM, 
-                fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM);
+                fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM, fakeMessageBoxService);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
@@ -81,7 +83,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 A.Fake<ICurrentDateTimeProvider>(),
                 fakeMacroTransformer, fakeDateTimeValidator,
                 fakeEnvironmentsManager,fakeLoggerAdminVM,fakeLoggerNewBatchVM,
-                 fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM);
+                 fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM, fakeMessageBoxService);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
@@ -104,7 +106,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 A.Fake<ICurrentDateTimeProvider>(),
                 fakeMacroTransformer, fakeDateTimeValidator,
                 fakeEnvironmentsManager, fakeLoggerAdminVM, fakeLoggerNewBatchVM,
-                 fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM);
+                 fakeLoggerAppenAclVM, fakeLoggerSetExpiryDateVM, fakeLoggerReplaceAclVM, fakeLoggerErrorDeserialisingVM, fakeMessageBoxService);
             var jobsFilePath = @"c:\jobs.json";
             mockFileSystem.AddFile(jobsFilePath, new MockFileData("JsonContent"));
 
