@@ -53,7 +53,7 @@
                     <DataTemplate DataType="models:BatchDetailsAttributes">
                         <StackPanel Orientation="Vertical">
                             <Label Content="{Binding Key}" Name="lbl_BatchDetails" />
-                            <TextBox Text="{Binding Value}"
+                            <TextBox Text="{Binding Value}" Style="{StaticResource TextboxStyle}"
                                      AutomationProperties.LabeledBy="{Binding ElementName=lbl_BatchDetails}" Name="Value_batchId" 
                                      FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Mode=Self}}"
                                      />
