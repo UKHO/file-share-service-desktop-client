@@ -70,7 +70,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40" SharedSizeGroup="Buttons" />
-                <ColumnDefinition Width="0" SharedSizeGroup="AndOr" />
+                <ColumnDefinition Width="100" SharedSizeGroup="AndOr" />
                 <ColumnDefinition Width="250" SharedSizeGroup="Field" />
                 <ColumnDefinition Width="140" SharedSizeGroup="Operator" />
                 <ColumnDefinition Width="450" SharedSizeGroup="Value" />
@@ -85,7 +85,7 @@
                       ItemsSource="{Binding SearchCriteria}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="local:SearchCriterionViewModel">
-                    <Grid>
+                    <Grid Margin="0 0 0 1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition    SharedSizeGroup="Buttons" />
                             <ColumnDefinition    SharedSizeGroup="AndOr" />
