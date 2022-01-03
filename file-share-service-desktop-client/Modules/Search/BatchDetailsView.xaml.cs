@@ -1,8 +1,10 @@
 ﻿using Prism.Commands;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Search
 {
@@ -19,15 +21,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             this.DownloadExecutionCommand = new DelegateCommand<string>(OnDownloadExecutionCommand);
         }
 
-        private void OnDownloadExecutionCommand(string fileName)
+        private async void OnDownloadExecutionCommand(string fileName)
         {
+            var batchId = this.DataContext.GetType().GetProperty("BatchId").GetValue(this.DataContext);
+           
             var downloadLocation = GetDownloadLocation(fileName);
             downloadLocation = Path.Combine(downloadLocation, fileName);
-
+                        
         }
 
         public DelegateCommand<string> DownloadExecutionCommand { get; private set; }
-               
+
         #region private methods
         //This should be helper class
         private static string GetDownloadLocation(string fileName)
@@ -65,5 +69,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             return downloadLocation;
         }
         #endregion
+
     }
 }

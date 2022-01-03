@@ -70,7 +70,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="Batch ID:" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding BatchId}" Width="130"
+                <TextBlock x:Name="BatchId" Grid.Row="1" Grid.Column="0" Text="{Binding BatchId}" Width="130"
                            Style="{StaticResource TextBlockStyle}" />
                 <Label Grid.Row="0" Grid.Column="1" Content="Published:" />
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding BatchPublishedDate}" Width="190"
@@ -101,7 +101,7 @@
                         <DataGridTemplateColumn Header="Download">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button x:Name="btnDwnld" Content="download" Command="{Binding Path=DownloadExecutionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Filename}"/>
+                                    <Button x:Name="btnDwnld" Content="download" Command="{Binding Path=DownloadExecutionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Filename}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
