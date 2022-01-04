@@ -973,6 +973,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 0 });
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).Returns(new Result<IBatchHandle>() { IsSuccess = true });
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None, A<KeyValuePair<string, string>>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).Returns(new Result<CommitBatchResponse> { IsSuccess = true });
 
             var executeTask = vm.OnExecuteCommand();
             Assert.IsTrue(vm.IsCommitting);
@@ -1043,6 +1044,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).Returns(new Result<IBatchHandle>() { IsSuccess = true});
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None, A<KeyValuePair<string, string>>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).Returns(new Result<CommitBatchResponse> { IsSuccess = true });
+            
             var executeTask = vm.OnExecuteCommand();
             Assert.IsTrue(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();

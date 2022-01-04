@@ -176,16 +176,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         newBatchFilesViewModel.MimeType,
         progress =>
         {
-                                Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
+{
+    fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
+    fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
+});
+            if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
             {
-                                fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
-                                fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
-            });
-                                if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
-                                {
-                                    logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
-                                }
-                                }, cancellationToken, newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray())
+                logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
+            }
+        }, cancellationToken, newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray())
                                 .ContinueWith(
                                             res =>
                                             {
@@ -224,24 +224,24 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                             {
                                 ExecutionResult = $"File Share Service batch commit completed for batch ID: {batchHandle?.BatchId}";
                                 logger.LogInformation("File Share Service batch commit completed for batch ID:{BatchId}.", batchHandle?.BatchId);
+                                if (!IsCanceled)
+                                {
+                                    ExecutionResult = !await CheckBatchIsCommitted(fileShareClient, batchHandle, MaxBatchCommitWaitTime)
+                                    ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle?.BatchId}"
+                                    : $"Batch uploaded. New batch ID: {batchHandle?.BatchId}";
+
+                                    logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle?.BatchId);
+                                }
                             }
                             else
                             {
+                                await RollBackBatch(batchHandle, fileShareClient);
                                 ExecutionResult = (result.Errors != null && result.Errors.Any()) ?
                                     string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)) :
                                     $"File Share Service batch commit failed for batch ID:{batchHandle?.BatchId} with status: {result.StatusCode}.";
 
                                 logger.LogError("File Share Service batch commit failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
                                     DisplayName, batchHandle?.BatchId, ExecutionResult);
-                            }
-
-                            if (!IsCanceled)
-                            {
-                                ExecutionResult = !await CheckBatchIsCommitted(fileShareClient, batchHandle, MaxBatchCommitWaitTime)
-                                ? $"Batch didn't committed in expected time. Please contact support team. New batch ID: {batchHandle?.BatchId}"
-                                : $"Batch uploaded. New batch ID: {batchHandle?.BatchId}";
-
-                                logger.LogInformation("Execute job completed for Action : {Action}, displayName:{displayName} and batch ID:{BatchId}.", Action, DisplayName, batchHandle?.BatchId);
                             }
 
                             cancellationToken.ThrowIfCancellationRequested();
