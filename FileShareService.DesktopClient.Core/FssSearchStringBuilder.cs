@@ -24,8 +24,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
                 if (index > 0)
                 {
-                    //If Or condtion is used, the query will be generated as ...Or (<filter_condition>)
-                    string andOr = c.And.Equals(AndOr.Or) ? $" {c.And} (" : $" {c.And} ";
+                    string andOr = $" {c.And} ";
                     query.Append(andOr);
                 }
 
@@ -50,14 +49,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                         throw new NotImplementedException(
                             $"Not implemented search builder for {c.SelectedFssAttribute.Type}");
                 }
-
-                //Close the bracket for the query, if Or condition is used
-                if(index > 0 && c.And.Equals(AndOr.Or))
-                {
-                    query.Append(")");
-                }
             }
-
             return query.ToString();
         }
 
