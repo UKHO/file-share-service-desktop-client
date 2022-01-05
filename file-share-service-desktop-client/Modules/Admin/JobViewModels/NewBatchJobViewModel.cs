@@ -376,8 +376,21 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             logger.LogInformation("File Share Service SetExpiryDateAsync started for batch ID:{BatchId}.", batchHandle.BatchId);
             DateTime? expiryDateString = DateTime.UtcNow.AddDays(-7);
-            await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
-            logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
+            var setBatchExpiryResult = await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = expiryDateString }, CancellationToken.None);
+            if (setBatchExpiryResult.IsSuccess)
+            {
+                ExecutionResult = $"File Share Service set expiry date completed for batch ID: {batchHandle?.BatchId}";
+            }
+            else
+            {
+                ExecutionResult = (setBatchExpiryResult.Errors != null && setBatchExpiryResult.Errors.Any()) ?
+                    string.Join(Environment.NewLine, setBatchExpiryResult.Errors.Select(e => e.Description)) :
+                    $"File Share Service set expiry date failed for batch ID:{ batchHandle?.BatchId} with status: {setBatchExpiryResult.StatusCode}.";
+
+                logger.LogError("File Share Service set expiry date failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
+                    DisplayName, batchHandle?.BatchId, ExecutionResult);
+            }
+            logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle?.BatchId);
         }
 
         public async Task<bool> CheckBatchIsCommitted(IFileShareApiAdminClient fileShareClient, IBatchHandle batchHandle, double waitTimeInMinutes)
