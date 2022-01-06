@@ -95,7 +95,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
             var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
 
-            var expectedYear = DateTime.UtcNow.Year.ToString();
+            var expectedYear = fakeCurrentDateTimeProvider.CurrentDateTime.Year.ToString();
             if (input.Contains("Year2"))
             {
                 expectedYear = expectedYear.Substring(2, 2);
@@ -159,7 +159,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 
 
             var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
-            var expectedWeekNumber = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Week.ToString();
+            var expectedWeekNumber = WeekNumber.GetUKHOWeekFromDateTime(fakeCurrentDateTimeProvider.CurrentDateTime.AddDays(offset * 7)).Week.ToString();
 
             Assert.AreEqual(expectedWeekNumber, expandedAttributes["WeekMacro1"]);
             Assert.AreEqual("Padding " + expectedWeekNumber, expandedAttributes["WeekMacro2"]);
@@ -211,7 +211,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 
 
             var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
-            var expectedWeekYear = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Year.ToString();
+            var expectedWeekYear = WeekNumber.GetUKHOWeekFromDateTime(fakeCurrentDateTimeProvider.CurrentDateTime.AddDays(offset * 7)).Year.ToString();
             if (input.Contains("Year2"))
             {
                 expectedWeekYear = expectedWeekYear.Substring(2, 2);
@@ -274,7 +274,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
 
             var expiry = vm.ExpiryDate;
             Assert.IsNotNull(expiry);
-            Assert.AreEqual(DateTime.UtcNow.AddDays(dayOffsetFromNow).Date, DateTime.Parse(expiry!).Date);
+            Assert.AreEqual(fakeCurrentDateTimeProvider.CurrentDateTime.AddDays(dayOffsetFromNow).Date, DateTime.Parse(expiry!).Date);
         }
 
         [Test]
