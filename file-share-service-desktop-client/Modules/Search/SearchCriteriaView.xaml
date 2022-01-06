@@ -114,7 +114,8 @@
                         <ComboBox Grid.Column="1"
                                   SelectedItem="{Binding And, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding Source={StaticResource AndOr}}"
-                                  Style="{StaticResource ComboBoxStyle}" />
+                                  Style="{StaticResource ComboBoxStyle}"
+                                  Visibility="{Binding IsAndOrVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                         <ComboBox
                             Grid.Column="2"
