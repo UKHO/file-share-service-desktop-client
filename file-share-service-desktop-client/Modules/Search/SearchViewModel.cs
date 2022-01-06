@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareClient.Models;
@@ -15,13 +20,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
     public class SearchViewModel : BindableBase, ISearchViewModel
     {
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
+        private readonly IMessageBoxService messageBoxService;
+        private readonly ILogger<BatchDetailsViewModel> logger;
         private string searchText = string.Empty;
         private string searchResultAsJson = string.Empty;
         private bool searchInProgress;
         private BatchSearchResponse? searchResult;
         private int pageOffset = 0;
         private const int pageSize = 25;
-
+        private List<BatchDetailsViewModel> batchDetailsVM;
+        
         public SearchViewModel(IAuthProvider authProvider,
             IFssSearchStringBuilder fssSearchStringBuilder,
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
@@ -39,6 +47,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 () => SearchResult != null && pageOffset + pageSize < SearchResult.Total);
             authProvider.PropertyChanged += (sender, args) => SearchCommand.RaiseCanExecuteChanged();
             SearchCriteria.PropertyChanged += OnSearchCriteriaPropertyChanged;
+           
         }
 
         private void OnSearchCriteriaPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -73,6 +82,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private async Task ExecuteSearch()
         {
             SearchInProgress = true;
+            batchDetailsVM = new List<BatchDetailsViewModel>();
             try
             {
                 var fssClient = fileShareApiAdminClientFactory.Build();
@@ -80,6 +90,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
                 SearchResultAsJson = result.ToJson();
                 SearchResult = result;
+                foreach(var entries in  SearchResult.Entries)
+                {
+                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService, logger)
+                    {
+                        BatchId = entries.BatchId,
+                        Attributes = entries.Attributes,
+                        BatchPublishedDate = entries.BatchPublishedDate,
+                        Files = entries.Files
+                    };
+                    batchDetailsVM.Add(bdvm);
+                }
+                RaisePropertyChanged(nameof(BatchDetailsVM));
                 NextPageCommand.RaiseCanExecuteChanged();
                 PreviousPageCommand.RaiseCanExecuteChanged();
             }
@@ -149,14 +171,27 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     searchResult = value;
                     RaisePropertyChanged();
                     RaisePropertyChanged(nameof(SearchCountSummary));
+                   
                 }
             }
         }
-
+               
         public string SearchCountSummary =>
-            SearchResult == null ? "" : $"Showing {pageOffset+1}-{pageOffset+SearchResult.Count} of {SearchResult.Total}";
+            SearchResult == null ? "" : $"Showing {pageOffset+1}-{pageOffset + SearchResult.Count} of {SearchResult.Total}";
 
         public DelegateCommand NextPageCommand { get; }
         public DelegateCommand PreviousPageCommand { get; }
+        public List<BatchDetailsViewModel> BatchDetailsVM 
+        { 
+            get => batchDetailsVM;
+            set
+            { 
+               if(batchDetailsVM != value)
+                {
+                    batchDetailsVM = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
     }
 }

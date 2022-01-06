@@ -58,10 +58,10 @@
         </ScrollViewer>
 
         <ScrollViewer Grid.Row="5">
-            <ItemsControl ItemsSource="{Binding SearchResult.Entries}">
+            <ItemsControl ItemsSource="{Binding BatchDetailsVM}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="models:BatchDetails">
-                        <local:BatchDetailsView />
+                    <DataTemplate>
+                        <local:BatchDetailsView/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

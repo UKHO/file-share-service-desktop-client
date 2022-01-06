@@ -3,12 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:UKHO.FileShareService.DesktopClient.Modules.Search"
              xmlns:models="clr-namespace:UKHO.FileShareClient.Models;assembly=FileShareClient"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             MaxWidth="1240"
-             d:DataContext="{d:DesignInstance Type=models:BatchDetails, IsDesignTimeCreatable=False}">
+             MaxWidth="1240" >
     <UserControl.Resources>
         <ResourceDictionary>
             <Style TargetType="Label">
@@ -101,7 +101,7 @@
                         <DataGridTemplateColumn Header="Download" Width="300">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button x:Name="btnDwnld"  HorizontalAlignment="Left" Height="35px" FontSize="14" Command="{Binding Path=DownloadExecutionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Filename}" Width="50" ToolTip="Download">
+                                    <Button x:Name="btnDwnld"  HorizontalAlignment="Left" Height="35px" FontSize="14" Command="{Binding Path=DataContext.DownloadExecutionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Filename}" Width="50" ToolTip="Download">
                                         <Path Data="m 3.5 0 4 0 0 8 3 0 -5 5 -5 -5 3 0 z" Fill="White" Stroke="White" StrokeThickness="1" />
                                     </Button>
                                 </DataTemplate>
