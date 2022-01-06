@@ -84,5 +84,28 @@ namespace FileShareService.DesktopClientTests.Modules.Search
                 firstSearchCriterionViewModel.Value = "Bob";
             });
         }
+
+        [Test]
+        public void TestSearchCountSummary()
+        {
+            //If Search result is null
+            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
+                () => searchViewModel.SearchResult = null);
+            Assert.AreEqual(string.Empty, searchViewModel.SearchCountSummary);
+
+            //If Search count is 0
+            var batchSearchResponse1 = new BatchSearchResponse(total: 0);
+            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
+                () => searchViewModel.SearchResult = batchSearchResponse1);
+            Assert.AreSame(batchSearchResponse1, searchViewModel.SearchResult);
+            Assert.AreSame("No batches found.", searchViewModel.SearchCountSummary);
+
+            //If Search count is greater than 0
+            var batchSearchResponse2 = new BatchSearchResponse(10, 25);
+            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
+                () => searchViewModel.SearchResult = batchSearchResponse2);
+            Assert.AreSame(batchSearchResponse2, searchViewModel.SearchResult);
+            Assert.AreEqual("Showing 1-10 of 25", searchViewModel.SearchCountSummary);
+        }
     }
 }

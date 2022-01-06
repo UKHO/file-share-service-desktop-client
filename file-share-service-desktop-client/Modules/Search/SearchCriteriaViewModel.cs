@@ -141,6 +141,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     item.IsAndOrVisible = index != 0;
                 }
             }
+            RaisePropertyChanged(nameof(SearchCriteria));
         }
     }
 }
