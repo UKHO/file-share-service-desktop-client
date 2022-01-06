@@ -20,7 +20,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             foreach (var (c, index) in searchCriteria.Select((c, i) => (c, i)))
             {
                 if (c == null || c.SelectedFssAttribute == null || c.Operator == null)
-                    return query.ToString();
+                    continue;
 
                 if (index > 0)
                 {
