@@ -88,11 +88,6 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         [Test]
         public void TestSearchCountSummary()
         {
-            //If Search result is null
-            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
-                () => searchViewModel.SearchResult = null);
-            Assert.AreEqual(string.Empty, searchViewModel.SearchCountSummary);
-
             //If Search count is 0
             var batchSearchResponse1 = new BatchSearchResponse(total: 0);
             searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),

@@ -59,8 +59,9 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         [TestCase("$(   now.AddDays(30).Year2   )")]
         public void TestExpandMacrosOfYearInNewBatchAttributes(string input)
         {
+            int year = DateTime.Now.Year;
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
-                .Returns(new DateTime(2021, 02, 10, 15, 32, 10, DateTimeKind.Utc));
+                .Returns(new DateTime(year, 02, 10, 15, 32, 10, DateTimeKind.Utc));
             var file1FullFileName = @"c:/data/files/f1.txt";
             fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
 
