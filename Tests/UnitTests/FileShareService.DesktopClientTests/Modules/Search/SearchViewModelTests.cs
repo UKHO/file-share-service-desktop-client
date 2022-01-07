@@ -18,6 +18,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         private IFileShareApiAdminClientFactory fakeFileShareApiAdminClientFactory = null!;
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private IFssUserAttributeListProvider fakeFssUserAttributeListProvider = null!;
+        private IMessageBoxService fakeMessageBoxService = null!;
 
         [SetUp]
         public void Setup()
@@ -27,9 +28,10 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakeFileShareApiAdminClientFactory = A.Fake<IFileShareApiAdminClientFactory>();
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeFssUserAttributeListProvider = A.Fake<IFssUserAttributeListProvider>();
+            fakeMessageBoxService = A.Fake<IMessageBoxService>();
             searchViewModel =
                 new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
-                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager);
+                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService);
         }
 
         [Test]

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareClient.Models;
@@ -21,7 +17,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
     {
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private readonly IMessageBoxService messageBoxService;
-        private readonly ILogger<BatchDetailsViewModel> logger;
         private string searchText = string.Empty;
         private string searchResultAsJson = string.Empty;
         private bool searchInProgress;
@@ -34,10 +29,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             IFssSearchStringBuilder fssSearchStringBuilder,
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
             IFssUserAttributeListProvider fssUserAttributeListProvider,
-            IEnvironmentsManager environmentsManager)
+            IEnvironmentsManager environmentsManager,
+            IMessageBoxService messageBoxService)
         {
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
-
+            this.messageBoxService = messageBoxService;
             SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder, fssUserAttributeListProvider, environmentsManager);
             SearchCommand = new DelegateCommand(async () => await OnSearch(),
                 () => authProvider.IsLoggedIn && !SearchInProgress);
@@ -92,7 +88,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 SearchResult = result;
                 foreach(var entries in  SearchResult.Entries)
                 {
-                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService, logger)
+                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService)
                     {
                         BatchId = entries.BatchId,
                         Attributes = entries.Attributes,
