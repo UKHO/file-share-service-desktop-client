@@ -6,8 +6,7 @@
              xmlns:local="clr-namespace:UKHO.FileShareService.DesktopClient.Modules.Search"
              xmlns:models="clr-namespace:UKHO.FileShareClient.Models;assembly=FileShareClient"
              xmlns:views="clr-namespace:UKHO.FileShareService.DesktopClient.Views"
-             mc:Ignorable="d"
-             HorizontalAlignment="Center"
+             mc:Ignorable="d"            
              d:DesignHeight="450" d:DesignWidth="1000"
              d:DataContext="{d:DesignInstance Type=local:SearchViewModel, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
@@ -18,63 +17,65 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="0" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="0" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <TextBlock Margin="10">
+            <TextBlock Margin="10">
             <Run FontSize="36" FontWeight="Medium">Search files</Run>
             <LineBreak />
             <Run FontSize="18">Refine your search results by changing inputs or adding new lines</Run>
-        </TextBlock>
+            </TextBlock>
 
-        <TextBox Grid.Row="0" 
+            <TextBox Grid.Row="0" 
                  HorizontalAlignment="Right"
                  HorizontalContentAlignment="Left"
-                 Height="32"
+                 Height="37"
                  Width="500"
-                 Text="{Binding SearchText}" />
+                 Text="{Binding SearchText}" 
+                 TextWrapping="Wrap"/>
 
-        <local:SearchCriteriaView Grid.Row="2" DataContext="{Binding SearchCriteria}" />
+            <local:SearchCriteriaView Grid.Row="2" DataContext="{Binding SearchCriteria}" />
 
-        <Button Grid.Row="3"
+            <Button Grid.Row="3"
                 Command="{Binding SearchCommand}"
                 Content="Search"
                 HorizontalAlignment="Right"
                 Margin="32 8" />
 
-        <ScrollViewer Grid.Row="4">
-            <TextBox
+            <ScrollViewer Grid.Row="4">
+                <TextBox
                 Text="{Binding SearchResultAsJson}"
                 MinHeight="100px"
                 TextWrapping="Wrap" />
-        </ScrollViewer>
+            </ScrollViewer>
 
-        <ScrollViewer Grid.Row="5">
-            <ItemsControl ItemsSource="{Binding SearchResult.Entries}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="models:BatchDetails">
-                        <local:BatchDetailsView />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-        <StackPanel Grid.Row="6" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
-            <Label Content="{Binding SearchCountSummary}" FontSize="24" />
-            <Button Command="{Binding PreviousPageCommand}">&lt;</Button>
-            <Button Command="{Binding NextPageCommand}">&gt;</Button>
-        </StackPanel>
+            <ScrollViewer Grid.Row="5">
+                <ItemsControl ItemsSource="{Binding SearchResult.Entries}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="models:BatchDetails">
+                            <local:BatchDetailsView />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <StackPanel Grid.Row="6" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
+                <Label Content="{Binding SearchCountSummary}" FontSize="24" />
+                <Button Command="{Binding PreviousPageCommand}">&lt;</Button>
+                <Button Command="{Binding NextPageCommand}">&gt;</Button>
+            </StackPanel>
 
-        <views:Spinner Grid.Row="5" Grid.RowSpan="2"
+            <views:Spinner Grid.Row="5" Grid.RowSpan="2"
                        Visibility="{Binding SearchInProgress, Converter={StaticResource BooleanToVisibilityConverter}}" />
-        <Label
+            <Label
             Content="Querying the File Share Service"
             Grid.Row="5"
             Grid.RowSpan="2"
@@ -84,5 +85,6 @@
             HorizontalAlignment="Center"
             Margin="0 170 0 0"
             Visibility="{Binding SearchInProgress, Converter={StaticResource BooleanToVisibilityConverter}}" />
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </UserControl>
