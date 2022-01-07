@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using UKHO.FileShareAdminClient.Models.Response;
 using UKHO.FileShareClient.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Search
@@ -15,12 +17,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private readonly IMessageBoxService messageBoxService;
         public CancellationTokenSource? CancellationTokenSource;
+        private readonly IFileService fileService;
 
         public BatchDetailsViewModel(IFileShareApiAdminClientFactory fileShareApiAdminClientFactory, 
-            IMessageBoxService messageBoxService)
+            IMessageBoxService messageBoxService, IFileService fileService)
         {
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.messageBoxService = messageBoxService;
+            this.fileService = fileService;
             this.DownloadExecutionCommand = new DelegateCommand<string>(OnDownloadExecutionCommand);
         }
 
@@ -33,19 +37,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             var downloadLocation = GetDownloadLocation(fileName);
             if (String.IsNullOrWhiteSpace(downloadLocation)) return;
             downloadLocation = Path.Combine(downloadLocation, fileName);
-           
-            if (File.Exists(downloadLocation) && messageBoxService.ShowMessageBox($"Confirmation for fileName: {fileName}", $"{fileName} already exists in selected directory. Do you want to replace it ?", 
-                    MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+
+            var result =await DownloadFileAsync(BatchId, downloadLocation, fileName,fileSizeInBytes,cancellationToken);
+            if (result.IsSuccess)
             {
-                return;
+                messageBoxService.ShowMessageBox("Information", $"Download completed for file {fileName} and BatchId {BatchId}.", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-
-            var fileStream = new FileStream(downloadLocation, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-
-            var fssClient = fileShareApiAdminClientFactory.Build();
-            var response = await fssClient.DownloadFileAsync(BatchId, fileName, fileStream, fileSizeInBytes, cancellationToken);
-
-            messageBoxService.ShowMessageBox("Information", $"Download completed for file {fileName} and BatchId {BatchId}.",  MessageBoxButton.OK,MessageBoxImage.Information);
         }
 
         public DelegateCommand<string> DownloadExecutionCommand { get; set; }
@@ -85,5 +82,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         }
         #endregion
 
+        public async Task <IResult<DownloadFileResponse>> DownloadFileAsync(string BatchId ,string fileDownloadPath, string fileName, long fileSizeInBytes,CancellationToken cancellationToken)
+        {
+            if (fileService.Exists(fileDownloadPath) && messageBoxService.ShowMessageBox($"Confirmation for fileName: {fileName}", $"{fileName} already exists in selected directory. Do you want to replace it ?",
+                  MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+            {
+                return null!;
+            }
+
+            var fileStream = new FileStream(fileDownloadPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+
+            var fssClient = fileShareApiAdminClientFactory.Build();
+            var response = await fssClient.DownloadFileAsync(BatchId, fileName, fileStream, fileSizeInBytes, cancellationToken);
+            return response;
+        }
     }
 }
