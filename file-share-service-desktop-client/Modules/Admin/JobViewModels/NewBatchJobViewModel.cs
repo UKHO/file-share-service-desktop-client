@@ -164,51 +164,49 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                             cancellationToken.ThrowIfCancellationRequested();
                             await Task.WhenAll(
                             Files.SelectMany(f => f.Files.Select(file => (f, file)))
-                            .Select(f =>
+                            .Select(async f =>
                             {
                                 logger.LogInformation("File Share Service upload files started for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle?.BatchId);
                                 var fileUploadProgressViewModel = new FileUploadProgressViewModel(f.file.Name);
                                 FileUploadProgress.Add(fileUploadProgressViewModel);
 
                                 var (newBatchFilesViewModel, file) = f;
-                                var openRead = fileSystem.File.OpenRead(file.FullName);
-                                return fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name,
-        newBatchFilesViewModel.MimeType,
-        progress =>
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-{
-    fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
-    fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
-});
-            if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
-            {
-                logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
-            }
-        }, cancellationToken, newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray())
-                                .ContinueWith(
-                                            res =>
-                                            {
-                                                if (res.Result.IsSuccess)
-                                                {
-                                                    ExecutionResult = $"File Share Service add file to batch completed for file:{f.file.Name} and BatchId:{batchHandle?.BatchId}";
-                                                    logger.LogInformation("File Share Service add file to batch completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle?.BatchId);
-                                                }
-                                                else if (res.Result.Errors != null && res.Result.Errors.Any())
-                                                {
-                                                    ExecutionResult = (res.Result.Errors != null && res.Result.Errors.Any()) ?
-                            string.Join(Environment.NewLine, res.Result.Errors.Select(e => e.Description)) :
-                            $"File Share Service add file to batch failed for batch ID:{batchHandle?.BatchId} with status: {res.Result.StatusCode}.";
+                                using var openRead = fileSystem.File.OpenRead(file.FullName);
+                                var res = await fileShareClient.AddFileToBatch(batchHandle, openRead, file.Name, newBatchFilesViewModel.MimeType,
+                                    progress =>
+                                    {
+                                        Application.Current.Dispatcher.Invoke(() =>
+                                        {
+                                            fileUploadProgressViewModel.CompleteBlocks = progress.blocksComplete;
+                                            fileUploadProgressViewModel.TotalBlocks = progress.totalBlockCount;
+                                        });
 
-                                                    logger.LogError("File Share Service add file to batch failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                                                        DisplayName, batchHandle?.BatchId, ExecutionResult);
+                                        if (fileUploadProgressViewModel.CompleteBlocks == fileUploadProgressViewModel.TotalBlocks)
+                                        {
+                                            logger.LogInformation("File Share Service upload files completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle.BatchId);
+                                        }
+                                    },
+                                    cancellationToken,
+                                    newBatchFilesViewModel.Attributes?.Select(k => new KeyValuePair<string, string>(k.Key, k.Value)).ToArray());
+                                
+                                if (res.IsSuccess)
+                                {
+                                    ExecutionResult = $"File Share Service add file to batch completed for file:{f.file.Name} and BatchId:{batchHandle?.BatchId}";
+                                    logger.LogInformation("File Share Service add file to batch completed for file:{file} and BatchId:{BatchId} .", f.file.Name, batchHandle?.BatchId);
+                                }
+                                else if (res.Errors != null && res.Errors.Any())
+                                {
+                                    ExecutionResult = (res.Errors != null && res.Errors.Any()) ?
+                                        string.Join(Environment.NewLine, res.Errors.Select(e => e.Description)) :
+                                        $"File Share Service add file to batch failed for batch ID:{batchHandle?.BatchId} with status: {res.StatusCode}.";
 
-                                                    isAddFileToBatchError = true;
-                                                    CancellationTokenSource.Cancel();
-                                                }
-                                            })
-                                .ContinueWith(_ => openRead.Dispose());
-                            }).ToArray());
+                                    logger.LogError("File Share Service add file to batch failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
+                                        DisplayName, batchHandle?.BatchId, ExecutionResult);
+
+                                    isAddFileToBatchError = true;
+                                    CancellationTokenSource.Cancel();
+                                }
+                             }).ToArray());
 
                             //cleaning up file progress as all uploaded
                             FileUploadProgress.Clear();
