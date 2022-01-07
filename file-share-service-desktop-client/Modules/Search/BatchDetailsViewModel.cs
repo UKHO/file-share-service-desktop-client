@@ -44,7 +44,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
             var fssClient = fileShareApiAdminClientFactory.Build();
             var response = await fssClient.DownloadFileAsync(BatchId, fileName, fileStream, fileSizeInBytes, cancellationToken);
-
+            fileStream.Close();
             messageBoxService.ShowMessageBox("Information", $"Download completed for file {fileName} and BatchId {BatchId}.",  MessageBoxButton.OK,MessageBoxImage.Information);
         }
 
