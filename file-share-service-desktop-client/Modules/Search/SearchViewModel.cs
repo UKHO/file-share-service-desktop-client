@@ -17,6 +17,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
     {
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private readonly IMessageBoxService messageBoxService;
+        private readonly IFileService fileService;
         private string searchText = string.Empty;
         private string searchResultAsJson = string.Empty;
         private bool searchInProgress;
@@ -30,10 +31,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
             IFssUserAttributeListProvider fssUserAttributeListProvider,
             IEnvironmentsManager environmentsManager,
-            IMessageBoxService messageBoxService)
+            IMessageBoxService messageBoxService,
+            IFileService fileService)
         {
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.messageBoxService = messageBoxService;
+            this.fileService = fileService;
             SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder, fssUserAttributeListProvider, environmentsManager);
             SearchCommand = new DelegateCommand(async () => await OnSearch(),
                 () => authProvider.IsLoggedIn && !SearchInProgress);
@@ -88,7 +91,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 SearchResult = result;
                 foreach(var entries in  SearchResult.Entries)
                 {
-                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService)
+                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService)
                     {
                         BatchId = entries.BatchId,
                         Attributes = entries.Attributes,

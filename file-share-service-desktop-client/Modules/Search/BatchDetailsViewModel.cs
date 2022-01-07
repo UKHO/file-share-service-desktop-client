@@ -38,7 +38,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             if (String.IsNullOrWhiteSpace(downloadLocation)) return;
             downloadLocation = Path.Combine(downloadLocation, fileName);
 
-            var result =await DownloadFileAsync(BatchId, downloadLocation, fileName,fileSizeInBytes,cancellationToken);
+            var result =await DownlodFile(BatchId, downloadLocation, fileName,fileSizeInBytes,cancellationToken);
             if (result.IsSuccess)
             {
                 messageBoxService.ShowMessageBox("Information", $"Download completed for file {fileName} and BatchId {BatchId}.", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -82,7 +82,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         }
         #endregion
 
-        public async Task <IResult<DownloadFileResponse>> DownloadFileAsync(string BatchId ,string fileDownloadPath, string fileName, long fileSizeInBytes,CancellationToken cancellationToken)
+        public async Task <IResult<DownloadFileResponse>> DownlodFile(string BatchId ,string fileDownloadPath, string fileName, long fileSizeInBytes,CancellationToken cancellationToken)
         {
             if (fileService.Exists(fileDownloadPath) && messageBoxService.ShowMessageBox($"Confirmation for fileName: {fileName}", $"{fileName} already exists in selected directory. Do you want to replace it ?",
                   MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
