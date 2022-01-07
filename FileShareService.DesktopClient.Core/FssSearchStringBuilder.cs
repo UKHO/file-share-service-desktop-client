@@ -28,27 +28,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     query.Append(andOr);
                 }
 
-                switch (c.SelectedFssAttribute.Type)
-                {
-                    case AttributeType.UserAttributeString:
-                        query.Append(
-                            c.Operator == Operators.Exists || c.Operator == Operators.NotExists
-                                ? $"$batch({c.SelectedFssAttribute.AttributeName}) {MapOperator(c.Operator)}"
-                                : $"$batch({c.SelectedFssAttribute.AttributeName}) {MapOperator(c.Operator)} '{GetValueForOperator(c.Operator.Value, c.Value)}'");
-                        break;
-                    case AttributeType.String:
-                        query.Append($"{c.SelectedFssAttribute.AttributeName} {MapOperator(c.Operator)} '{c.Value}'");
-                        break;
-                    case AttributeType.Number:
-                    case AttributeType.Date:
-                    case AttributeType.NullableDate:
-                        query.Append($"{c.SelectedFssAttribute.AttributeName} {MapOperator(c.Operator)} {GetValueForOperator(c.Operator.Value, c.Value)}"
-                                .TrimEnd());
-                        break;
-                    default:
-                        throw new NotImplementedException(
-                            $"Not implemented search builder for {c.SelectedFssAttribute.Type}");
-                }
+                query.Append(MapOperatorAndValue(c.SelectedFssAttribute, c.Operator, c.Value));
+
             }
             return query.ToString();
         }
@@ -84,8 +65,86 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 Operators.GreaterThanOrEquals => "ge",
                 Operators.LessThan => "lt",
                 Operators.LessThanOrEquals => "le",
+
+                Operators.Contains => "contains",
+                Operators.StartsWith => "startswith",
+                Operators.EndsWith => "endswith",
                 _ => throw new ArgumentOutOfRangeException(nameof(argOperator), argOperator, null)
             };
+        }
+
+        private string MapOperatorAndValue(IFssBatchAttribute attribute, Operators? @operator, string value)
+        {
+
+            switch(@operator)
+            {
+                case Operators.Equals:
+                case Operators.NotEquals:
+                case Operators.GreaterThan:
+                case Operators.GreaterThanOrEquals:
+                case Operators.LessThan:
+                case Operators.LessThanOrEquals:
+                case Operators.Exists:
+                case Operators.NotExists:
+                    return MapForComparisonOperators(attribute, MapOperator(@operator), value);
+
+                case Operators.Contains:
+                case Operators.StartsWith:
+                case Operators.EndsWith:
+                    return MapForFunctionOperators(attribute, MapOperator(@operator), value);
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(@operator), @operator, null);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <param name="operator"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private string MapForComparisonOperators(IFssBatchAttribute attribute, string @operator, string value)
+        {
+            switch(attribute.Type)
+            {
+                case AttributeType.String:
+                    return $"{attribute.AttributeName} {@operator} '{value}'";
+
+                case AttributeType.Number:
+                case AttributeType.Date:
+                case AttributeType.NullableDate:
+                    return $"{attribute.AttributeName} {@operator} {value}";
+
+                case AttributeType.UserAttributeString:
+                    return $"$batch({attribute.AttributeName}) {@operator} '{value}'";
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(attribute), attribute, null);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <param name="operator"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private string MapForFunctionOperators(IFssBatchAttribute attribute, string @operator, string value)
+        {
+            switch (attribute.Type)
+            {
+                case AttributeType.String:
+                    return $"{@operator}({attribute.AttributeName}, '{value}')";
+
+                case AttributeType.UserAttributeString:
+                    return $"{@operator}($batch({attribute.AttributeName}), '{value}')";
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(attribute), attribute, null);
+            }
         }
     }
 }
