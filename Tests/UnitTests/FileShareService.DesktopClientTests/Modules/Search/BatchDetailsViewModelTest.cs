@@ -46,7 +46,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
             A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, CancellationToken.None)).Returns(new Result<DownloadFileResponse> { IsSuccess=true ,StatusCode = 206 });
         
-            var result = await BatchDetailVM.DownlodFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
+            var result = await BatchDetailVM.DownloadFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
         
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(result.StatusCode, 206);
@@ -62,7 +62,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             A.CallTo(() => fakeFileService.Exists(fileDownloadPath)).Returns(true);
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.No);
     
-            await BatchDetailVM.DownlodFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
+            await BatchDetailVM.DownloadFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
     
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
             A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, CancellationToken.None)).MustNotHaveHappened();
@@ -80,7 +80,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
             A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, CancellationToken.None)).Returns(new Result<DownloadFileResponse> { IsSuccess = true, StatusCode = 206 });
             
-            var result = await BatchDetailVM.DownlodFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
+            var result = await BatchDetailVM.DownloadFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
            
             Assert.IsTrue(result.IsSuccess);
             Assert.AreEqual(result.StatusCode, 206);

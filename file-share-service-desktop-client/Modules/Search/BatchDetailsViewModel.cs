@@ -78,7 +78,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         }
         #endregion
 
-        public async Task <IResult<DownloadFileResponse>> DownlodFile(string BatchId ,string fileDownloadPath, string fileName, long fileSizeInBytes,CancellationToken cancellationToken)
+        public async Task <IResult<DownloadFileResponse>> DownloadFile(string BatchId ,string fileDownloadPath, string fileName, long fileSizeInBytes,CancellationToken cancellationToken)
         {
             if (fileService.Exists(fileDownloadPath) && messageBoxService.ShowMessageBox($"Confirmation for fileName: {fileName}", $"{fileName} already exists in selected directory. Do you want to replace it ?",
                   MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
@@ -90,6 +90,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
             var fssClient = fileShareApiAdminClientFactory.Build();
             var response = await fssClient.DownloadFileAsync(BatchId, fileName, fileStream, fileSizeInBytes, cancellationToken);
+            fileStream.Close();
             messageBoxService.ShowMessageBox("Information", $"Download completed for file {fileName} and BatchId {BatchId}.", MessageBoxButton.OK, MessageBoxImage.Information);
             return response;
         }
