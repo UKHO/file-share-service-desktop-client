@@ -29,8 +29,18 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     query.Append(andOr.ToLower());
                 }
 
-                query.Append(MapOperatorAndValue(c.SelectedFssAttribute, c.Operator, c.Value));
+                switch (MapOperatorType(c.Operator))
+                {
+                    case OperatorType.ComparisonOperator:
+                        query.Append(MapForComparisonOperators(c.SelectedFssAttribute, MapOperator(c.Operator), c.Value));
+                        break;
+                    case OperatorType.FunctionOperator:
+                        query.Append(MapForFunctionOperators(c.SelectedFssAttribute, MapOperator(c.Operator), c.Value));
+                        break;
 
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(c.Operator), c.Operator, null);
+                }
             }
             return query.ToString();
         }
@@ -74,29 +84,23 @@ namespace UKHO.FileShareService.DesktopClient.Core
             };
         }
 
-        private string MapOperatorAndValue(IFssBatchAttribute attribute, Operators? @operator, string value)
+        private OperatorType MapOperatorType(Operators? @operator)
         {
-
-            switch(@operator)
+            return @operator switch
             {
-                case Operators.Equals:
-                case Operators.NotEquals:
-                case Operators.GreaterThan:
-                case Operators.GreaterThanOrEquals:
-                case Operators.LessThan:
-                case Operators.LessThanOrEquals:
-                case Operators.Exists:
-                case Operators.NotExists:
-                    return MapForComparisonOperators(attribute, MapOperator(@operator), value);
-
-                case Operators.Contains:
-                case Operators.StartsWith:
-                case Operators.EndsWith:
-                    return MapForFunctionOperators(attribute, MapOperator(@operator), value);
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(@operator), @operator, null);
-            }
+                Operators.Equals => OperatorType.ComparisonOperator,
+                Operators.NotEquals => OperatorType.ComparisonOperator,
+                Operators.GreaterThan => OperatorType.ComparisonOperator,
+                Operators.GreaterThanOrEquals => OperatorType.ComparisonOperator,
+                Operators.LessThan => OperatorType.ComparisonOperator,
+                Operators.LessThanOrEquals => OperatorType.ComparisonOperator,
+                Operators.Exists => OperatorType.ComparisonOperator,
+                Operators.NotExists => OperatorType.ComparisonOperator,
+                Operators.Contains => OperatorType.FunctionOperator,
+                Operators.StartsWith => OperatorType.FunctionOperator,
+                Operators.EndsWith => OperatorType.FunctionOperator,
+                _ => throw new ArgumentOutOfRangeException(nameof(@operator), @operator, null)
+            };
         }
 
         /// <summary>
