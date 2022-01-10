@@ -24,6 +24,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private BatchSearchResponse? searchResult;
         private int pageOffset = 0;
         private const int pageSize = 25;
+        private const string NO_BATCH_FOUND = "No batches found.";
+
         private List<BatchDetailsViewModel> batchDetailsVM;
         
         public SearchViewModel(IAuthProvider authProvider,
@@ -174,10 +176,20 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 }
             }
         }
-               
-        public string SearchCountSummary =>
-            SearchResult == null ? "" : $"Showing {pageOffset+1}-{pageOffset + SearchResult.Count} of {SearchResult.Total}";
 
+        public string SearchCountSummary
+        {
+            get
+            {
+                if (SearchResult == null)
+                    return "";
+
+                if (searchResult?.Total == 0)
+                    return NO_BATCH_FOUND;
+
+                return $"Showing {pageOffset + 1}-{pageOffset + SearchResult.Count} of {SearchResult.Total}";
+            }
+        }
         public DelegateCommand NextPageCommand { get; }
         public DelegateCommand PreviousPageCommand { get; }
         public List<BatchDetailsViewModel> BatchDetailsVM 

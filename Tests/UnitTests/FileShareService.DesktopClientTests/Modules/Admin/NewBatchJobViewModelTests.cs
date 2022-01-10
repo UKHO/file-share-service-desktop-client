@@ -60,7 +60,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         public void TestExpandMacrosOfYearInNewBatchAttributes(string input)
         {
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
-                .Returns(new DateTime(2021, 02, 10, 15, 32, 10, DateTimeKind.Utc));
+                .Returns(new DateTime(DateTime.Now.Year, 02, 10, 15, 32, 10, DateTimeKind.Utc));
             var file1FullFileName = @"c:/data/files/f1.txt";
             fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
 
