@@ -92,16 +92,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private void OnAddRow(SearchCriterionViewModel obj)
         {
             SearchCriteria.Insert(SearchCriteria.IndexOf(obj), new SearchCriterionViewModel(this));
+            SetVisiblePropertyForAndControl();
         }
 
         private void OnDeleteRow(SearchCriterionViewModel searchCriterionViewModelToRemove)
         {
             SearchCriteria.Remove(searchCriterionViewModelToRemove);
+            SetVisiblePropertyForAndControl();
         }
 
         private void OnAddNewSearchCriterion()
         {
             SearchCriteria.Add(new SearchCriterionViewModel(this));
+            SetVisiblePropertyForAndControl();
         }
 
         public ObservableCollection<SearchCriterionViewModel> SearchCriteria { get; } = new();
@@ -127,6 +130,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         public string GetSearchString()
         {
             return fssSearchStringBuilder.BuildSearch(SearchCriteria);
+        }
+
+        private void SetVisiblePropertyForAndControl()
+        {
+            if (SearchCriteria != null)
+            {
+                foreach (var (item, index) in SearchCriteria.Select((v, i) => (v, i)))
+                {
+                    item.IsAndOrVisible = index != 0;
+                }
+            }
+            RaisePropertyChanged(nameof(SearchCriteria));
         }
     }
 }
