@@ -38,11 +38,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             if (String.IsNullOrWhiteSpace(downloadLocation)) return;
             downloadLocation = Path.Combine(downloadLocation, fileName);
 
-            var result =await DownlodFile(BatchId, downloadLocation, fileName,fileSizeInBytes,cancellationToken);
-            if (result.IsSuccess)
-            {
-                messageBoxService.ShowMessageBox("Information", $"Download completed for file {fileName} and BatchId {BatchId}.", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+            await DownlodFile(BatchId, downloadLocation, fileName,fileSizeInBytes,cancellationToken);
         }
 
         public DelegateCommand<string> DownloadExecutionCommand { get; set; }
@@ -94,6 +90,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
             var fssClient = fileShareApiAdminClientFactory.Build();
             var response = await fssClient.DownloadFileAsync(BatchId, fileName, fileStream, fileSizeInBytes, cancellationToken);
+            messageBoxService.ShowMessageBox("Information", $"Download completed for file {fileName} and BatchId {BatchId}.", MessageBoxButton.OK, MessageBoxImage.Information);
             return response;
         }
     }
