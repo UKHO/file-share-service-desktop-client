@@ -38,8 +38,8 @@
             <TextBox Grid.Row="0" 
                  HorizontalAlignment="Right"
                  HorizontalContentAlignment="Left"
-                 Height="37"
-                 Width="500"
+                 Height="37" IsReadOnly="True"
+                 Width="500" AutomationProperties.Name="Search Text"
                  Text="{Binding SearchText}" 
                  TextWrapping="Wrap"/>
 

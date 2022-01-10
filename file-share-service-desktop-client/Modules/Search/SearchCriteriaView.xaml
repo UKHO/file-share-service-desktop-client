@@ -118,7 +118,7 @@
                                   Visibility="{Binding IsAndOrVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
                         <ComboBox
-                            Grid.Column="2" AutomationProperties.LabeledBy="{Binding ElementName=Filed}"
+                            Grid.Column="2" AutomationProperties.LabeledBy="{Binding ElementName=Field}"
                             SelectedItem="{Binding SelectedField, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSource="{Binding AvailableAttributes}"
                             DisplayMemberPath="DisplayName"
