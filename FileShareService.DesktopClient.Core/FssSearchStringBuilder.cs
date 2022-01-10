@@ -16,16 +16,17 @@ namespace UKHO.FileShareService.DesktopClient.Core
         public string BuildSearch(IEnumerable<ISearchCriterion> searchCriteria)
         {
             StringBuilder query = new StringBuilder();
+            bool isAndOrSelected = false;
 
             foreach (var (c, index) in searchCriteria.Select((c, i) => (c, i)))
             {
                 if (c == null || c.SelectedFssAttribute == null || c.Operator == null)
                     continue;
 
-                if (index > 0)
+                if (index > 0 && isAndOrSelected)
                 {
                     string andOr = $" {c.And} ";
-                    query.Append(andOr);
+                    query.Append(andOr.ToLower());
                 }
 
                 query.Append(MapOperatorAndValue(c.SelectedFssAttribute, c.Operator, c.Value));
