@@ -591,7 +591,12 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                             {
                                 ExpectedFileCount = 1,
                                 MimeType = "text/plain",
-                                SearchPath = file1FullFileName
+                                SearchPath = file1FullFileName,
+                                Attributes = new List<KeyValueAttribute>
+                                            {
+                                            new KeyValueAttribute("Product Type","AVCS"),
+                                            new KeyValueAttribute("Exchange Set Type", "Base")
+                                            }                                                       
                             }
                         }
                 }
@@ -600,38 +605,20 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
 
-            Assert.AreEqual("Create new Batch 123", vm.DisplayName);
-
-            var batchHandle = A.Fake<IResult<IBatchHandle>>();
-            var result_createBatchTcs = A.Fake<IResult<IBatchHandle>>();
-            var result_addFileToBatchTcs = A.Fake<IResult<AddFileToBatchResponse>>();
-            var result_commitBatchTcs = A.Fake<IResult<CommitBatchResponse>>();
-
-            var createBatchTcs = new TaskCompletionSource<IResult<IBatchHandle>>();
-            var addFileToBatchTcs = new TaskCompletionSource<IResult<AddFileToBatchResponse>>();
-            var commitBatchTcs = new TaskCompletionSource<IResult<CommitBatchResponse>>();
+            Assert.AreEqual("Create new Batch 123", vm.DisplayName);            
 
             A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).Returns(new BatchSearchResponse() { Total = 0 });
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
-            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).Returns(new Result<IBatchHandle>() { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).Returns(new Result<IBatchHandle>() { IsSuccess = true, Data=A.Fake<IBatchHandle>() });
             A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None, A<KeyValuePair<string, string>>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, A<Action<(int, int)>>.Ignored, A<CancellationToken>.Ignored, A<KeyValuePair<string, string>[]>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).Returns(new Result<CommitBatchResponse> { IsSuccess = true });
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
 
-
-            var executeTask = vm.OnExecuteCommand();
-            vm.ExcecuteJobCommand.Execute();
-            Assert.IsTrue(vm.IsExecuting);
-            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
-
-            createBatchTcs.SetResult(result_createBatchTcs);
-            addFileToBatchTcs.SetResult(result_addFileToBatchTcs);
-            commitBatchTcs.SetResult(result_commitBatchTcs);
-
-
+            var executeTask = vm.OnExecuteCommand();                       
+                   
             await executeTask;
-            Assert.IsFalse(vm.IsExecuting);
-            Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
+            Assert.IsFalse(vm.IsExecuting);            
             Assert.IsTrue(vm.IsExecutingComplete);
             Assert.IsFalse(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).MustHaveHappened();
@@ -906,36 +893,18 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 () => fakeFileShareApiAdminClient,
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
 
-            Assert.AreEqual("Create new Batch 123", vm.DisplayName);
-
-            var result_createBatchTcs = A.Fake<IResult<IBatchHandle>>();
-            var result_addFileToBatchTcs = A.Fake<IResult<AddFileToBatchResponse>>();
-            var result_commitBatchTcs = A.Fake<IResult<CommitBatchResponse>>();
-
-            var createBatchTcs = new TaskCompletionSource<IResult<IBatchHandle>>();
-            var addFileToBatchTcs = new TaskCompletionSource<IResult<AddFileToBatchResponse>>();
-            var commitBatchTcs = new TaskCompletionSource<IResult<CommitBatchResponse>>();
+            Assert.AreEqual("Create new Batch 123", vm.DisplayName);            
 
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).Returns(new Result<IBatchHandle>() { IsSuccess = true });
-            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None, A<KeyValuePair<string, string>>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, A<Action<(int, int)>>.Ignored, A<CancellationToken>.Ignored, A<KeyValuePair<string, string>[]>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).Returns(new Result<CommitBatchResponse> { IsSuccess = true });
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored))
                 .Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
 
-
-            var executeTask = vm.OnExecuteCommand();
-            //vm.ExcecuteJobCommand.Execute();
-            Assert.IsTrue(vm.IsExecuting);
-            Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
-
-            createBatchTcs.SetResult(result_createBatchTcs);
-            addFileToBatchTcs.SetResult(result_addFileToBatchTcs);
-            commitBatchTcs.SetResult(result_commitBatchTcs);
-
-
+            var executeTask = vm.OnExecuteCommand();                      
+           
             await executeTask;
-            Assert.IsFalse(vm.IsExecuting);
-            Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
+            Assert.IsFalse(vm.IsExecuting);            
             Assert.IsTrue(vm.IsExecutingComplete);
             Assert.IsFalse(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).MustHaveHappened();
