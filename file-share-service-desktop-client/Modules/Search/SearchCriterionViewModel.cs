@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core.Models;
@@ -13,6 +12,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private Attribute? selectedFssField;
         private Operators? @operator;
         private string value = string.Empty;
+        private bool isAndOrVisible;
 
         public SearchCriterionViewModel(ISearchCriteriaViewModel searchCriteriaViewModel)
         {
@@ -84,6 +84,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 if (this.value != value)
                 {
                     this.value = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public bool IsAndOrVisible
+        {
+            get => isAndOrVisible;
+            set
+            {
+                if (isAndOrVisible != value)
+                {
+                    isAndOrVisible = value;
                     RaisePropertyChanged();
                 }
             }
