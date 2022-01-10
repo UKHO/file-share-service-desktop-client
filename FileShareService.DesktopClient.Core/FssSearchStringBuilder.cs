@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Core
@@ -14,33 +15,44 @@ namespace UKHO.FileShareService.DesktopClient.Core
     {
         public string BuildSearch(IEnumerable<ISearchCriterion> searchCriteria)
         {
-            return string.Join(" and ", searchCriteria.Select(c =>
-                {
-                    if (c.SelectedFssAttribute == null || c.Operator == null)
-                        return "";
+            StringBuilder query = new StringBuilder();
+            bool isAndOrSelected = false;
 
-                    switch (c.SelectedFssAttribute.Type)
-                    {
-                        case AttributeType.UserAttributeString:
-                            return
-                                c.Operator == Operators.Exists || c.Operator == Operators.NotExists
-                                    ? $"$batch({c.SelectedFssAttribute.AttributeName}) {MapOperator(c.Operator)}"
-                                    : $"$batch({c.SelectedFssAttribute.AttributeName}) {MapOperator(c.Operator)} '{GetValueForOperator(c.Operator.Value, c.Value)}'";
-                        case AttributeType.String:
-                            return
-                                $"{c.SelectedFssAttribute.AttributeName} {MapOperator(c.Operator)} '{c.Value}'";
-                        case AttributeType.Number:
-                        case AttributeType.Date:
-                        case AttributeType.NullableDate:
-                            return
-                                $"{c.SelectedFssAttribute.AttributeName} {MapOperator(c.Operator)} {GetValueForOperator(c.Operator.Value, c.Value)}"
-                                    .TrimEnd();
-                        default:
-                            throw new NotImplementedException(
-                                $"Not implemented search builder for {c.SelectedFssAttribute.Type}");
-                    }
-                })
-                .Where(s => !string.IsNullOrEmpty(s)));
+            foreach (var (c, index) in searchCriteria.Select((c, i) => (c, i)))
+            {
+                if (c == null || c.SelectedFssAttribute == null || c.Operator == null)
+                    continue;
+
+                if (index > 0 && isAndOrSelected)
+                {
+                    string andOr = $" {c.And} ";
+                    query.Append(andOr.ToLower());
+                }
+
+                switch (c.SelectedFssAttribute.Type)
+                {
+                    case AttributeType.UserAttributeString:
+                        query.Append(
+                            c.Operator == Operators.Exists || c.Operator == Operators.NotExists
+                                ? $"$batch({c.SelectedFssAttribute.AttributeName}) {MapOperator(c.Operator)}"
+                                : $"$batch({c.SelectedFssAttribute.AttributeName}) {MapOperator(c.Operator)} '{GetValueForOperator(c.Operator.Value, c.Value)}'");
+                        break;
+                    case AttributeType.String:
+                        query.Append($"{c.SelectedFssAttribute.AttributeName} {MapOperator(c.Operator)} '{c.Value}'");
+                        break;
+                    case AttributeType.Number:
+                    case AttributeType.Date:
+                    case AttributeType.NullableDate:
+                        query.Append($"{c.SelectedFssAttribute.AttributeName} {MapOperator(c.Operator)} {GetValueForOperator(c.Operator.Value, c.Value)}"
+                                .TrimEnd());
+                        break;
+                    default:
+                        throw new NotImplementedException(
+                            $"Not implemented search builder for {c.SelectedFssAttribute.Type}");
+                }
+                isAndOrSelected = true;
+            }
+            return query.ToString();
         }
 
         private string GetValueForOperator(Operators @operator, string value)
