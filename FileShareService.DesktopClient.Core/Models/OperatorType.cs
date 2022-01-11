@@ -3,6 +3,7 @@
     public enum OperatorType
     {
         ComparisonOperator,
-        FunctionOperator
+        FunctionOperator,
+        LogicalOperator
     }
 }

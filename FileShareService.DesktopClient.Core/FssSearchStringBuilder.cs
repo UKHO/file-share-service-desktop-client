@@ -29,39 +29,29 @@ namespace UKHO.FileShareService.DesktopClient.Core
                     query.Append(andOr.ToLower());
                 }
 
-                switch (MapOperatorType(c.Operator))
+                string queryString = 
+                    MapOperatorType(c.Operator) switch
                 {
-                    case OperatorType.ComparisonOperator:
-                        query.Append(MapForComparisonOperators(c.SelectedFssAttribute, MapOperator(c.Operator), c.Value));
-                        break;
-                    case OperatorType.FunctionOperator:
-                        query.Append(MapForFunctionOperators(c.SelectedFssAttribute, MapOperator(c.Operator), c.Value));
-                        break;
+                    OperatorType.ComparisonOperator => 
+                            MapForComparisonOperators(c.SelectedFssAttribute, MapOperator(c.Operator), c.Value),
 
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(c.Operator), c.Operator, null);
+                    OperatorType.FunctionOperator =>
+                            MapForFunctionOperators(c.SelectedFssAttribute, MapOperator(c.Operator), c.Value),
+
+                    OperatorType.LogicalOperator =>
+                            MapForLogicalOperators(c.SelectedFssAttribute, MapOperator(c.Operator)),
+
+                    _ => throw new NotImplementedException(
+                               $"Not implemented search builder for operator {c.Operator} and type {MapOperatorType(c.Operator)}")
+                };
+
+                if(!string.IsNullOrWhiteSpace(queryString))
+                {
+                    query.Append(queryString);
+                    isAndOrSelected = true;
                 }
             }
             return query.ToString();
-        }
-
-        private string GetValueForOperator(Operators @operator, string value)
-        {
-            return @operator switch
-            {
-                Operators.Equals => value,
-                Operators.NotEquals => value,
-                Operators.GreaterThan => value,
-                Operators.GreaterThanOrEquals => value,
-                Operators.LessThan => value,
-                Operators.LessThanOrEquals => value,
-                Operators.Contains => value,
-                Operators.StartsWith => value,
-                Operators.EndsWith => value,
-                Operators.Exists => "",
-                Operators.NotExists => "",
-                _ => throw new ArgumentOutOfRangeException(nameof(@operator), @operator, null)
-            };
         }
 
         private string MapOperator(Operators? argOperator)
@@ -76,7 +66,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 Operators.GreaterThanOrEquals => "ge",
                 Operators.LessThan => "lt",
                 Operators.LessThanOrEquals => "le",
-
                 Operators.Contains => "contains",
                 Operators.StartsWith => "startswith",
                 Operators.EndsWith => "endswith",
@@ -94,8 +83,8 @@ namespace UKHO.FileShareService.DesktopClient.Core
                 Operators.GreaterThanOrEquals => OperatorType.ComparisonOperator,
                 Operators.LessThan => OperatorType.ComparisonOperator,
                 Operators.LessThanOrEquals => OperatorType.ComparisonOperator,
-                Operators.Exists => OperatorType.ComparisonOperator,
-                Operators.NotExists => OperatorType.ComparisonOperator,
+                Operators.Exists => OperatorType.LogicalOperator,
+                Operators.NotExists => OperatorType.LogicalOperator,
                 Operators.Contains => OperatorType.FunctionOperator,
                 Operators.StartsWith => OperatorType.FunctionOperator,
                 Operators.EndsWith => OperatorType.FunctionOperator,
@@ -103,13 +92,6 @@ namespace UKHO.FileShareService.DesktopClient.Core
             };
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="operator"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
         private string MapForComparisonOperators(IFssBatchAttribute attribute, string @operator, string value)
         {
             switch(attribute.Type)
@@ -130,26 +112,24 @@ namespace UKHO.FileShareService.DesktopClient.Core
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="operator"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
         private string MapForFunctionOperators(IFssBatchAttribute attribute, string @operator, string value)
         {
-            switch (attribute.Type)
+            return attribute.Type switch
             {
-                case AttributeType.String:
-                    return $"{@operator}({attribute.AttributeName}, '{value}')";
+                AttributeType.String => $"{@operator}({attribute.AttributeName}, '{value}')",
+                AttributeType.UserAttributeString => $"{@operator}($batch({attribute.AttributeName}), '{value}')",
+                _ => string.Empty
+            };
+        }
 
-                case AttributeType.UserAttributeString:
-                    return $"{@operator}($batch({attribute.AttributeName}), '{value}')";
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(attribute), attribute, null);
-            }
+        private string MapForLogicalOperators(IFssBatchAttribute attribute, string @operator)
+        {
+            return attribute.Type switch
+            {
+                AttributeType.NullableDate => $"{attribute.AttributeName} {@operator}",
+                AttributeType.UserAttributeString => $"$batch({attribute.AttributeName}) {@operator}",
+                _ => string.Empty
+            };
         }
     }
 }
