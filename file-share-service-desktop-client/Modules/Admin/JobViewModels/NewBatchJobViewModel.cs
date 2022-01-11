@@ -248,7 +248,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                             if (isAddFileToBatchError)
                             {
                                 await RollBackBatch(batchHandle, fileShareClient);
-                                ExecutionResult = $"File Share Service - error while uploading files for batch ID: {batchHandle?.BatchId}";
                             }
                             else
                                 ExecutionResult = await HandleCanceledOperationsAsync(batchHandle, IsCommittingOnCancel, fileShareClient);
@@ -353,17 +352,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var rollBackBatchResult = await fileShareClient.RollBackBatchAsync(batchHandle, CancellationToken.None);
             if (rollBackBatchResult.IsSuccess)
             {
-                ExecutionResult = $"File Share Service rollback completed for batch ID: {batchHandle?.BatchId}";
+                logger.LogInformation("File Share Service RollBackBatchAsync completed for batch ID:{BatchId}.", batchHandle?.BatchId);
             }
             else
             {
-                ExecutionResult = GetErrors(rollBackBatchResult,
-                    $"File Share Service rollback failed for batch ID:{batchHandle?.BatchId} with status: {rollBackBatchResult.StatusCode}.");
-
                 logger.LogError("File Share Service rollback failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
                     DisplayName, batchHandle?.BatchId, ExecutionResult);
             }
-            logger.LogInformation("File Share Service RollBackBatchAsync completed for batch ID:{BatchId}.", batchHandle?.BatchId);
+            
         }
 
         private async Task SetBatchExpiry(IBatchHandle batchHandle, IFileShareApiAdminClient fileShareClient)
@@ -563,9 +559,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         private string GetErrors<T>(FileShareClient.Models.IResult<T> apiResult, string altMessage)
         {
-            return (apiResult.Errors != null && apiResult.Errors.Any()) ?
-                    string.Join(Environment.NewLine, apiResult.Errors.Select(e => e.Description)) :
-                    altMessage;
+            string errMsg = "New batch job execution failed: ";
+            string responseErrors = (apiResult.Errors != null && apiResult.Errors.Any()) ?
+            string.Join(Environment.NewLine, apiResult.Errors.Select(e => e.Description)) :
+            altMessage;
+            return errMsg + responseErrors;
         }
     }
 
