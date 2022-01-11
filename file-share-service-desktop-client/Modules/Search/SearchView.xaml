@@ -29,7 +29,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Margin="10">
+        <TextBlock Margin="10" Focusable="True">
             <Run FontSize="36" FontWeight="Medium">Search files</Run>
             <LineBreak />
             <Run FontSize="18">Refine your search results by changing inputs or adding new lines</Run>
@@ -38,8 +38,8 @@
             <TextBox Grid.Row="0" 
                  HorizontalAlignment="Right"
                  HorizontalContentAlignment="Left"
-                 Height="37"
-                 Width="500"
+                 Height="37" IsReadOnly="True"
+                 Width="500" AutomationProperties.Name="Search Text"
                  Text="{Binding SearchText}" 
                  TextWrapping="Wrap"/>
 
@@ -51,8 +51,8 @@
                 HorizontalAlignment="Right"
                 Margin="32 8" />
 
-            <ScrollViewer Grid.Row="4">
-                <TextBox
+        <ScrollViewer Grid.Row="4">
+            <TextBox IsReadOnly="True"
                 Text="{Binding SearchResultAsJson}"
                 MinHeight="100px"
                 TextWrapping="Wrap" />
