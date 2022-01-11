@@ -29,7 +29,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-        <TextBlock Margin="10" Focusable="True">
+            <TextBlock Margin="10" Focusable="True">
             <Run FontSize="36" FontWeight="Medium">Search files</Run>
             <LineBreak />
             <Run FontSize="18">Refine your search results by changing inputs or adding new lines</Run>
@@ -51,27 +51,27 @@
                 HorizontalAlignment="Right"
                 Margin="32 8" />
 
-        <ScrollViewer Grid.Row="4">
-            <TextBox IsReadOnly="True"
+            <ScrollViewer Grid.Row="4">
+                <TextBox IsReadOnly="True"
                 Text="{Binding SearchResultAsJson}"
                 MinHeight="100px"
                 TextWrapping="Wrap" />
             </ScrollViewer>
 
-        <ScrollViewer Grid.Row="5">
-            <ItemsControl ItemsSource="{Binding BatchDetailsVM}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <local:BatchDetailsView/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-        <StackPanel Grid.Row="6" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
-            <Label Content="{Binding SearchCountSummary}" FontSize="24" />
-            <Button Command="{Binding PreviousPageCommand}">&lt;</Button>
-            <Button Command="{Binding NextPageCommand}">&gt;</Button>
-        </StackPanel>
+            <ScrollViewer Grid.Row="5">
+                <ItemsControl ItemsSource="{Binding BatchDetailsVM}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:BatchDetailsView />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <StackPanel Grid.Row="6" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
+                <Label Content="{Binding SearchCountSummary}" FontSize="24" />
+                <Button Command="{Binding PreviousPageCommand}" AutomationProperties.Name="Previous">&lt;</Button>
+                <Button Command="{Binding NextPageCommand}" AutomationProperties.Name="Next">&gt;</Button>
+            </StackPanel>
 
             <views:Spinner Grid.Row="5" Grid.RowSpan="2"
                        Visibility="{Binding SearchInProgress, Converter={StaticResource BooleanToVisibilityConverter}}" />

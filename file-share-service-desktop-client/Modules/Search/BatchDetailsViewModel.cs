@@ -76,7 +76,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     System.IO.Directory.CreateDirectory(path);
                 }
                 downloadLocation = path;
-                File.Delete(fileName);
             }
 
             return downloadLocation;
@@ -91,8 +90,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 return null!;
             }
 
-            var fileStream = new FileStream(fileDownloadPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-
+            using var fileStream = new FileStream(fileDownloadPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+           
             var fssClient = fileShareApiAdminClientFactory.Build();
             var response = await fssClient.DownloadFileAsync(BatchId, fileName, fileStream, fileSizeInBytes, cancellationToken);
             fileStream.Close();           
