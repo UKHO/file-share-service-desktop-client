@@ -10,6 +10,7 @@ using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 using System;
 using System.Threading;
 using UKHO.FileShareAdminClient.Models.Response;
+using UKHO.FileShareClient.Models;
 
 namespace FileShareService.DesktopClientTests.Modules.Admin
 {
