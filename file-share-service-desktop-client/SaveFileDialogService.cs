@@ -10,7 +10,7 @@ namespace UKHO.FileShareService.DesktopClient
     public class SaveFileDialogService : ISaveFileDialogService
     {
 
-        public String SaveFileDialog(string fileName)
+        public string SaveFileDialog(string fileName)
         {
             string downloadLocation = string.Empty;
             var dialog = new Microsoft.Win32.SaveFileDialog();

@@ -43,7 +43,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService , fakesaveFileDialogService);
             
             BatchDetailVM.Files = new List<BatchDetailsFiles>() { new BatchDetailsFiles() { Filename = "AFilename.txt", FileSize = 100 } };
-            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Path.Combine(Environment.CurrentDirectory));
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Environment.CurrentDirectory);
 
             BatchDetailVM.BatchId = Guid.NewGuid().ToString();
             string fileDownloadPath = Path.Combine(Environment.CurrentDirectory, "AFilename.txt");          
@@ -55,6 +55,9 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             BatchDetailVM.DownloadExecutionCommand.Execute("AFilename.txt");
 
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, MessageBoxButton.OK, A<MessageBoxImage>.Ignored)).MustHaveHappened();
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog("AFilename.txt")).MustHaveHappened();
+            A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, "AFilename.txt", A<FileStream>.Ignored, 100, A<CancellationToken>.Ignored)).MustHaveHappened();
+
         } 
 
         [Test]
@@ -63,7 +66,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService, fakesaveFileDialogService);
 
             BatchDetailVM.Files = new List<BatchDetailsFiles>() { new BatchDetailsFiles() { Filename = "AFilename.txt", FileSize = 100 } };
-            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Path.Combine(Environment.CurrentDirectory));
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Environment.CurrentDirectory);
 
             BatchDetailVM.BatchId = Guid.NewGuid().ToString();
             string fileDownloadPath = Path.Combine(Environment.CurrentDirectory, "AFilename.txt");
@@ -72,7 +75,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
 
             BatchDetailVM.DownloadExecutionCommand.Execute("AFilename.txt");
 
-            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).MustNotHaveHappened();
             A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, A<CancellationToken>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, MessageBoxButton.OK, A<MessageBoxImage>.Ignored)).MustNotHaveHappened();
         }
@@ -83,7 +86,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService, fakesaveFileDialogService);
 
             BatchDetailVM.Files = new List<BatchDetailsFiles>() { new BatchDetailsFiles() { Filename = "AFilename.txt", FileSize = 100 } };
-            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Path.Combine(Environment.CurrentDirectory));
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Environment.CurrentDirectory);
 
             BatchDetailVM.BatchId = Guid.NewGuid().ToString();
             string fileDownloadPath = Path.Combine(Environment.CurrentDirectory, "AFilename.txt");
