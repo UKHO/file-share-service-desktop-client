@@ -25,6 +25,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         private IMessageBoxService fakeMessageBoxService = null!;
         private  IFileService fakeFileService = null!;
         private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
+        private ISaveFileDialogService fakesaveFileDialogService = null!;
 
         [SetUp]
         public void Setup()
@@ -33,58 +34,67 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakeMessageBoxService = A.Fake<IMessageBoxService>();
             fakeFileService = A.Fake<IFileService>();
             fakeFileShareApiAdminClient = A.Fake<IFileShareApiAdminClient>();
+            fakesaveFileDialogService = A.Fake<ISaveFileDialogService>();
         }
         [Test]
         public async Task TestDownloadFileWithFileExistsAndYesResponse()
-        {           
-            var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService);
-            var batchId = Guid.NewGuid().ToString();
-            string fileDownloadPath = Path.Combine(Environment.CurrentDirectory, "AFilename.txt");
+        {
            
+            var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService , fakesaveFileDialogService);
+            
+            BatchDetailVM.Files = new List<BatchDetailsFiles>() { new BatchDetailsFiles() { Filename = "AFilename.txt", FileSize = 100 } };
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Path.Combine(Environment.CurrentDirectory));
+
+            BatchDetailVM.BatchId = Guid.NewGuid().ToString();
+            string fileDownloadPath = Path.Combine(Environment.CurrentDirectory, "AFilename.txt");          
             A.CallTo(() => fakeFileService.Exists(fileDownloadPath)).Returns(true);
-            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored,MessageBoxButton.YesNo, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Yes);
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
-            A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, CancellationToken.None)).Returns(new Result<DownloadFileResponse> { IsSuccess=true ,StatusCode = 206 });
-        
-            var result = await BatchDetailVM.DownloadFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
-        
-            Assert.IsTrue(result.IsSuccess);
-            Assert.AreEqual(result.StatusCode, 206);
-        }
+            A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<DownloadFileResponse> { IsSuccess = true, StatusCode = 206 });
+
+            BatchDetailVM.DownloadExecutionCommand.Execute("AFilename.txt");
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, MessageBoxButton.OK, A<MessageBoxImage>.Ignored)).MustHaveHappened();
+        } 
 
         [Test]
         public async Task TestDownloadFileWithFileExistsAndNoResponse()
         {
-            var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService);
-            var batchId = Guid.NewGuid().ToString();
+            var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService, fakesaveFileDialogService);
+
+            BatchDetailVM.Files = new List<BatchDetailsFiles>() { new BatchDetailsFiles() { Filename = "AFilename.txt", FileSize = 100 } };
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Path.Combine(Environment.CurrentDirectory));
+
+            BatchDetailVM.BatchId = Guid.NewGuid().ToString();
             string fileDownloadPath = Path.Combine(Environment.CurrentDirectory, "AFilename.txt");
-    
             A.CallTo(() => fakeFileService.Exists(fileDownloadPath)).Returns(true);
-            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.No);
-    
-            await BatchDetailVM.DownloadFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
-    
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, MessageBoxButton.YesNo, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.No);
+
+            BatchDetailVM.DownloadExecutionCommand.Execute("AFilename.txt");
+
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
-            A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, CancellationToken.None)).MustNotHaveHappened();
+            A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, A<CancellationToken>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, MessageBoxButton.OK, A<MessageBoxImage>.Ignored)).MustNotHaveHappened();
         }
 
         [Test]
         public async Task TestDownloadFileWithFileNotExists()
         {
-            var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService);
+            var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService, fakesaveFileDialogService);
 
-            var batchId = Guid.NewGuid().ToString();
+            BatchDetailVM.Files = new List<BatchDetailsFiles>() { new BatchDetailsFiles() { Filename = "AFilename.txt", FileSize = 100 } };
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(Path.Combine(Environment.CurrentDirectory));
+
+            BatchDetailVM.BatchId = Guid.NewGuid().ToString();
             string fileDownloadPath = Path.Combine(Environment.CurrentDirectory, "AFilename.txt");
-
             A.CallTo(() => fakeFileService.Exists(fileDownloadPath)).Returns(false);
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
-            A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, CancellationToken.None)).Returns(new Result<DownloadFileResponse> { IsSuccess = true, StatusCode = 206 });
-            
-            var result = await BatchDetailVM.DownloadFile(batchId, fileDownloadPath, "AFilename.txt", 10, CancellationToken.None);
-           
-            Assert.IsTrue(result.IsSuccess);
-            Assert.AreEqual(result.StatusCode, 206);
-            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeFileShareApiAdminClient.DownloadFileAsync(A<string>.Ignored, A<string>.Ignored, A<FileStream>.Ignored, A<long>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<DownloadFileResponse> { IsSuccess = true, StatusCode = 206 });
+
+            BatchDetailVM.DownloadExecutionCommand.Execute("AFilename.txt");
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored,MessageBoxButton.YesNo, A<MessageBoxImage>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, MessageBoxButton.OK, A<MessageBoxImage>.Ignored)).MustHaveHappened();
         }       
     }
 }

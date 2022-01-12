@@ -20,6 +20,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         private IFssUserAttributeListProvider fakeFssUserAttributeListProvider = null!;
         private IMessageBoxService fakeMessageBoxService = null!;
         private IFileService fakeFileService = null!;
+        private ISaveFileDialogService fakesaveFileDialogService = null!;
 
 
         [SetUp]
@@ -32,9 +33,10 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakeFssUserAttributeListProvider = A.Fake<IFssUserAttributeListProvider>();
             fakeMessageBoxService = A.Fake<IMessageBoxService>();
             fakeFileService = A.Fake<IFileService>();
+            fakesaveFileDialogService = A.Fake<ISaveFileDialogService>();
             searchViewModel =
                 new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
-                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService);
+                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService,fakesaveFileDialogService);
         }
 
         [Test]

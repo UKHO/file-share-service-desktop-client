@@ -94,6 +94,7 @@ namespace UKHO.FileShareService.DesktopClient
             containerRegistry.Register<IDateTimeValidator, DateTimeValidator>();
             containerRegistry.Register<IMessageBoxService, MessageBoxService>();
             containerRegistry.Register<IFileService, FileService>();
+            containerRegistry.Register<ISaveFileDialogService, SaveFileDialogService>();
         }
 
         protected override Window CreateShell()

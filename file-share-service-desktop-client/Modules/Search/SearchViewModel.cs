@@ -18,6 +18,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private readonly IFileShareApiAdminClientFactory fileShareApiAdminClientFactory;
         private readonly IMessageBoxService messageBoxService;
         private readonly IFileService fileService;
+        private readonly ISaveFileDialogService saveFileDialogService;
         private string searchText = string.Empty;
         private string searchResultAsJson = string.Empty;
         private bool searchInProgress;
@@ -34,11 +35,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             IFssUserAttributeListProvider fssUserAttributeListProvider,
             IEnvironmentsManager environmentsManager,
             IMessageBoxService messageBoxService,
-            IFileService fileService)
+            IFileService fileService,
+            ISaveFileDialogService saveFileDialogService)
         {
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.messageBoxService = messageBoxService;
             this.fileService = fileService;
+            this.saveFileDialogService = saveFileDialogService;
             SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder, fssUserAttributeListProvider, environmentsManager);
             SearchCommand = new DelegateCommand(async () => await OnSearch(),
                 () => authProvider.IsLoggedIn && !SearchInProgress);
@@ -93,7 +96,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 SearchResult = result;
                 foreach(var entries in  SearchResult.Entries)
                 {
-                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService)
+                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService,saveFileDialogService)
                     {
                         BatchId = entries.BatchId,
                         Attributes = entries.Attributes,
