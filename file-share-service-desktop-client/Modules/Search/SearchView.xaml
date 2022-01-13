@@ -29,7 +29,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Margin="10">
+            <TextBlock Margin="10" Focusable="True">
             <Run FontSize="36" FontWeight="Medium">Search files</Run>
             <LineBreak />
             <Run FontSize="18">Refine your search results by changing inputs or adding new lines</Run>
@@ -38,8 +38,8 @@
             <TextBox Grid.Row="0" 
                  HorizontalAlignment="Right"
                  HorizontalContentAlignment="Left"
-                 Height="37"
-                 Width="500"
+                 Height="37" IsReadOnly="True"
+                 Width="500" AutomationProperties.Name="Search Text"
                  Text="{Binding SearchText}" 
                  TextWrapping="Wrap"/>
 
@@ -52,16 +52,16 @@
                 Margin="32 8" />
 
             <ScrollViewer Grid.Row="4">
-                <TextBox
+                <TextBox IsReadOnly="True"
                 Text="{Binding SearchResultAsJson}"
                 MinHeight="100px"
                 TextWrapping="Wrap" />
             </ScrollViewer>
 
             <Grid Row="5">
-                <ItemsControl ItemsSource="{Binding SearchResult.Entries}">
+                <ItemsControl ItemsSource="{Binding BatchDetailsVM}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="models:BatchDetails">
+                        <DataTemplate>
                             <local:BatchDetailsView />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -69,8 +69,8 @@
             </Grid>
             <StackPanel Grid.Row="6" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
                 <Label Content="{Binding SearchCountSummary}" FontSize="24" />
-                <Button Command="{Binding PreviousPageCommand}">&lt;</Button>
-                <Button Command="{Binding NextPageCommand}">&gt;</Button>
+                <Button Command="{Binding PreviousPageCommand}" AutomationProperties.Name="Previous">&lt;</Button>
+                <Button Command="{Binding NextPageCommand}" AutomationProperties.Name="Next">&gt;</Button>
             </StackPanel>
 
             <views:Spinner Grid.Row="5" Grid.RowSpan="2"

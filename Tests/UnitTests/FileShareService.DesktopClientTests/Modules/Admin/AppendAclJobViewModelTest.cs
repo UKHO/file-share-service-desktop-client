@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models.Response;
+using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 using UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels;
 using AdminClientModell = UKHO.FileShareAdminClient.Models;
