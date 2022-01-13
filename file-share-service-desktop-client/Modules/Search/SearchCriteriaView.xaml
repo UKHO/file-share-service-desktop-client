@@ -132,7 +132,7 @@
                         <TextBox Grid.Column="4"
                                  Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource TextBoxStyle}" 
-                                 />
+                                 IsEnabled="{Binding IsValueEnabled}" />
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

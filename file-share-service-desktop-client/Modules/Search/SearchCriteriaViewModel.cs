@@ -87,6 +87,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private void OnChildCriterionPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             RaisePropertyChanged(nameof(SearchCriteria));
+            SetEnablePropertyForValueControl();
         }
 
         private void OnAddRow(SearchCriterionViewModel obj)
@@ -139,6 +140,25 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 foreach (var (item, index) in SearchCriteria.Select((v, i) => (v, i)))
                 {
                     item.IsAndOrVisible = index != 0;
+                }
+            }
+            RaisePropertyChanged(nameof(SearchCriteria));
+        }
+
+        private void SetEnablePropertyForValueControl()
+        {
+            if (SearchCriteria != null)
+            {
+                foreach (var item in SearchCriteria)
+                {
+                    item.IsValueEnabled = item.Operator == null ||
+                                            (item.Operator != Operators.Exists &&
+                                            item.Operator != Operators.NotExists);
+
+                    if (!item.IsValueEnabled)
+                    {
+                        item.Value = string.Empty;
+                    }
                 }
             }
             RaisePropertyChanged(nameof(SearchCriteria));
