@@ -18,6 +18,10 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         private IFileShareApiAdminClientFactory fakeFileShareApiAdminClientFactory = null!;
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private IFssUserAttributeListProvider fakeFssUserAttributeListProvider = null!;
+        private IMessageBoxService fakeMessageBoxService = null!;
+        private IFileService fakeFileService = null!;
+        private ISaveFileDialogService fakesaveFileDialogService = null!;
+
 
         [SetUp]
         public void Setup()
@@ -27,9 +31,12 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakeFileShareApiAdminClientFactory = A.Fake<IFileShareApiAdminClientFactory>();
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeFssUserAttributeListProvider = A.Fake<IFssUserAttributeListProvider>();
+            fakeMessageBoxService = A.Fake<IMessageBoxService>();
+            fakeFileService = A.Fake<IFileService>();
+            fakesaveFileDialogService = A.Fake<ISaveFileDialogService>();
             searchViewModel =
                 new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
-                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager);
+                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService,fakesaveFileDialogService);
         }
 
         [Test]
@@ -83,6 +90,24 @@ namespace FileShareService.DesktopClientTests.Modules.Search
                 firstSearchCriterionViewModel.Operator = firstSearchCriterionViewModel.AvailableOperators.First();
                 firstSearchCriterionViewModel.Value = "Bob";
             });
+        }
+
+        [Test]
+        public void TestSearchCountSummary()
+        {
+            //If Search count is 0
+            var batchSearchResponse1 = new BatchSearchResponse(total: 0);
+            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
+                () => searchViewModel.SearchResult = batchSearchResponse1);
+            Assert.AreSame(batchSearchResponse1, searchViewModel.SearchResult);
+            Assert.AreSame("No batches found.", searchViewModel.SearchCountSummary);
+
+            //If Search count is greater than 0
+            var batchSearchResponse2 = new BatchSearchResponse(10, 25);
+            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
+                () => searchViewModel.SearchResult = batchSearchResponse2);
+            Assert.AreSame(batchSearchResponse2, searchViewModel.SearchResult);
+            Assert.AreEqual("Showing 1-10 of 25", searchViewModel.SearchCountSummary);
         }
     }
 }
