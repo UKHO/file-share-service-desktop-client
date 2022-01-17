@@ -56,7 +56,13 @@
                                      DisplayMemberPath="Name"
                                      Width="150"
                                      FontSize="21"
-                                     SelectedItem="{Binding CurrentEnvironment}" />
+                                     SelectedItem="{Binding CurrentEnvironment}" >
+                        <mah:SplitButton.ItemContainerStyle>
+                            <Style>
+                                <Setter Property="AutomationProperties.Name" Value="{Binding Path=Name}"/>
+                            </Style>
+                        </mah:SplitButton.ItemContainerStyle>
+                    </mah:SplitButton>
                 </StackPanel>
             </Border>
         </mah:WindowCommands>
