@@ -98,7 +98,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 if (isAndOrVisible != value)
                 {
                     isAndOrVisible = value;
-                    RaisePropertyChanged(nameof(And));
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -111,7 +111,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 if (isValueEnabled != value)
                 {
                     isValueEnabled = value;
-                    RaisePropertyChanged(nameof(Value));
+                    RaisePropertyChanged();
                 }
             }
         }

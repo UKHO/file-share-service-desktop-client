@@ -177,6 +177,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     if (!item.IsValueEnabled)
                     {
                         item.Value = string.Empty;
+                        break;
                     }
                 }
             }
