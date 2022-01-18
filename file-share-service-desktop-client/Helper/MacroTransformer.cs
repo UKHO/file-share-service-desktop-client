@@ -81,12 +81,15 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year\s*\)", nowAddDays_Year},
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year2\s*\)", (match) => nowAddDays_Year(match).Substring(2,2)},
                 {@"\$\(\s*now\.WeekNumber\s*\)",now_WeekNumber },
+                {@"\$\(\s*now\.WeekNumber2\s*\)",(match) => now_WeekNumber(match).PadLeft(2,'0')},
                 {@"\$\(\s*now\.WeekNumber\.Year\s*\)", now_WeekNumberYear },
                 {@"\$\(\s*now\.WeekNumber\.Year2\s*\)", (match) => now_WeekNumberYear(match).Substring(2,2) },
                 {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\)", now_WeekNumberPlusWeeks },
+                {@"\$\(\s*now\.WeekNumber2\s*([+-]\s*\d+)\)",(match) => now_WeekNumberPlusWeeks(match).PadLeft(2,'0')},
                 {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year\)", now_WeekNumberPlusWeeksYear},
                 {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year2\)", (match) => now_WeekNumberPlusWeeksYear(match).Substring(2,2) },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\s*\)",nowAddDays_Week },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber2\s*\)",(match) => nowAddDays_Week(match).PadLeft(2,'0')},
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year\s*\)", nowAddDays_WeekYear },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year2\s*\)", (match) => nowAddDays_WeekYear(match).Substring(2,2)},
                 {@"\$\(now.AddDays\(\s*([+-]?\s*\d+)\s*\)\)", nowAddDays_Date },
@@ -99,7 +102,7 @@ namespace UKHO.FileShareService.DesktopClient.Helper
             return replacementExpressions.Aggregate(value,
                 (input, kv) =>
                 {
-                    var match = Regex.Match(input, kv.Key);
+                    var match = Regex.Match(input, kv.Key, RegexOptions.IgnoreCase);
                     while (match.Success)
                     {
                         var end = Math.Min(match.Index + match.Length, input.Length);
@@ -107,7 +110,7 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                                 match.Result(kv.Value(match)) +
                                 input[end..];
 
-                        match = Regex.Match(input, kv.Key);
+                        match = Regex.Match(input, kv.Key, RegexOptions.IgnoreCase);
                     }
 
                     return input;

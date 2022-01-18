@@ -169,6 +169,70 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 expandedAttributes["MultiWeekMacro"]);
         }
 
+        [TestCase("$(now.WeekNumber2)", 0)]
+        [TestCase("$(now.AddDays(7).WeekNumber2)", 1)]
+        [TestCase("$(now.AddDays(21).WeekNumber2)", 3)]
+        [TestCase("$(now.AddDays(-14).WeekNumber2)", -2)]
+        [TestCase("$(now.WeekNumber2   )", 0)]
+        [TestCase("$(   now.WeekNumber2)", 0)]
+        [TestCase("$(   now.WeekNumber2   )", 0)]
+        [TestCase("$(now.WeekNumber2+1)", 1)]
+        [TestCase("$(now.weeknumber2 +1)", 1)]
+        [TestCase("$(now.WeekNumber2 + 1)", 1)]
+        [TestCase("$(now.WeekNumber2+ 1)", 1)]
+        [TestCase("$(now.WeekNumber2 +10)", 10)]
+        [TestCase("$(now.WeekNumber2   -1)", -1)]
+        [TestCase("$(now.WeekNumber2-1)", -1)]
+        [TestCase("$(now.WeekNumber2 -  1)", -1)]
+        [TestCase("$(now.WeekNumber2   -10)", -10)]
+        [TestCase("$(now.weeknumber2   -10)", -10)]
+        public void TestExpandMacrosOfUkhoZeroPaddedWeekInNewBatchAttributes(string input, int offset)
+        {
+            A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime).Returns(DateTime.UtcNow);
+            var file1FullFileName = @"c:/data/files/f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute>
+                    {
+                        new KeyValueAttribute("BatchAttribute1", "Value1"),
+                        new KeyValueAttribute("WeekMacro1", input),
+                        new KeyValueAttribute("WeekMacro2", "Padding " + input),
+                        new KeyValueAttribute("WeekMacro3", $"Padding {input} and Right Padding"),
+                        new KeyValueAttribute("MultiWeekMacro", $"Padding {input} and {input} with Right Padding")
+                    },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 1,
+                                MimeType = "text/plain",
+                                SearchPath = file1FullFileName
+                            }
+                        }
+                }
+            },
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+
+            var expandedAttributes = vm.Attributes!.ToDictionary(kv => kv.Key, kv => kv.Value);
+            var expectedWeekNumber = WeekNumber.GetUKHOWeekFromDateTime(DateTime.UtcNow.AddDays(offset * 7)).Week.ToString().PadLeft(2, '0');
+
+            Assert.AreEqual(expectedWeekNumber, expandedAttributes["WeekMacro1"]);
+            Assert.AreEqual("Padding " + expectedWeekNumber, expandedAttributes["WeekMacro2"]);
+            Assert.AreEqual("Padding " + expectedWeekNumber + " and Right Padding", expandedAttributes["WeekMacro3"]);
+            Assert.AreEqual("Padding " + expectedWeekNumber + " and " + expectedWeekNumber + " with Right Padding",
+                expandedAttributes["MultiWeekMacro"]);
+        }
+
+
         [TestCase("$(now.WeekNumber.Year)", 0)]
         [TestCase("$(now.WeekNumber.Year2)", 0)]
         [TestCase("$(now.AddDays(7).WeekNumber.Year)", 1)]
@@ -369,6 +433,56 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         [TestCase("Week $(now.AddDays(-14).WeekNumber)", "Week 9")]
         [TestCase("abc$(now.AddDays(360).Year)_$(now.AddDays(360).WeekNumber)", "abc2021_10")]
         public void TestFileSearchWithMacroInDirectory(string directoryMacro, string expandedDirectoryName)
+        {
+            var now = new DateTime(2020, 03, 18, 10, 30, 55, DateTimeKind.Utc);
+            A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime).Returns(now);
+
+            var file1FullFileName = Path.Combine("c:\\data", expandedDirectoryName, "f1.txt");
+            var file2FullFileName = Path.Combine("c:\\data", expandedDirectoryName, "f2.txt");
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+            fileSystem.AddFile(file2FullFileName, new MockFileData("File 2 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 1,
+                                MimeType = "text/plain",
+                                SearchPath = Path.Combine("c:\\data", directoryMacro, "f1.txt")
+                            },
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = 1,
+                                MimeType = "text/plain",
+                                SearchPath = Path.Combine("c:\\data", directoryMacro, "f2.txt")
+                            }
+                        }
+                }
+            },
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+
+            Assert.AreEqual(2, vm.Files.SelectMany(f => f.Files).Count());
+            CollectionAssert.AreEqual(new[] { file1FullFileName, file2FullFileName },
+                vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
+        }
+
+
+        [TestCase("abc$(now.AddDays(-21).WeekNumber2)", "abc08")]
+        [TestCase("abc$(now.AddDays(-21).WeekNumber2)_$(now.AddDays(7).WeekNumber.Year)", "abc08_2020")]
+        [TestCase("abc$(now.AddDays(-21).WeekNumber2)_$(now.AddDays(7).WeekNumber.Year2)", "abc08_20")]
+        [TestCase("abc$(now.AddDays(-96).WeekNumber2)_$(now.AddDays(7).WeekNumber.Year2)", "abc50_20")]
+        [TestCase("Week $(now.AddDays(-14).WeekNumber2)", "Week 09")]
+        public void TestFileSearchWithMacroInDirectoryForWeekNumber2(string directoryMacro, string expandedDirectoryName)
         {
             var now = new DateTime(2020, 03, 18, 10, 30, 55, DateTimeKind.Utc);
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime).Returns(now);
