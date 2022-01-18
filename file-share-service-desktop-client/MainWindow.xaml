@@ -96,14 +96,14 @@
         <Border Grid.Row="0" BorderThickness="0 2 0 2" BorderBrush="{StaticResource LightGreyBrush}" Padding="20 4">
             <StackPanel Orientation="Horizontal">
                 <Border BorderThickness="2" BorderBrush="{StaticResource AccentColorBrush}">
-                    <Label Foreground="{StaticResource AccentColorBrush}" FontSize="16" FontWeight="DemiBold">ALPHA</Label>
+                    <Label Foreground="{StaticResource AccentColorBrush}" FontSize="16" FontWeight="DemiBold">BETA</Label>
                 </Border>
                 <TextBlock Foreground="{StaticResource AccentColorBrush}"
                            FontSize="16"
                            FontWeight="Light"
                            VerticalAlignment="Center"
                            Margin="6">
-                    This service is in alpha phase - please provide
+                    This service is in beta phase - please provide
                     <Hyperlink FontWeight="Medium" TextDecorations=""
                                NavigateUri="mailto:martin.rock-evans@ukho.gov.uk">
                         feedback

@@ -1,4 +1,4 @@
-apiVersion: backstage.io/v1alpha1
+apiVersion: backstage.io/v1beta1
 kind: Component
 metadata:
   name: File-Share-Service-Desktop-Client
@@ -7,7 +7,7 @@ metadata:
     github.com/project-slug: ukho/file-share-service-desktop-client
 spec:
   type: service
-  lifecycle: alpha
+  lifecycle: beta
   owner: user/rockydevnet
   system: ADDS
   consumesApis:
