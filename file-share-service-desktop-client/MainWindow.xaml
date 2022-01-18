@@ -56,7 +56,8 @@
                                      DisplayMemberPath="Name"
                                      Width="150"
                                      FontSize="21"
-                                     SelectedItem="{Binding CurrentEnvironment}" >
+                                     SelectedItem="{Binding CurrentEnvironment}" 
+                                     IsDropDownOpen="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource self}, Mode=OneWay}">
                         <mah:SplitButton.ItemContainerStyle>
                             <Style>
                                 <Setter Property="AutomationProperties.Name" Value="{Binding Path=Name}"/>
