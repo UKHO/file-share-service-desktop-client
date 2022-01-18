@@ -22,18 +22,18 @@
         <StackPanel Margin=" 0 30"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Center">
-            <TextBlock FontSize="28"
+            <TextBlock FontSize="28" Focusable="True"
                        TextWrapping="Wrap"
                        MaxWidth="1000"
                        Margin="0 5">
                 The ADMIRALTY File Share Service allows you to search and download files.
             </TextBlock>
 
-            <Label FontSize="36"
+            <TextBlock FontSize="36" Focusable="True"
                    FontWeight="Medium"
-                   Margin="0 5">Sign in to access your files</Label>
-            <Label FontSize="18"
-                   Margin="0 5">You need to sign in with your account access the File Share Service.</Label>
+                   Margin="0 5">Sign in to access your files</TextBlock>
+            <TextBlock FontSize="18" Focusable="True"
+                   Margin="0 5">You need to sign in with your account access the File Share Service.</TextBlock>
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -46,7 +46,14 @@
                           ItemsSource="{Binding Environments}"
                           DisplayMemberPath="Name"
                           FontSize="21"
-                          SelectedItem="{Binding CurrentEnvironment}"/>
+                          SelectedItem="{Binding CurrentEnvironment}"
+                          IsDropDownOpen="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource self}, Mode=OneWay}">
+                    <ComboBox.ItemContainerStyle>
+                        <Style>
+                            <Setter Property="AutomationProperties.Name" Value="{Binding Path=Name}"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
 
                 <Button Grid.Row="0" Grid.Column="1" 
                         Margin="0"
