@@ -141,8 +141,9 @@
                     FontSize="16"
                     Margin="30 13"
                     FontWeight="Light"
-                    Foreground="#333333">
-                    © Crown copyright 2021 UK Hydrographic Office
+                    Foreground="#333333"
+                    ContentStringFormat="© Crown copyright {0} UK Hydrographic Office"
+                    Content="{Binding Year}">                    
                 </Label>
             </Grid>
         </Border>

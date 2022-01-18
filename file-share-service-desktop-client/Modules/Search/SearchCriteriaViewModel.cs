@@ -24,6 +24,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private readonly Attribute[] systemAttributes;
         private IEnumerable<Attribute> availableAttributes;
 
+        private const string OPERATOR_PROPERTY = "Operator";
+        private const string SELECTED_FIELD_PROPERTY = "SelectedField";
+
         public SearchCriteriaViewModel(IFssSearchStringBuilder fssSearchStringBuilder,
             IFssUserAttributeListProvider fssUserAttributeListProvider,
             IEnvironmentsManager environmentsManager)
@@ -87,7 +90,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private void OnChildCriterionPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             RaisePropertyChanged(nameof(SearchCriteria));
-            SetEnablePropertyForValueControl();
+
+            if (e.PropertyName == OPERATOR_PROPERTY)
+            {
+                SetEnablePropertyForValueControl();
+            }
+
+            if (e.PropertyName == SELECTED_FIELD_PROPERTY)
+            {
+                SetDefaultOperator();
+            }
         }
 
         private void OnAddRow(SearchCriterionViewModel obj)
@@ -133,6 +145,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             return fssSearchStringBuilder.BuildSearch(SearchCriteria);
         }
 
+        /// <summary>
+        /// Set visible property for AndOr control based on index.
+        /// If index is 0, this control should not be visible.
+        /// </summary>
         private void SetVisiblePropertyForAndControl()
         {
             if (SearchCriteria != null)
@@ -145,6 +161,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             RaisePropertyChanged(nameof(SearchCriteria));
         }
 
+        /// <summary>
+        /// Set enable property of value control, based on operators.
+        /// </summary>
         private void SetEnablePropertyForValueControl()
         {
             if (SearchCriteria != null)
@@ -162,6 +181,24 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 }
             }
             RaisePropertyChanged(nameof(SearchCriteria));
+        }
+
+        /// <summary>
+        /// Set first available operator as default, when existing selected field is changed 
+        /// and existing selected operator is not applicable for changed attribute type.
+        /// </summary>
+        private void SetDefaultOperator()
+        {
+            foreach (var item in SearchCriteria)
+            {
+                if (item.SelectedField != null &&
+                    item.Operator != null &&
+                    !item.AvailableOperators.Any(op => op == item.Operator))
+                {
+                    item.Operator = item.AvailableOperators.First();
+                    break;
+                }
+            }
         }
     }
 }

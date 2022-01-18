@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Prism.Commands;
@@ -68,5 +69,7 @@ namespace UKHO.FileShareService.DesktopClient.ViewModels
 
         public string Version => Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>()
             .Single().Version;
+
+        public int Year => DateTime.UtcNow.Year;
     }
 }
