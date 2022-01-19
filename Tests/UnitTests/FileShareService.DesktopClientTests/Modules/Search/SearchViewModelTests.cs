@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Windows;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using UKHO.FileShareAdminClient;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -21,6 +25,8 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         private IMessageBoxService fakeMessageBoxService = null!;
         private IFileService fakeFileService = null!;
         private ISaveFileDialogService fakesaveFileDialogService = null!;
+        private ILogger<SearchViewModel> fakeLoggerSearchVM = null!;
+        private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
 
 
         [SetUp]
@@ -34,9 +40,11 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakeMessageBoxService = A.Fake<IMessageBoxService>();
             fakeFileService = A.Fake<IFileService>();
             fakesaveFileDialogService = A.Fake<ISaveFileDialogService>();
+            fakeLoggerSearchVM = A.Fake<ILogger<SearchViewModel>>();
+            fakeFileShareApiAdminClient = A.Fake<IFileShareApiAdminClient>();
             searchViewModel =
                 new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
-                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService,fakesaveFileDialogService);
+                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService,fakesaveFileDialogService,fakeLoggerSearchVM);
         }
 
         [Test]
@@ -108,6 +116,6 @@ namespace FileShareService.DesktopClientTests.Modules.Search
                 () => searchViewModel.SearchResult = batchSearchResponse2);
             Assert.AreSame(batchSearchResponse2, searchViewModel.SearchResult);
             Assert.AreEqual("Showing 1-10 of 25", searchViewModel.SearchCountSummary);
-        }
+        }     
     }
 }

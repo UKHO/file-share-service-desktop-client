@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using Prism.Mvvm;
 using UKHO.FileShareClient.Models;
@@ -19,6 +23,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private readonly IMessageBoxService messageBoxService;
         private readonly IFileService fileService;
         private readonly ISaveFileDialogService saveFileDialogService;
+        private readonly ILogger<SearchViewModel> logger;
         private string searchText = string.Empty;
         private string searchResultAsJson = string.Empty;
         private bool searchInProgress;
@@ -36,12 +41,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             IEnvironmentsManager environmentsManager,
             IMessageBoxService messageBoxService,
             IFileService fileService,
-            ISaveFileDialogService saveFileDialogService)
+            ISaveFileDialogService saveFileDialogService,
+             ILogger<SearchViewModel> logger)
         {
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.messageBoxService = messageBoxService;
             this.fileService = fileService;
             this.saveFileDialogService = saveFileDialogService;
+            this.logger = logger;
             SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder, fssUserAttributeListProvider, environmentsManager);
             SearchCommand = new DelegateCommand(async () => await OnSearch(),
                 () => authProvider.IsLoggedIn && !SearchInProgress);
@@ -89,12 +96,21 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             batchDetailsVM = new List<BatchDetailsViewModel>();
             try
             {
+                logger.LogInformation("File Share Service search started for SearchText :{searchText}", searchText);
                 var fssClient = fileShareApiAdminClientFactory.Build();
-                var result = await fssClient.Search(searchText, pageSize, pageOffset);
+                var result = await fssClient.Search(searchText, pageSize, pageOffset, CancellationToken.None);
 
-                SearchResultAsJson = result.ToJson();
-                SearchResult = result;
-                foreach(var entries in  SearchResult.Entries)
+                if (!result.IsSuccess)
+                {
+                    logger.LogInformation("File Share Service search failed  with status: {StatusCode} and Error Description : {Description}", result.StatusCode, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+                    messageBoxService.ShowMessageBox("Error", $"File Share Service search failed  with status: {result.StatusCode} and Error Description : {string.Join(Environment.NewLine, result.Errors.Select(e => e.Description))}", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                SearchResultAsJson = result.Data.ToJson();
+                SearchResult = result.Data;
+
+                foreach (var entries in SearchResult.Entries)
                 {
                     BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService,saveFileDialogService)
                     {
@@ -105,9 +121,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     };
                     batchDetailsVM.Add(bdvm);
                 }
-                RaisePropertyChanged(nameof(BatchDetailsVM));
-                NextPageCommand.RaiseCanExecuteChanged();
-                PreviousPageCommand.RaiseCanExecuteChanged();
+                logger.LogInformation("File Share Service search result Found :{Total} record.", SearchResult.Total);
             }
             catch (Exception e)
             {
@@ -116,6 +130,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             }
             finally
             {
+                RaisePropertyChanged(nameof(BatchDetailsVM));
+                NextPageCommand.RaiseCanExecuteChanged();
+                PreviousPageCommand.RaiseCanExecuteChanged();
                 SearchInProgress = false;
             }
         }
