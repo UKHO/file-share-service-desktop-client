@@ -24,9 +24,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private readonly Attribute[] systemAttributes;
         private IEnumerable<Attribute> availableAttributes;
 
-        private const string OPERATOR_PROPERTY = "Operator";
-        private const string SELECTED_FIELD_PROPERTY = "SelectedField";
-
         public SearchCriteriaViewModel(IFssSearchStringBuilder fssSearchStringBuilder,
             IFssUserAttributeListProvider fssUserAttributeListProvider,
             IEnvironmentsManager environmentsManager)
@@ -91,12 +88,12 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         {
             RaisePropertyChanged(nameof(SearchCriteria));
 
-            if (e.PropertyName == OPERATOR_PROPERTY)
+            if (e.PropertyName == nameof(SearchCriterionViewModel.Operator))
             {
                 SetEnablePropertyForValueControl();
             }
 
-            if (e.PropertyName == SELECTED_FIELD_PROPERTY)
+            if (e.PropertyName == nameof(SearchCriterionViewModel.SelectedField))
             {
                 SetDefaultOperator();
             }
@@ -177,7 +174,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     if (!item.IsValueEnabled)
                     {
                         item.Value = string.Empty;
-                        break;
                     }
                 }
             }
@@ -197,7 +193,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     !item.AvailableOperators.Any(op => op == item.Operator))
                 {
                     item.Operator = item.AvailableOperators.First();
-                    break;
+                    item.Value = string.Empty;
                 }
             }
         }

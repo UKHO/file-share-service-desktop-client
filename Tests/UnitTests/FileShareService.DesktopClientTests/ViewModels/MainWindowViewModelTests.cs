@@ -19,6 +19,7 @@ namespace FileShareService.DesktopClientTests.ViewModels
         private IAuthProvider fakeAuthProvider = null!;
         private IUnityContainer fakeContainerRegistry = null!;
         private INavigation fakeNavigation = null!;
+        private ICurrentDateTimeProvider fakecurrentDateTimeProvider = null!;
 
         [SetUp]
         public void Setup()
@@ -29,7 +30,7 @@ namespace FileShareService.DesktopClientTests.ViewModels
             fakeContainerRegistry = A.Fake<IUnityContainer>();
             fakeNavigation = A.Fake<INavigation>();
             vm = new MainWindowViewModel(fakeEnvironmentsManager, fakeContainerRegistry, fakeAuthProvider,
-                fakeNavigation);
+                fakeNavigation, fakecurrentDateTimeProvider);
 
             environments = new List<EnvironmentConfig>();
 
