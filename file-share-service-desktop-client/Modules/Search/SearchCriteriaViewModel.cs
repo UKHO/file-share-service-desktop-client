@@ -36,7 +36,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             systemAttributes = new Attribute[]
             {
                 new("Filename", "filename", AttributeType.String),
-                new("File Size", "fileSize", AttributeType.Number),
+                new("File Size (in bytes)", "fileSize", AttributeType.Number),
                 new("MIME type", "mimetype", AttributeType.String),
                 new("Batch Published Date", "batchPublishedDate", AttributeType.Date),
                 new("Batch Expiry Date", "expiryDate", AttributeType.NullableDate),
