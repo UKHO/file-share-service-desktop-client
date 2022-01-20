@@ -13,6 +13,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private Operators? @operator;
         private string value = string.Empty;
         private bool isAndOrVisible;
+        private bool isValueEnabled = true;
 
         public SearchCriterionViewModel(ISearchCriteriaViewModel searchCriteriaViewModel)
         {
@@ -97,6 +98,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 if (isAndOrVisible != value)
                 {
                     isAndOrVisible = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public bool IsValueEnabled
+        {
+            get => isValueEnabled;
+            set
+            {
+                if (isValueEnabled != value)
+                {
+                    isValueEnabled = value;
                     RaisePropertyChanged();
                 }
             }
