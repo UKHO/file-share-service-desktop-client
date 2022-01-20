@@ -116,6 +116,66 @@ namespace FileShareService.DesktopClientTests.Modules.Search
                 () => searchViewModel.SearchResult = batchSearchResponse2);
             Assert.AreSame(batchSearchResponse2, searchViewModel.SearchResult);
             Assert.AreEqual("Showing 1-10 of 25", searchViewModel.SearchCountSummary);
-        }     
+        }
+
+        [Test]
+        public void TestExecuteSearchForOKResponseWithCancellation()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+
+            var expectedResult = new BatchSearchResponse
+            {
+                Count = 2,
+                Total = 2,
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1"), new BatchDetails("batch2")
+                },
+                Links = new Links(new Link("self"))
+            };
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { Data = expectedResult, StatusCode = 200, IsSuccess = true });
+
+            searchVM.SearchCommand.Execute();
+
+            Assert.AreEqual(expectedResult.Total, searchVM.SearchResult.Total);
+            Assert.AreEqual(expectedResult.Count, searchVM.SearchResult.Count);
+            Assert.AreEqual(expectedResult.Entries.Count, searchVM.SearchResult.Entries.Count);
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExecuteSearchForBadRequesteWithCancellation()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { StatusCode = 400, IsSuccess = false });
+
+            searchVM.SearchCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustHaveHappened();
+        }
+
+        [Test]
+        public void TestExecuteSearchForInternalServerErroreWithCancellation()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { StatusCode = 500, IsSuccess = false });
+
+            searchVM.SearchCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustHaveHappened();
+        }
+
+
     }
 }
