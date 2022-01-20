@@ -432,6 +432,123 @@ namespace FileShareService.DesktopClient.CoreTests
                     }
                 }));
         }
+
+        [Test]
+        public void TestSimpleTwoBatchAttributeEqualsValueJoinedWithOr()
+        {
+            Assert.AreEqual("$batch(Attr1) eq 'Value 1' or $batch(Attr2) eq 'Value 2'",
+                fssSearchStringBuilder.BuildSearch(new ISearchCriterion[]
+                {
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = simpleBatchAttribute1,
+                        Operator = Operators.Equals,
+                        Value = "Value 1",
+                        And = AndOr.And  //This will not be considered as this is 1st row
+                    },
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = simpleBatchAttribute2,
+                        Operator = Operators.Equals,
+                        Value = "Value 2",
+                        And = AndOr.Or
+                    }
+                }));
+        }
+
+        #region Function operator tests
+
+        [Test]
+        public void TestStringBatchSystemAttributeContainsValue()
+        {
+            Assert.AreEqual("contains(businessUnit, 'service')",
+                fssSearchStringBuilder.BuildSearch(new ISearchCriterion[]
+                {
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = stringBatchSystemAttribute1,
+                        Operator = Operators.Contains,
+                        Value = "service"
+                    }
+                }));
+        }
+
+        [Test]
+        public void TestStringBatchSystemAttributeStartsWithValue()
+        {
+            Assert.AreEqual("startswith(businessUnit, 'service')",
+                fssSearchStringBuilder.BuildSearch(new ISearchCriterion[]
+                {
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = stringBatchSystemAttribute1,
+                        Operator = Operators.StartsWith,
+                        Value = "service"
+                    }
+                }));
+        }
+
+        [Test]
+        public void TestStringBatchSystemAttributeEndsWithValue()
+        {
+            Assert.AreEqual("endswith(businessUnit, 'service')",
+                fssSearchStringBuilder.BuildSearch(new ISearchCriterion[]
+                {
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = stringBatchSystemAttribute1,
+                        Operator = Operators.EndsWith,
+                        Value = "service"
+                    }
+                }));
+        }
+
+        [Test]
+        public void TestBatchAttributeContainsValue()
+        {
+            Assert.AreEqual("contains($batch(Attr1), 'service')",
+                fssSearchStringBuilder.BuildSearch(new ISearchCriterion[]
+                {
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = simpleBatchAttribute1,
+                        Operator = Operators.Contains,
+                        Value = "service"
+                    }
+                }));
+        }
+
+        [Test]
+        public void TestBatchAttributeStartsWithValue()
+        {
+            Assert.AreEqual("startswith($batch(Attr1), 'service')",
+                fssSearchStringBuilder.BuildSearch(new ISearchCriterion[]
+                {
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = simpleBatchAttribute1,
+                        Operator = Operators.StartsWith,
+                        Value = "service"
+                    }
+                }));
+        }
+
+        [Test]
+        public void TestBatchAttributeEndsWithValue()
+        {
+            Assert.AreEqual("endswith($batch(Attr1), 'service')",
+                fssSearchStringBuilder.BuildSearch(new ISearchCriterion[]
+                {
+                    new TestSearchCriterion
+                    {
+                        SelectedFssAttribute = simpleBatchAttribute1,
+                        Operator = Operators.EndsWith,
+                        Value = "service"
+                    }
+                }));
+        }
+
+        #endregion
     }
 
     internal class TestSearchCriterion : ISearchCriterion
