@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -102,8 +103,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
                 if (!result.IsSuccess)
                 {
-                    logger.LogInformation("File Share Service search failed  with status: {StatusCode} and Error Description : {Description}", result.StatusCode, string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
-                    messageBoxService.ShowMessageBox("Error", $"File Share Service search failed  with status: {result.StatusCode} and Error Description : {string.Join(Environment.NewLine, result.Errors.Select(e => e.Description))}", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var errors = result.Errors ?? new List<Error>();
+                    if (result.StatusCode == (int)HttpStatusCode.BadRequest)
+                    {                      
+                        messageBoxService.ShowMessageBox("Error", $"File Share Service search failed  with status: {result.StatusCode} and Error Description : {string.Join(Environment.NewLine, errors.Select(e => e.Description))}", MessageBoxButton.OK, MessageBoxImage.Error);                        
+                    }
+                    else 
+                    { 
+                        messageBoxService.ShowMessageBox("Error", $"Something went wrong, Please try again later or contact administrator.", MessageBoxButton.OK, MessageBoxImage.Error);                        
+                    }
+                    logger.LogError("File Share Service search failed  with status: {StatusCode} and Error Description : {Description}", result.StatusCode, string.Join(Environment.NewLine, errors.Select(e => e.Description)));
                     return;
                 }
 
@@ -127,6 +136,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             {
                 SearchResult = null;
                 SearchResultAsJson = e.ToString();
+                logger.LogError("File Share Service search failed  with  Error Description : {Description}", e.Message);
             }
             finally
             {
