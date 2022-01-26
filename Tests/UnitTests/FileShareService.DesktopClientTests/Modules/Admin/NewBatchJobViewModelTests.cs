@@ -737,7 +737,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).MustHaveHappened();
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).MustHaveHappened();
-            vm.CloseExecutionCommand.Execute();
+            vm.CloseExecutionCommand!.Execute();
             Assert.IsFalse(vm.IsExecutingComplete);
         }
 
@@ -1023,7 +1023,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).MustHaveHappened();
             A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).MustHaveHappened();
-            vm.CloseExecutionCommand.Execute();
+            vm.CloseExecutionCommand!.Execute();
             Assert.IsFalse(vm.IsExecutingComplete);
         }
 

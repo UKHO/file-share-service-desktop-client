@@ -140,9 +140,9 @@ namespace FileShareService.DesktopClientTests.Modules.Search
 
             searchVM.SearchCommand.Execute();
 
-            Assert.AreEqual(expectedResult.Total, searchVM.SearchResult.Total);
-            Assert.AreEqual(expectedResult.Count, searchVM.SearchResult.Count);
-            Assert.AreEqual(expectedResult.Entries.Count, searchVM.SearchResult.Entries.Count);
+            Assert.AreEqual(expectedResult.Total, searchVM.SearchResult?.Total);
+            Assert.AreEqual(expectedResult.Count, searchVM.SearchResult?.Count);
+            Assert.AreEqual(expectedResult.Entries.Count, searchVM.SearchResult?.Entries.Count);
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustNotHaveHappened();
         }
 
