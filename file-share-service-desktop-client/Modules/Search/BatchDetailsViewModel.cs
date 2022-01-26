@@ -32,20 +32,15 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
         private async void OnDownloadExecutionCommand(string fileName)
         {
-            if (Files == null || BatchId == null)
-            {
-                return;
-            }
-
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = CancellationTokenSource.Token;
-            long fileSizeInBytes = (Files.Find(x => x.Filename == fileName)?.FileSize).GetValueOrDefault(0L);
+            long fileSizeInBytes = (Files!.Find(x => x.Filename == fileName)?.FileSize).GetValueOrDefault(0L);
 
             var downloadLocation = saveFileDialogService.SaveFileDialog(fileName);
             if (string.IsNullOrWhiteSpace(downloadLocation)) return;
             downloadLocation = Path.Combine(downloadLocation, fileName);
 
-            var result= await DownloadFile(BatchId, downloadLocation, fileName,fileSizeInBytes, cancellationToken);
+            var result= await DownloadFile(BatchId!, downloadLocation, fileName,fileSizeInBytes, cancellationToken);
            
             if(result!=null && result.IsSuccess)
             {
