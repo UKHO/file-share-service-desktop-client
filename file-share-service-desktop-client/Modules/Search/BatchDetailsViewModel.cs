@@ -34,7 +34,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         {
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = CancellationTokenSource.Token;
-            long fileSizeInBytes = (Files!.Find(x => x.Filename == fileName)?.FileSize).GetValueOrDefault(0L);
+            long fileSizeInBytes = (long)Files!.Find(x => x.Filename == fileName)!.FileSize!;
 
             var downloadLocation = saveFileDialogService.SaveFileDialog(fileName);
             if (string.IsNullOrWhiteSpace(downloadLocation)) return;
