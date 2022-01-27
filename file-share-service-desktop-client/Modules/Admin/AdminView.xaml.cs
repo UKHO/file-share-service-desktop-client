@@ -18,10 +18,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
         }
 
 
-        private void handleAlertFocus(Border border, string alertMessageTextBoxName)
+        private void handleAlertFocus(Border? border, string alertMessageTextBoxName)
         {
-            TextBox txtAlertMessage = border.FindName(alertMessageTextBoxName) as TextBox;
-            if (border.IsVisible && txtAlertMessage != null)
+            if ((border?.FindName(alertMessageTextBoxName)) is TextBox txtAlertMessage && border.IsVisible)
             {
                 txtAlertMessage.Dispatcher.BeginInvoke(
                 new Action(
@@ -36,32 +35,27 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
 
         private void pnlExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            Border border = sender as Border;
-            handleAlertFocus(border, "txtBatchCommitResponse");
+            handleAlertFocus(sender as Border, "txtBatchCommitResponse");
         }
 
         private void pnlBatchCommitInProgressResponse_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            Border border = sender as Border;
-            handleAlertFocus(border, "txtBatchCommitInProgressResponse");
+            handleAlertFocus(sender as Border, "txtBatchCommitInProgressResponse");
         }
 
         private void pnlAppendAclExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            Border border = sender as Border;
-            handleAlertFocus(border, "txtAppendAclResponse");
+            handleAlertFocus(sender as Border, "txtAppendAclResponse");
         }
 
         private void pnlsetExpiryAclExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            Border border = sender as Border;
-            handleAlertFocus(border, "txtSetExpiryDateResponse");
+            handleAlertFocus(sender as Border, "txtSetExpiryDateResponse");
         }
 
         private void pnlReplaceAclExecutionComplete_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
         {
-            Border border = sender as Border;
-            handleAlertFocus(border, "txtReplaceAclResponse");
+            handleAlertFocus(sender as Border, "txtReplaceAclResponse");
         }
     }
 }

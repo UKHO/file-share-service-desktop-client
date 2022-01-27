@@ -104,7 +104,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
-        public DelegateCommand CloseExecutionCommand { get; set; }
+        public DelegateCommand? CloseExecutionCommand { get; set; }
 
         public virtual void OnCloseExecutionCommand()
         {

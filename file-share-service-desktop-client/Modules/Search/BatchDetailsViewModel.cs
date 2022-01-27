@@ -34,13 +34,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         {
             CancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = CancellationTokenSource.Token;
-            long fileSizeInBytes = (long)Files.Find(x => x.Filename == fileName).FileSize;
+            long fileSizeInBytes = (long)Files!.Find(x => x.Filename == fileName)!.FileSize!;
 
             var downloadLocation = saveFileDialogService.SaveFileDialog(fileName);
-            if (String.IsNullOrWhiteSpace(downloadLocation)) return;
+            if (string.IsNullOrWhiteSpace(downloadLocation)) return;
             downloadLocation = Path.Combine(downloadLocation, fileName);
 
-            var result= await DownloadFile(BatchId, downloadLocation, fileName,fileSizeInBytes, cancellationToken);
+            var result= await DownloadFile(BatchId!, downloadLocation, fileName,fileSizeInBytes, cancellationToken);
            
             if(result!=null && result.IsSuccess)
             {
@@ -50,10 +50,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
         public DelegateCommand<string> DownloadExecutionCommand { get; set; }
 
-        public string BatchId { get; set; }
-        public List<BatchDetailsAttributes> Attributes { get; set; }
+        public string? BatchId { get; set; }
+        public List<BatchDetailsAttributes>? Attributes { get; set; }
         public DateTime? BatchPublishedDate { get; set; }
-        public List<BatchDetailsFiles> Files { get; set; }
+        public List<BatchDetailsFiles>? Files { get; set; }
 
      
         public async Task <IResult<DownloadFileResponse>> DownloadFile(string BatchId ,string fileDownloadPath, string fileName, long fileSizeInBytes,CancellationToken cancellationToken)

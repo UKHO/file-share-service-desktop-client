@@ -37,7 +37,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakesaveFileDialogService = A.Fake<ISaveFileDialogService>();
         }
         [Test]
-        public async Task TestDownloadFileWithFileExistsAndYesResponse()
+        public void TestDownloadFileWithFileExistsAndYesResponse()
         {
            
             var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService , fakesaveFileDialogService);
@@ -61,7 +61,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         } 
 
         [Test]
-        public async Task TestDownloadFileWithFileExistsAndNoResponse()
+        public void TestDownloadFileWithFileExistsAndNoResponse()
         {
             var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService, fakesaveFileDialogService);
 
@@ -81,7 +81,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         }
 
         [Test]
-        public async Task TestDownloadFileWithFileNotExists()
+        public void TestDownloadFileWithFileNotExists()
         {
             var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService, fakesaveFileDialogService);
 

@@ -33,7 +33,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private const int pageSize = 25;
         private const string NO_BATCH_FOUND = "No batches found.";
 
-        private List<BatchDetailsViewModel> batchDetailsVM;
+        private List<BatchDetailsViewModel>? batchDetailsVM;
         
         public SearchViewModel(IAuthProvider authProvider,
             IFssSearchStringBuilder fssSearchStringBuilder,
@@ -121,7 +121,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
 
                 foreach (var entries in SearchResult.Entries)
                 {
-                    BatchDetailsViewModel bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService,saveFileDialogService)
+                    var bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService,saveFileDialogService)
                     {
                         BatchId = entries.BatchId,
                         Attributes = entries.Attributes,
@@ -222,7 +222,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         }
         public DelegateCommand NextPageCommand { get; }
         public DelegateCommand PreviousPageCommand { get; }
-        public List<BatchDetailsViewModel> BatchDetailsVM 
+        public List<BatchDetailsViewModel>? BatchDetailsVM 
         { 
             get => batchDetailsVM;
             set

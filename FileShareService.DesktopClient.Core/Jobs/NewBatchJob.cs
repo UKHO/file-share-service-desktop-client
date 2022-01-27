@@ -172,7 +172,7 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     {
         public string SearchPath { get; set; } = string.Empty;
         public int ExpectedFileCount { get; set; }
-        public string MimeType { get; set; }
+        public string MimeType { get; set; } = string.Empty;
         public List<KeyValueAttribute> Attributes { get; set; } = new List<KeyValueAttribute>();
     }
 
