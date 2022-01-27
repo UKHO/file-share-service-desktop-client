@@ -351,17 +351,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             {
                 foreach (var file in Files)
                 {
-                    string? directory = Path.GetDirectoryName(file.RawSearchPath);
+                    string? directory = Path.GetDirectoryName(file.SearchPath);
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {
-                        job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.RawSearchPath}'");
+                        job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.SearchPath}'");
                         continue;
                     }
 
                     if (file.ExpectedFileCount <= 0)
                     {
-                        job.ErrorMessages.Add($"File expected count is missing or invalid in file path '{file.RawSearchPath}'");
+                        job.ErrorMessages.Add($"File expected count is missing or invalid in file path '{file.SearchPath}'");
                         continue;
                     }
 
@@ -389,7 +389,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (!file.CorrectNumberOfFilesFound)
                     {
-                        string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.RawSearchPath}'.";
+                        string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.SearchPath}'.";
 
                         var directories = GetDirectories(directory);
                         var files = GetFiles(directory);

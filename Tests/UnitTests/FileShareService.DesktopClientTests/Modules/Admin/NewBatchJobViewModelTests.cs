@@ -362,23 +362,23 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
         }
 
-        [TestCase("c:\\data\\abc\\f1.txt", "c:\\data\\abc\\f1.txt")]
-        [TestCase("c:\\data\\abc$(now.Year)_$(now.WeekNumber)\\f1.txt", "c:\\data\\abc2020_11\\f1.txt")]
-        [TestCase("c:\\data\\abc$(now.AddDays(30).Year)_$(now.AddDays(30).WeekNumber)\\f1.txt", "c:\\data\\abc2020_16\\f1.txt")]
-        [TestCase("c:\\data\\Week $(now.AddDays(-14).WeekNumber)\\f1.txt", "c:\\data\\Week 9\\f1.txt")]
-        [TestCase("c:\\data\\abc$(now.AddDays(360).Year)_$(now.AddDays(360).WeekNumber)\\f1.txt", "c:\\data\\abc2021_10\\f1.txt")]
-        [TestCase("\\\\business.ukho.gov.uk\\dfs\\$(now.Year).txt", "\\\\business.ukho.gov.uk\\dfs\\2021.txt")]
-        [TestCase("\\\\business.ukho.gov.uk\\$(now.Year)\\f1.txt", "\\\\business.ukho.gov.uk\\2021\\f1.txt")]
-        public void TestFileSearchWithMacroInDirectory(string directoryMacro, string expandedDirectoryName)
+        [TestCase("c:\\data\\abc\\f1*.txt", "c:\\data\\abc\\f1*.txt")]
+        [TestCase("c:\\data\\abc$(now.Year)_$(now.WeekNumber)\\f1*.txt", "c:\\data\\abc2020_11\\f1*.txt")]
+        [TestCase("c:\\data\\abc$(now.AddDays(30).Year)_$(now.AddDays(30).WeekNumber)\\f1*.txt", "c:\\data\\abc2020_16\\f1*.txt")]
+        [TestCase("c:\\data\\Week $(now.AddDays(-14).WeekNumber)\\f1*.txt", "c:\\data\\Week 9\\f1*.txt")]
+        [TestCase("c:\\data\\abc$(now.AddDays(360).Year)_$(now.AddDays(360).WeekNumber)\\f1*.txt", "c:\\data\\abc2021_10\\f1*.txt")]
+        [TestCase("c:\\data\\$(now.Year)*.txt", "c:\\data\\2020*.txt")]
+        [TestCase("c:\\$(now.Year)\\*.txt", "c:\\2020\\*.txt")]
+        public void TestFileSearchWithMacroInDirectory(string macroFilePath, string expandedFilePath)
         {
             var now = new DateTime(2020, 03, 18, 10, 30, 55, DateTimeKind.Utc);
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime).Returns(now);
 
-            var file1FullFileName = expandedDirectoryName;
-            var file2FullFileName = expandedDirectoryName;
-            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
-            fileSystem.AddFile(file2FullFileName, new MockFileData("File 2 contents"));
-            fileSystem.AddDirectory(Path.GetDirectoryName(expandedDirectoryName));
+            var filesA = (macroFilePath: macroFilePath.Replace("*.txt", "A*.txt"), expandedFilePath: expandedFilePath.Replace("*.txt", "AA.txt"));
+            var filesB = (macroFilePath: macroFilePath.Replace("*.txt", "B*.txt"), expandedFilePath: expandedFilePath.Replace("*.txt", "BB.txt"));
+            fileSystem.AddFile(filesA.expandedFilePath, new MockFileData("File AA contents"));
+            fileSystem.AddFile(filesB.expandedFilePath, new MockFileData("File BB contents"));
+            fileSystem.AddDirectory(Path.GetDirectoryName(expandedFilePath));
 
             var vm = new NewBatchJobViewModel(new NewBatchJob
             {
@@ -393,13 +393,13 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                             {
                                 ExpectedFileCount = 1,
                                 MimeType = "text/plain",
-                                SearchPath = directoryMacro
+                                SearchPath = filesA.macroFilePath
                             },
                             new NewBatchFiles
                             {
                                 ExpectedFileCount = 1,
                                 MimeType = "text/plain",
-                                SearchPath = directoryMacro
+                                SearchPath = filesB.macroFilePath
                             }
                         }
                 }
@@ -409,7 +409,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                 fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
 
             Assert.AreEqual(2, vm.Files.SelectMany(f => f.Files).Count());
-            CollectionAssert.AreEqual(new[] { file1FullFileName, file2FullFileName },
+            CollectionAssert.AreEqual(new[] { filesA.expandedFilePath, filesB.expandedFilePath },
                 vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
 
             vm.ExcecuteJobCommand.CanExecute();
