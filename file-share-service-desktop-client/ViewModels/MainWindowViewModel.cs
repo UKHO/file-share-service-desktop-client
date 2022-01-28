@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Prism.Commands;
@@ -13,12 +14,14 @@ namespace UKHO.FileShareService.DesktopClient.ViewModels
         private readonly IEnvironmentsManager environmentsManager;
         private readonly INavigation navigation;
         private IEnumerable<IPageButton> pageButtons = Enumerable.Empty<IPageButton>();
+        private readonly ICurrentDateTimeProvider currentDateTimeProvider;
 
         public MainWindowViewModel(IEnvironmentsManager environmentsManager, IUnityContainer containerRegistry,
-            IAuthProvider authProvider, INavigation navigation)
+            IAuthProvider authProvider, INavigation navigation, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             this.environmentsManager = environmentsManager;
             this.navigation = navigation;
+            this.currentDateTimeProvider = currentDateTimeProvider;
 
             environmentsManager.PropertyChanged += (sender, args) =>
             {
@@ -68,5 +71,7 @@ namespace UKHO.FileShareService.DesktopClient.ViewModels
 
         public string Version => Assembly.GetExecutingAssembly().GetCustomAttributes<AssemblyFileVersionAttribute>()
             .Single().Version;
+
+        public int Year => currentDateTimeProvider.CurrentDateTime.Year;
     }
 }

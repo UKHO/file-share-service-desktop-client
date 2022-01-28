@@ -1,5 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Prism.Commands;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Search
 {
@@ -11,7 +17,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
     {
         public BatchDetailsView()
         {
-            InitializeComponent();
+           InitializeComponent();
         }
+
     }
 }

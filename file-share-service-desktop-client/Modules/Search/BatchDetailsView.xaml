@@ -3,24 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:UKHO.FileShareService.DesktopClient.Modules.Search"
              xmlns:models="clr-namespace:UKHO.FileShareClient.Models;assembly=FileShareClient"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             MaxWidth="1240"
-             d:DataContext="{d:DesignInstance Type=models:BatchDetails, IsDesignTimeCreatable=False}">
+             MaxWidth="1240" >
     <UserControl.Resources>
         <ResourceDictionary>
             <Style TargetType="Label">
                 <Setter Property="FontSize" Value="16" />
             </Style>
-            <Style TargetType="TextBlock" x:Key="TextBlockStyle">
+            <Style TargetType="{x:Type TextBox}" x:Key="TextboxStyle">
                 <Setter Property="FontSize" Value="16" />
                 <Setter Property="Margin" Value="4 0" />
-                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                 <Setter Property="TextWrapping" Value="NoWrap" />
                 <Setter Property="FontWeight" Value="Bold" />
-                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="IsReadOnly" Value="True"/>
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -51,8 +52,11 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="models:BatchDetailsAttributes">
                         <StackPanel Orientation="Vertical">
-                            <Label Content="{Binding Key}" />
-                            <TextBlock Text="{Binding Value}" Style="{StaticResource TextBlockStyle}" />
+                            <Label Content="{Binding Key}" Name="lbl_BatchDetails" />
+                            <TextBox Text="{Binding Value}" Style="{StaticResource TextboxStyle}"
+                                     AutomationProperties.LabeledBy="{Binding ElementName=lbl_BatchDetails}" Name="Value_batchId" 
+                                     FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Mode=Self}}"
+                                     />
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -69,12 +73,14 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" Content="Batch ID:" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding BatchId}" Width="130"
-                           Style="{StaticResource TextBlockStyle}" />
-                <Label Grid.Row="0" Grid.Column="1" Content="Published:" />
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding BatchPublishedDate}" Width="190"
-                           Style="{StaticResource TextBlockStyle}" />
+                <Label Grid.Row="0" Grid.Column="0" Content="Batch ID:"  Name="lbl_BatchId" />
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding BatchId}" Width="130" 
+                         AutomationProperties.LabeledBy="{Binding ElementName=lbl_BatchId}"
+                           Style="{StaticResource TextboxStyle}" />
+                <Label Grid.Row="0" Grid.Column="1" Content="Published:" Name="lbl_Published"  />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding BatchPublishedDate}" Width="190"
+                           Style="{StaticResource TextboxStyle}"
+                            AutomationProperties.LabeledBy="{Binding ElementName=lbl_Published}"/>
             </Grid>
 
             <Expander Grid.Row="1"
@@ -95,9 +101,18 @@
                         </Style>
                     </DataGrid.ColumnHeaderStyle>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" />
-                        <DataGridTextColumn Header="MIME Type" Binding="{Binding MimeType}" />
-                        <DataGridTextColumn Header="File Size" Binding="{Binding FileSize}" />
+                        <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" Width="300"/>
+                        <DataGridTextColumn Header="MIME Type" Binding="{Binding MimeType}"  Width="300"/>
+                        <DataGridTextColumn Header="File Size" Binding="{Binding FileSize}" Width="300"/>
+                        <DataGridTemplateColumn Header="Download" Width="300">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button x:Name="btnDwnld"  HorizontalAlignment="Left" Height="35px" FontSize="14" Command="{Binding Path=DataContext.DownloadExecutionCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" CommandParameter="{Binding Filename}" Width="50" ToolTip="Download">
+                                        <Path Data="m 3.5 0 4 0 0 8 3 0 -5 5 -5 -5 3 0 z" Fill="White" Stroke="White" StrokeThickness="1" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </Expander>

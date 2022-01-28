@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Windows;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using UKHO.FileShareAdminClient;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -18,6 +22,12 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         private IFileShareApiAdminClientFactory fakeFileShareApiAdminClientFactory = null!;
         private IEnvironmentsManager fakeEnvironmentsManager = null!;
         private IFssUserAttributeListProvider fakeFssUserAttributeListProvider = null!;
+        private IMessageBoxService fakeMessageBoxService = null!;
+        private IFileService fakeFileService = null!;
+        private ISaveFileDialogService fakesaveFileDialogService = null!;
+        private ILogger<SearchViewModel> fakeLoggerSearchVM = null!;
+        private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
+
 
         [SetUp]
         public void Setup()
@@ -27,9 +37,14 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakeFileShareApiAdminClientFactory = A.Fake<IFileShareApiAdminClientFactory>();
             fakeEnvironmentsManager = A.Fake<IEnvironmentsManager>();
             fakeFssUserAttributeListProvider = A.Fake<IFssUserAttributeListProvider>();
+            fakeMessageBoxService = A.Fake<IMessageBoxService>();
+            fakeFileService = A.Fake<IFileService>();
+            fakesaveFileDialogService = A.Fake<ISaveFileDialogService>();
+            fakeLoggerSearchVM = A.Fake<ILogger<SearchViewModel>>();
+            fakeFileShareApiAdminClient = A.Fake<IFileShareApiAdminClient>();
             searchViewModel =
                 new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
-                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager);
+                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService,fakesaveFileDialogService,fakeLoggerSearchVM);
         }
 
         [Test]
@@ -84,5 +99,83 @@ namespace FileShareService.DesktopClientTests.Modules.Search
                 firstSearchCriterionViewModel.Value = "Bob";
             });
         }
+
+        [Test]
+        public void TestSearchCountSummary()
+        {
+            //If Search count is 0
+            var batchSearchResponse1 = new BatchSearchResponse(total: 0);
+            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
+                () => searchViewModel.SearchResult = batchSearchResponse1);
+            Assert.AreSame(batchSearchResponse1, searchViewModel.SearchResult);
+            Assert.AreSame("No batches found.", searchViewModel.SearchCountSummary);
+
+            //If Search count is greater than 0
+            var batchSearchResponse2 = new BatchSearchResponse(10, 25);
+            searchViewModel.AssertPropertyChanged(nameof(searchViewModel.SearchResult),
+                () => searchViewModel.SearchResult = batchSearchResponse2);
+            Assert.AreSame(batchSearchResponse2, searchViewModel.SearchResult);
+            Assert.AreEqual("Showing 1-10 of 25", searchViewModel.SearchCountSummary);
+        }
+
+        [Test]
+        public void TestExecuteSearchForOKResponseWithCancellation()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+
+            var expectedResult = new BatchSearchResponse
+            {
+                Count = 2,
+                Total = 2,
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1"), new BatchDetails("batch2")
+                },
+                Links = new Links(new Link("self"))
+            };
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { Data = expectedResult, StatusCode = 200, IsSuccess = true });
+
+            searchVM.SearchCommand.Execute();
+
+            Assert.AreEqual(expectedResult.Total, searchVM.SearchResult?.Total);
+            Assert.AreEqual(expectedResult.Count, searchVM.SearchResult?.Count);
+            Assert.AreEqual(expectedResult.Entries.Count, searchVM.SearchResult?.Entries.Count);
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExecuteSearchForBadRequesteWithCancellation()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { StatusCode = 400, IsSuccess = false });
+
+            searchVM.SearchCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustHaveHappened();
+        }
+
+        [Test]
+        public void TestExecuteSearchForInternalServerErroreWithCancellation()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { StatusCode = 500, IsSuccess = false });
+
+            searchVM.SearchCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustHaveHappened();
+        }
+
+
     }
 }

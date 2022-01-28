@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
 using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareAdminClient.Models.Response;
+using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Core.Jobs;
 using UKHO.FileShareService.DesktopClient.Helper;
@@ -218,8 +219,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var vm = new SetExpiryDateJobViewModel(setBatchExpiryJob, fakeLogger, () => fakeFileShareApiAdminClient, dateTimeValidator);
 
             Assert.AreEqual("Test - Set expiry date", vm.DisplayName);
-            Assert.IsTrue((string.IsNullOrEmpty(validExpiryDate) && string.IsNullOrEmpty(vm.ExpiryDate)) ||
-                (!string.IsNullOrEmpty(vm.ExpiryDate)));
+            Assert.IsTrue((string.IsNullOrEmpty(validExpiryDate) && string.IsNullOrEmpty(Convert.ToString(vm.ExpiryDate))) ||
+                (!string.IsNullOrEmpty(Convert.ToString(vm.ExpiryDate))));
             Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute(), $"Expected no validation error message for format {validExpiryDate}, but validation error message is generated.");
             Assert.AreEqual(0, vm.ValidationErrors.Count, $"Expected no error message for format {validExpiryDate}, but validation error message is generated.");
         }
