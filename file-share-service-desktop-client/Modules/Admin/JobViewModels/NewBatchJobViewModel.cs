@@ -437,7 +437,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (!IsDirectoryExist(directory))
                     {
-                        string directoryNotFoundMessage = $"Directory '{directory}' (from raw: '{file.RawSearchPath}') does not exist or you do not have permission to access the directory selected.";
+                        string directoryNotFoundMessage = $"Directory '{directory}' (from raw: '{file.RawSearchPath}') does not exist or you do not have permission to access the directory.";
                         string accessibleDirectory = GetAccessibleDirectoryName(Convert.ToString(fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent));
 
                         if (!string.IsNullOrWhiteSpace(accessibleDirectory))
@@ -447,8 +447,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                             var directories = GetDirectories(accessibleDirectory);
 
                             string existingDirectoryNames = directories.Any() ?
-                                string.Concat($" and available directories are :\n\t\t", string.Join("\n\t\t", directories.Select(dir => dir.Name))) :
-                                $"\n\tNo directory exists in the path '{accessibleDirectory}'";
+                                string.Concat($" and available subdirectories are :\n\t\t", string.Join("\n\t\t", directories.Select(dir => dir.Name))) :
+                                $"\n\tNo subdirectories exist in directory '{accessibleDirectory}'";
 
                             directoryNotFoundMessage = string.Concat(directoryNotFoundMessage, existingDirectoryNames);
                         }
@@ -459,18 +459,18 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (!file.CorrectNumberOfFilesFound)
                     {
-                        string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.SearchPath}'.";
+                        string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.SearchPath}' (from raw: '{file.RawSearchPath}').";
 
                         var directories = GetDirectories(directory);
                         var files = GetFiles(directory);
 
                         string existingDirectoryNames = directories.Any() ?
-                            $"\n\tThe available directories in '{directory}' are:\n\t\t" + string.Join("\n\t\t", directories.Select(dir => dir.Name)) :
-                            $"\n\tNo directory exists in the path '{directory}'";
+                            $"\n\tThe subdirectories in directory '{directory}' are:\n\t\t" + string.Join("\n\t\t", directories.Select(dir => dir.Name)) :
+                            $"\n\tNo subdirectories exist in directory '{directory}'";
 
                         string existingFileNames = files.Any() ?
-                            $"\n\tThe existing file(s) in directory '{directory}' are:\n\t\t" + string.Join("\n\t\t", files.Select(f => f.Name)) :
-                            $"\n\tNo file exists in the path '{directory}'";
+                            $"\n\tThe files in directory '{directory}' are:\n\t\t" + string.Join("\n\t\t", files.Select(f => f.Name)) :
+                            $"\n\tNo files exist in directory '{directory}'";
 
                         fileCountMismatchErrorMessage = string.Concat(fileCountMismatchErrorMessage, existingDirectoryNames, existingFileNames);
 

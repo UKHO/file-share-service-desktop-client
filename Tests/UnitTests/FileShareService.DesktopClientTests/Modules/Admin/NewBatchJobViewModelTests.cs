@@ -692,8 +692,8 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(vm.ExcecuteJobCommand.CanExecute());
 
             //Assert no file name amd folder name are exist in error message.
-            Assert.IsTrue(vm.ValidationErrors[0].Contains(@"No directory exists in the path 'c:\data\files'"));
-            Assert.IsTrue(vm.ValidationErrors[0].Contains(@"No file exists in the path 'c:\data\files'"));
+            Assert.IsTrue(vm.ValidationErrors[0].Contains(@"No subdirectories exist in directory 'c:\data\files'"));
+            Assert.IsTrue(vm.ValidationErrors[0].Contains(@"No files exist in directory 'c:\data\files'"));
         }
 
         [Test]
