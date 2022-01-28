@@ -425,19 +425,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
                     if (string.IsNullOrWhiteSpace(directory))
                     {
-                        job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.SearchPath}'");
+                        job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.SearchPath}' (from raw: '{file.RawSearchPath}')");
                         continue;
                     }
 
                     if (file.ExpectedFileCount <= 0)
                     {
-                        job.ErrorMessages.Add($"File expected count is missing or invalid in file path '{file.SearchPath}'");
+                        job.ErrorMessages.Add($"File expected count is missing or invalid in file path '{file.RawSearchPath}'");
                         continue;
                     }
 
                     if (!IsDirectoryExist(directory))
                     {
-                        string directoryNotFoundMessage = $"Directory '{directory}' does not exist or you do not have permission to access the directory selected.";
+                        string directoryNotFoundMessage = $"Directory '{directory}' (from raw: '{file.RawSearchPath}') does not exist or you do not have permission to access the directory selected.";
                         string accessibleDirectory = GetAccessibleDirectoryName(Convert.ToString(fileSystem.DirectoryInfo.FromDirectoryName(directory).Parent));
 
                         if (!string.IsNullOrWhiteSpace(accessibleDirectory))
