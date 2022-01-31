@@ -36,7 +36,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             systemAttributes = new Attribute[]
             {
                 new("Filename", "filename", AttributeType.String),
-                new("File Size", "fileSize", AttributeType.Number),
+                new("File Size (in bytes)", "fileSize", AttributeType.Number),
                 new("MIME type", "mimetype", AttributeType.String),
                 new("Batch Published Date", "batchPublishedDate", AttributeType.Date),
                 new("Batch Expiry Date", "expiryDate", AttributeType.NullableDate),
@@ -87,21 +87,34 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private void OnChildCriterionPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             RaisePropertyChanged(nameof(SearchCriteria));
+
+            if (e.PropertyName == nameof(SearchCriterionViewModel.Operator))
+            {
+                SetEnablePropertyForValueControl();
+            }
+
+            if (e.PropertyName == nameof(SearchCriterionViewModel.SelectedField))
+            {
+                SetDefaultOperator();
+            }
         }
 
         private void OnAddRow(SearchCriterionViewModel obj)
         {
             SearchCriteria.Insert(SearchCriteria.IndexOf(obj), new SearchCriterionViewModel(this));
+            SetVisiblePropertyForAndControl();
         }
 
         private void OnDeleteRow(SearchCriterionViewModel searchCriterionViewModelToRemove)
         {
             SearchCriteria.Remove(searchCriterionViewModelToRemove);
+            SetVisiblePropertyForAndControl();
         }
 
         private void OnAddNewSearchCriterion()
         {
             SearchCriteria.Add(new SearchCriterionViewModel(this));
+            SetVisiblePropertyForAndControl();
         }
 
         public ObservableCollection<SearchCriterionViewModel> SearchCriteria { get; } = new();
@@ -127,6 +140,62 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         public string GetSearchString()
         {
             return fssSearchStringBuilder.BuildSearch(SearchCriteria);
+        }
+
+        /// <summary>
+        /// Set visible property for AndOr control based on index.
+        /// If index is 0, this control should not be visible.
+        /// </summary>
+        private void SetVisiblePropertyForAndControl()
+        {
+            if (SearchCriteria != null)
+            {
+                foreach (var (item, index) in SearchCriteria.Select((v, i) => (v, i)))
+                {
+                    item.IsAndOrVisible = index != 0;
+                }
+            }
+            RaisePropertyChanged(nameof(SearchCriteria));
+        }
+
+        /// <summary>
+        /// Set enable property of value control, based on operators.
+        /// </summary>
+        private void SetEnablePropertyForValueControl()
+        {
+            if (SearchCriteria != null)
+            {
+                foreach (var item in SearchCriteria)
+                {
+                    item.IsValueEnabled = item.Operator == null ||
+                                            (item.Operator != Operators.Exists &&
+                                            item.Operator != Operators.NotExists);
+
+                    if (!item.IsValueEnabled)
+                    {
+                        item.Value = string.Empty;
+                    }
+                }
+            }
+            RaisePropertyChanged(nameof(SearchCriteria));
+        }
+
+        /// <summary>
+        /// Set first available operator as default, when existing selected field is changed 
+        /// and existing selected operator is not applicable for changed attribute type.
+        /// </summary>
+        private void SetDefaultOperator()
+        {
+            foreach (var item in SearchCriteria)
+            {
+                if (item.SelectedField != null &&
+                    item.Operator != null &&
+                    !item.AvailableOperators.Any(op => op == item.Operator))
+                {
+                    item.Operator = item.AvailableOperators.First();
+                    item.Value = string.Empty;
+                }
+            }
         }
     }
 }

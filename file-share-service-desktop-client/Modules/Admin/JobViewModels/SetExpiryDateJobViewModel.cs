@@ -37,7 +37,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
 
         private DateTime? expiryDate = null;
 
-        public string? ExpiryDate
+        public DateTime? ExpiryDate
         {
             get
             {
@@ -47,7 +47,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                 }
 
                 return expiryDate.HasValue ?
-                    ConvertToRFC3339Format(expiryDate.Value.ToUniversalTime()) : null;
+                    expiryDate.Value.ToUniversalTime() : null;
             }
         }
 
