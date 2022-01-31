@@ -481,9 +481,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             CollectionAssert.AreEqual(new[] { filesA.expandedFilePath, filesB.expandedFilePath },
                 vm.Files.SelectMany(f => f.Files.Select(fi => fi.FullName)));
 
-            vm.ExcecuteJobCommand.CanExecute();
-
-            Assert.IsEmpty(vm.ValidationErrors);
+            Assert.IsTrue(vm.ExcecuteJobCommand.CanExecute());
         }
 
 
