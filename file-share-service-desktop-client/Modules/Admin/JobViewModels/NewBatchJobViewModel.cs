@@ -197,7 +197,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                                         $"File Share Service add file to batch failed for batch ID:{batchHandle.BatchId} with status: {res.StatusCode}.");
 
                                     logger.LogError("File Share Service add file to batch failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                                        DisplayName, batchHandle?.BatchId, ExecutionResult);
+                                        DisplayName, batchHandle.BatchId, ExecutionResult);
 
                                     isAddFileToBatchError = true;
                                     CancellationTokenSource.Cancel();
@@ -231,10 +231,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                             {
                                 await RollBackBatch(batchHandle, fileShareClient);
                                 ExecutionResult = GetErrors(result,
-                                $"File Share Service batch commit failed for batch ID:{batchHandle?.BatchId} with status: {result.StatusCode}.");
+                                $"File Share Service batch commit failed for batch ID:{batchHandle.BatchId} with status: {result.StatusCode}.");
 
                                 logger.LogError("File Share Service batch commit failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                                    DisplayName, batchHandle?.BatchId, ExecutionResult);
+                                    DisplayName, batchHandle.BatchId, ExecutionResult);
                             }
 
                             cancellationToken.ThrowIfCancellationRequested();
@@ -365,17 +365,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var setBatchExpiryResult = await fileShareClient.SetExpiryDateAsync(batchHandle.BatchId, new BatchExpiryModel { ExpiryDate = ExpiryDate }, CancellationToken.None);
             if (setBatchExpiryResult.IsSuccess)
             {
-                ExecutionResult = $"File Share Service set expiry date completed for batch ID: {batchHandle?.BatchId}";
+                ExecutionResult = $"File Share Service set expiry date completed for batch ID: {batchHandle.BatchId}";
             }
             else
             {
                 ExecutionResult = GetErrors(setBatchExpiryResult,
-                    $"File Share Service set expiry date failed for batch ID:{ batchHandle?.BatchId} with status: {setBatchExpiryResult.StatusCode}.");
+                    $"File Share Service set expiry date failed for batch ID:{ batchHandle.BatchId} with status: {setBatchExpiryResult.StatusCode}.");
 
                 logger.LogError("File Share Service set expiry date failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
-                    DisplayName, batchHandle?.BatchId, ExecutionResult);
+                    DisplayName, batchHandle.BatchId, ExecutionResult);
             }
-            logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle?.BatchId);
+            logger.LogInformation("File Share Service SetExpiryDateAsync completed for batch ID:{BatchId}.", batchHandle.BatchId);
         }
 
         public async Task<bool> CheckBatchIsCommitted(IFileShareApiAdminClient fileShareClient, IBatchHandle batchHandle, double waitTimeInMinutes)
