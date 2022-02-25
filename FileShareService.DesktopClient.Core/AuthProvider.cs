@@ -87,7 +87,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
                .WithDefaultRedirectUri()
                .Build();
 
-            var cancellationSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+            using var cancellationSource = new CancellationTokenSource(TimeSpan.FromMinutes(2));
             TokenCacheHelper.EnableSerialization(publicClientApplication.UserTokenCache);         
             var accounts = (await publicClientApplication.GetAccountsAsync()).ToList();
             var tempToken = CurrentAccessToken;
