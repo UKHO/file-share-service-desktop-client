@@ -23,10 +23,42 @@ variables:
     value: "1.0."
   - name: UKHOAssemblyProduct
     value: "File Share Desktop Client"
+  - name: coverityPool
+    value: NautilusBuild
+  - group: Covscan-vars
 
 stages:
+  - stage: CoverityScan
+    displayName: "Coverity Scan"
+    pool:
+      name: $(coverityPool)
+    jobs:
+    - job: Coverity
+      workspace:
+        clean: all
+      steps:
+        - checkout: self
+          submodules: recursive
+        - task: UseDotNet@2
+          displayName: 'Use .NET Core sdk'
+          inputs:
+            packageType: sdk
+            version: 3.1.x
+            installationPath: $(Agent.ToolsDirectory)/dotnet
+        - checkout: covscan
+        - template: dotnet-cov.yml@covScan
+          parameters:
+            CovHostUrl: "$(CovHostUrl)"
+            CovUser: "$(CovUser)"
+            CovPwd: "$(CovPwd)"
+            StreamName: "file-share-service-desktop-client"
+            BuildCommand: "$(Build.Repository.LocalPath)/file-share-service-desktop-client/FileShareService.DesktopClient.csproj"
+            StripPath: $(Build.Repository.LocalPath)/file-share-service-desktop-client
+            CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
+
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
+    dependsOn: []
     jobs:
       - job:
         workspace:
