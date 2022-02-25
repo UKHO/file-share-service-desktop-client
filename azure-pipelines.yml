@@ -27,6 +27,14 @@ variables:
     value: NautilusBuild
   - group: Covscan-vars
 
+resources:
+  repositories:
+    - repository: covscan
+      type: github
+      name: UKHO/coverityscan-buildtemplates
+      endpoint: UKHO
+      ref: refs/heads/master
+
 stages:
   - stage: CoverityScan
     displayName: "Coverity Scan"
