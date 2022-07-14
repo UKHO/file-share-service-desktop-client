@@ -51,11 +51,11 @@ namespace FileShareService.DesktopClient.CoreTests
             Assert.AreEqual("D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.iso",
                 newBatchJob.ActionParams.Files[0].SearchPath);
             Assert.AreEqual("application/x-raw-disk-image", newBatchJob.ActionParams.Files[0].MimeType);
-            Assert.AreEqual(2, newBatchJob.ActionParams.Files[0].ExpectedFileCount);
+            Assert.AreEqual("2", newBatchJob.ActionParams.Files[0].ExpectedFileCount);
             Assert.AreEqual("D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.SHA1",
                 newBatchJob.ActionParams.Files[1].SearchPath);
             Assert.AreEqual("text/plain", newBatchJob.ActionParams.Files[1].MimeType);
-            Assert.AreEqual(2, newBatchJob.ActionParams.Files[1].ExpectedFileCount);
+            Assert.AreEqual("2", newBatchJob.ActionParams.Files[1].ExpectedFileCount);
 
             Assert.AreEqual("Sample 2, change ACL later to make the batch public", appendAclJob.DisplayName);
             Assert.AreEqual("64c954fe-cb20-46e1-b990-51dfb9711fdc", appendAclJob.ActionParams.BatchId);
@@ -124,7 +124,7 @@ namespace FileShareService.DesktopClient.CoreTests
 
             var files = newBatchJob!.ActionParams.Files;
 
-            Assert.AreEqual(3, files.Count);
+            Assert.AreEqual(2, files.Count);
 
             var asteriskFileCount = files[0];
             Assert.AreEqual("*", asteriskFileCount.ExpectedFileCount, "Asterisk file count is expected");

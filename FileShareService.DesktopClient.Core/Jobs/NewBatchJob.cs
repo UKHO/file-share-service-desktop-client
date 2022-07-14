@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UKHO.FileShareService.DesktopClient.Core.Models;
 
 namespace UKHO.FileShareService.DesktopClient.Core.Jobs
@@ -150,6 +151,15 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                 ErrorMessages.Add("File is not specified for upload.");
             }
 
+            var invalidFileCounts = ActionParams?.Files?
+                .Where(file => file.ExpectedFileCount != "*")
+                .Where(file => !(int.TryParse(file.ExpectedFileCount, out var fileCount) && 0 < fileCount));
+
+            foreach (var invalidFile in invalidFileCounts ?? Enumerable.Empty<NewBatchFiles>())
+            {
+                ErrorMessages.Add($"Expected file count value '{invalidFile.ExpectedFileCount}' is invalid for file path '{invalidFile.SearchPath}'. '*' or positive integer value allowed");
+            }
+
             #endregion
 
         }
@@ -171,7 +181,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
     public class NewBatchFiles
     {
         public string SearchPath { get; set; } = string.Empty;
-        public int ExpectedFileCount { get; set; }
+        //ExpectedFileCount can be "*" or an integer number
+        public string ExpectedFileCount { get; set; } = string.Empty;
         public string MimeType { get; set; } = string.Empty;
         public List<KeyValueAttribute> Attributes { get; set; } = new List<KeyValueAttribute>();
     }

@@ -428,13 +428,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.SearchPath}' (from raw: '{file.RawSearchPath}')");
                         continue;
                     }
-
-                    if (file.ExpectedFileCount <= 0)
-                    {
-                        job.ErrorMessages.Add($"File expected count is missing or invalid in file path '{file.RawSearchPath}'");
-                        continue;
-                    }
-
+                    
                     if (!IsDirectoryExist(directory))
                     {
                         string directoryNotFoundMessage = $"Directory '{directory}' (from raw: '{file.RawSearchPath}') does not exist or you do not have permission to access the directory.";
@@ -590,17 +584,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string RawSearchPath => newBatchFile.SearchPath;
         public string SearchPath { get; }
         public IEnumerable<IFileSystemInfo> Files { get; }
-        public int ExpectedFileCount => newBatchFile.ExpectedFileCount;
+        public string ExpectedFileCount => newBatchFile.ExpectedFileCount;
         public string MimeType => newBatchFile.MimeType;
 
-        public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
+        public bool CorrectNumberOfFilesFound => ExpectedFileCount == "*" || ExpectedFileCount == Files.Count().ToString();
         public List<KeyValueAttribute>? Attributes { get; }
 
         private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
         {
             try
             {
-                return directory.EnumerateFileSystemInfos(filePathName);
+                return directory.EnumerateFileSystemInfos(filePathName).ToList();
 
             }
             catch (Exception)

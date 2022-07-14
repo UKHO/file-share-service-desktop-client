@@ -22,12 +22,12 @@
         "files": [
           {
             "searchPath": "D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.iso",
-            "expectedFileCount": 2,
+            "expectedFileCount": "2",
             "mimeType": "application/x-raw-disk-image"
           },
           {
             "searchPath": "D:\\Data\\AVCS_DVDs\\Week 2021_19\\AVCS_S631-1_REISSUE_DVD*.SHA1",
-            "expectedFileCount": 2,
+            "expectedFileCount": "2",
             "mimeType": "text/plain"
           }
         ]

@@ -42,7 +42,7 @@
         "files": [
           {
             "searchPath": "D:\\SampleFilesTooling\\test1.txt",
-            "expectedFileCount": 1,
+            "expectedFileCount": "1",
             "mimeType": "application/x-raw-disk-image",
             "attributes": [
               {
@@ -61,7 +61,7 @@
           },
           {
             "searchPath": "D:\\SampleFilesTooling\\test2.txt",
-            "expectedFileCount": 1,
+            "expectedFileCount": "1",
             "mimeType": "text/plain",
             "attributes": null
           }
