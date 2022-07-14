@@ -12,9 +12,11 @@
     <None Remove="sampleActionsWithDuplicateJobs.json" />
     <None Remove="sampleActionsWithFileAttributes.json" />
     <None Remove="sampleActionsWithInvalidFormat.json" />
+    <None Remove="sampleActionsWithUnspecifiedFileCount.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="sampleActionsWithUnspecifiedFileCount.json" />
     <EmbeddedResource Include="sampleActionsWithFileAttributes.json" />
     <EmbeddedResource Include="sampleActions.json" />
     <EmbeddedResource Include="sampleActionsWithInvalidFormat.json" />

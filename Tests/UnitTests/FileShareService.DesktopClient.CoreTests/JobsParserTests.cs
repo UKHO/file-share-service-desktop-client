@@ -25,11 +25,8 @@ namespace FileShareService.DesktopClient.CoreTests
         [Test]
         public void TestSampleActions()
         {
-            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActions.json")!;
-            using var sr = new StreamReader(s);
-            var result = new JobsParser().Parse(sr.ReadToEnd());
-            Assert.AreEqual(3, result.jobs.Count());
-
+            var (_, result) = ParseEmbeddedResource("sampleActions.json");
+                      
             var newBatchJob = result.jobs.OfType<NewBatchJob>().Single();
             var appendAclJob = result.jobs.OfType<AppendAclJob>().Single();
             var setExpiryDateJob = result.jobs.OfType<SetExpiryDateJob>().Single();
@@ -85,39 +82,66 @@ namespace FileShareService.DesktopClient.CoreTests
         [Test]
         public void TestErrorDeserializingJobsWhenParseInvalidFormatFile()
         {
-            var jobParser = new JobsParser();
-            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithInvalidFormat.json")!;
-            using var sr = new StreamReader(s);
-            var result = jobParser.Parse(sr.ReadToEnd());
+            var (jobParser, parseResult) = ParseEmbeddedResource("sampleActionsWithInvalidFormat.json");
 
-            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.Single());
-            Assert.IsInstanceOf<JsonReaderException>(result.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(parseResult.jobs.Single());
+            Assert.IsInstanceOf<JsonReaderException>(parseResult.jobs.Cast<ErrorDeserializingJobsJob>().Single().Exception);
             Assert.AreEqual(1, jobParser.ErrorJobs?.Count);
         }
 
         [Test]
         public void TestErrorDeserializingJobsWhenParseInvalidActions()
         {
-            var jobParser = new JobsParser();
-            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithDuplicateJobs.json")!;
-            using var sr = new StreamReader(s);
-            var result = jobParser.Parse(sr.ReadToEnd());
+            var (jobParser, parseResult) = ParseEmbeddedResource("sampleActionsWithDuplicateJobs.json");
 
-            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(result.jobs.First());
+            Assert.IsInstanceOf<ErrorDeserializingJobsJob>(parseResult.jobs.First());
             Assert.AreEqual(1, jobParser.ErrorJobs?.Count);
         }
 
         [Test]
         public void TestErrorBlankFileAttributesWhenParseFileAttributes()
         {
-            var s = GetType().Assembly.GetManifestResourceStream(GetType(), "sampleActionsWithFileAttributes.json")!;
-            using var sr = new StreamReader(s);
-            var result = new JobsParser().Parse(sr.ReadToEnd());
+            var (_, parseResult) = ParseEmbeddedResource("sampleActionsWithFileAttributes.json");
 
-            Assert.IsInstanceOf<NewBatchJob>(result.jobs.First());
-            StringAssert.StartsWith("File attribute key cannot be blank", result.jobs.First().ErrorMessages.First());
-            StringAssert.StartsWith("File attribute value cannot be blank", result.jobs.First().ErrorMessages.ElementAt(1));
-            StringAssert.StartsWith("Invalid file attribute", result.jobs.First().ErrorMessages.Last());
+            Assert.IsInstanceOf<NewBatchJob>(parseResult.jobs.First());
+            StringAssert.StartsWith("File attribute key cannot be blank", parseResult.jobs.First().ErrorMessages.First());
+            StringAssert.StartsWith("File attribute value cannot be blank", parseResult.jobs.First().ErrorMessages.ElementAt(1));
+            StringAssert.StartsWith("Invalid file attribute", parseResult.jobs.First().ErrorMessages.Last());
+        }
+
+        [Test]
+        public void TestUnspecifiedFileCount()
+        {
+            var (jobParser, parseResult) = ParseEmbeddedResource("sampleActionsWithUnspecifiedFileCount.json");
+
+            Assert.AreEqual(0, jobParser.ErrorJobs!.Count, "Parse errors are not expected");
+
+            var jobs = parseResult.jobs!.ToArray();
+            Assert.AreEqual(1, jobs.Length, "One job is expected");
+
+            var newBatchJob = jobs[0] as NewBatchJob;
+            Assert.IsNotNull(newBatchJob, "newBatch job type is expected");
+
+            var files = newBatchJob!.ActionParams.Files;
+
+            Assert.AreEqual(3, files.Count);
+
+            var asteriskFileCount = files[0];
+            Assert.AreEqual("*", asteriskFileCount.ExpectedFileCount, "Asterisk file count is expected");
+
+            var specifiedFileCount = files[1];
+            Assert.AreEqual("2", specifiedFileCount.ExpectedFileCount, "File count 2 is expected");
+
+        }
+
+        private (JobsParser, Jobs) ParseEmbeddedResource(string embeddedFile)
+        {
+            var jobParser = new JobsParser();
+            var s = GetType().Assembly.GetManifestResourceStream(GetType(), embeddedFile)!;
+            using var sr = new StreamReader(s);
+            var result = jobParser.Parse(sr.ReadToEnd());
+
+            return (jobParser, result);
         }
     }
 }
