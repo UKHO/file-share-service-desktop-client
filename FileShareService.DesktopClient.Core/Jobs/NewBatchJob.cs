@@ -151,15 +151,6 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
                 ErrorMessages.Add("File is not specified for upload.");
             }
 
-            var invalidFileCounts = ActionParams?.Files?
-                .Where(file => file.ExpectedFileCount != "*")
-                .Where(file => !(int.TryParse(file.ExpectedFileCount, out var fileCount) && 0 < fileCount));
-
-            foreach (var invalidFile in invalidFileCounts ?? Enumerable.Empty<NewBatchFiles>())
-            {
-                ErrorMessages.Add($"Expected file count value '{invalidFile.ExpectedFileCount}' is invalid for file path '{invalidFile.SearchPath}'. '*' or positive integer value allowed");
-            }
-
             #endregion
 
         }

@@ -428,7 +428,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         job.ErrorMessages.Add($"Directory not specified or invalid directory specified - '{file.SearchPath}' (from raw: '{file.RawSearchPath}')");
                         continue;
                     }
-                    
+
+                    if (!file.ExpectedFileCountIsValid)
+                    {                        
+                        job.ErrorMessages.Add($"Expected file count value '{file.ExpectedFileCount}' is invalid for file path '{file.SearchPath}'. '*' or positive non-zero integer value allowed");
+                        continue;
+                    }
+
                     if (!IsDirectoryExist(directory))
                     {
                         string directoryNotFoundMessage = $"Directory '{directory}' (from raw: '{file.RawSearchPath}') does not exist or you do not have permission to access the directory.";
@@ -450,7 +456,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         job.ErrorMessages.Add(directoryNotFoundMessage);
                         continue;
                     }
-
+                                        
                     if (!file.CorrectNumberOfFilesFound)
                     {
                         string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.SearchPath}' (from raw: '{file.RawSearchPath}').";
@@ -570,12 +576,13 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
 
+            ExpectedFileCountIsValid = newBatchFile.ExpectedFileCount == "*" || (int.TryParse(newBatchFile.ExpectedFileCount, out var fileCount) && 0 < fileCount);
+
             Files = (directory != null && directory.Exists && searchFileInfo != null)
                 ? GetFiles(directory, searchFileInfo.Name)
                 : Array.Empty<IFileSystemInfo>();
-
-            //note: if expectedFileCount is 0 in json, then a parser error will be generated and we won't actually get to this point
-            CorrectNumberOfFilesFound = 0 < Files.Length && ("*" == newBatchFile.ExpectedFileCount || Files.Length.ToString() == newBatchFile.ExpectedFileCount);
+                        
+            CorrectNumberOfFilesFound = ("*" == newBatchFile.ExpectedFileCount && 0 < Files.Length) || Files.Length.ToString() == newBatchFile.ExpectedFileCount;
 
             Attributes = this.newBatchFile.Attributes?
                 .Where(att => att != null)?
@@ -587,6 +594,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         public string SearchPath { get; }
         public IFileSystemInfo[] Files { get; }
         public string ExpectedFileCount => newBatchFile.ExpectedFileCount;
+        public bool ExpectedFileCountIsValid { get; set; }
         public string MimeType => newBatchFile.MimeType;
         public bool CorrectNumberOfFilesFound { get; private set; }
         public List<KeyValueAttribute>? Attributes { get; }

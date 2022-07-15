@@ -1142,12 +1142,12 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();
         }
 
-        [TestCase("*", 0, false, TestName = "ExpectedFileCountTests when * CanExecute is false when no files match search")]
-        [TestCase("*", 1, true, TestName = "ExpectedFileCountTests when * CanExecute is true when one file matches")]
-        [TestCase("*", 10, true, TestName = "ExpectedFileCountTests when * CanExecute is true when ten file matches")]
-        [TestCase("0", 0, false, TestName = "ExpectedFileCountTests when 0 CanExecute is false when no files match search")] //note: this is an unrealistic scenario
-        [TestCase("1", 1, true, TestName = "ExpectedFileCountTests when 1 CanExecute is true when one file matches")]
-        [TestCase("10", 10, true, TestName = "ExpectedFileCountTests when 10 CanExecute is true when ten file matches")]
+        [TestCase("*", 0, false, Description = "When expectedFileCount is * CanExecute is false when no files match search")]
+        [TestCase("*", 1, true, Description = "When expectedFileCount is * CanExecute is true when one file matches")]
+        [TestCase("*", 10, true, Description = "When expectedFileCount is * CanExecute is true when ten file matches")]
+        [TestCase("0", 0, false, Description = "When expectedFileCount is 0 CanExecute is false when no files match search")] //note: this is an unrealistic scenario
+        [TestCase("1", 1, true, Description = "When expectedFileCount is 1 CanExecute is true when one file matches")]
+        [TestCase("10", 10, true, Description = "When expectedFileCount is 10 CanExecute is true when ten file matches")]
         public void ExpectedFileCountTests(string expectedFileCount, int actualFiles, bool expectedCanExecute)
         {
             fileSystem.AddDirectory("c:\\data\\files");
