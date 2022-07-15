@@ -25,7 +25,25 @@
           },
           {
             "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": "  *  ",
+            "mimeType": "text/plain",
+            "attributes": []
+          },
+          {
+            "searchPath": "c:\\temp\\*.txt",
             "expectedFileCount": "2",
+            "mimeType": "text/plain",
+            "attributes": []
+          },
+          {
+            "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": 2,
+            "mimeType": "text/plain",
+            "attributes": []
+          },
+          {
+            "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": "  2  ",
             "mimeType": "text/plain",
             "attributes": []
           }

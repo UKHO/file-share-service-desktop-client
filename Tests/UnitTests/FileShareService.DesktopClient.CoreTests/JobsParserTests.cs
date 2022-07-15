@@ -124,13 +124,17 @@ namespace FileShareService.DesktopClient.CoreTests
 
             var files = newBatchJob!.ActionParams.Files;
 
-            Assert.AreEqual(2, files.Count);
+            Assert.AreEqual(5, files.Count);
 
-            var asteriskFileCount = files[0];
-            Assert.AreEqual("*", asteriskFileCount.ExpectedFileCount, "Asterisk file count is expected");
+            foreach (var asteriskFileCount in files.Take(2))
+            {
+                Assert.AreEqual("*", asteriskFileCount.ExpectedFileCount, "Asterisk file count is expected");
+            }
 
-            var specifiedFileCount = files[1];
-            Assert.AreEqual("2", specifiedFileCount.ExpectedFileCount, "File count 2 is expected");
+            foreach (var specifiedFileCount in files.Skip(2).Take(3))
+            {
+                Assert.AreEqual("2", specifiedFileCount.ExpectedFileCount, "File count 2 is expected");
+            }
 
         }
 

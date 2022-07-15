@@ -1141,5 +1141,54 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsTrue(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();
         }
+
+        [TestCase("*", 0, false, TestName = "ExpectedFileCountTests when * CanExecute is false when no files match search")]
+        [TestCase("*", 1, true, TestName = "ExpectedFileCountTests when * CanExecute is true when one file matches")]
+        [TestCase("*", 10, true, TestName = "ExpectedFileCountTests when * CanExecute is true when ten file matches")]
+        [TestCase("0", 0, false, TestName = "ExpectedFileCountTests when 0 CanExecute is false when no files match search")] //note: this is an unrealistic scenario
+        [TestCase("1", 1, true, TestName = "ExpectedFileCountTests when 1 CanExecute is true when one file matches")]
+        [TestCase("10", 10, true, TestName = "ExpectedFileCountTests when 10 CanExecute is true when ten file matches")]
+        public void ExpectedFileCountTests(string expectedFileCount, int actualFiles, bool expectedCanExecute)
+        {
+            fileSystem.AddDirectory("c:\\data\\files");
+
+            for (var fileId = 0; fileId < actualFiles; fileId++)
+            {
+                var fileName = $"c:\\data\\files\\f{fileId}.txt";
+                fileSystem.AddFile(fileName, new MockFileData($"File {fileId} content"));
+            }
+
+            var newBatchJob = new NewBatchJob
+            {
+                DisplayName = "AsteriskExpectedFileCountTests",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "ADDS",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = expectedFileCount,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                        }
+                }
+            };
+
+            var vm = new NewBatchJobViewModel(
+                newBatchJob,
+                fileSystem, 
+                fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, 
+                macroTransformer, 
+                dateTimeValidator, 
+                fakeMessageBoxService);
+
+            Assert.AreEqual(actualFiles, vm.Files[0].Files.Length);
+            Assert.AreEqual(expectedCanExecute, vm.ExcecuteJobCommand.CanExecute());
+        }
     }
 }

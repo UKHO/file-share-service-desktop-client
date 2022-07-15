@@ -180,9 +180,16 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
     public class NewBatchFiles
     {
+        private string expectedFileCount = string.Empty;
+
         public string SearchPath { get; set; } = string.Empty;
+
         //ExpectedFileCount can be "*" or an integer number
-        public string ExpectedFileCount { get; set; } = string.Empty;
+        public string ExpectedFileCount { 
+            get => expectedFileCount; 
+            set => expectedFileCount = value?.Trim() ?? string.Empty; 
+        } 
+
         public string MimeType { get; set; } = string.Empty;
         public List<KeyValueAttribute> Attributes { get; set; } = new List<KeyValueAttribute>();
     }

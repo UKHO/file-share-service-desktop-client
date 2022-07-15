@@ -570,36 +570,36 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
 
-
             Files = (directory != null && directory.Exists && searchFileInfo != null)
-            ? GetFiles(directory, searchFileInfo.Name)
-            : Enumerable.Empty<IFileSystemInfo>();
+                ? GetFiles(directory, searchFileInfo.Name)
+                : Array.Empty<IFileSystemInfo>();
+
+            //note: if expectedFileCount is 0 in json, then a parser error will be generated and we won't actually get to this point
+            CorrectNumberOfFilesFound = 0 < Files.Length && ("*" == newBatchFile.ExpectedFileCount || Files.Length.ToString() == newBatchFile.ExpectedFileCount);
 
             Attributes = this.newBatchFile.Attributes?
-            .Where(att => att != null)?
-            .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
-            .ToList();
+                .Where(att => att != null)?
+                .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
+                .ToList();
         }
 
         public string RawSearchPath => newBatchFile.SearchPath;
         public string SearchPath { get; }
-        public IEnumerable<IFileSystemInfo> Files { get; }
+        public IFileSystemInfo[] Files { get; }
         public string ExpectedFileCount => newBatchFile.ExpectedFileCount;
         public string MimeType => newBatchFile.MimeType;
-
-        public bool CorrectNumberOfFilesFound => ExpectedFileCount == "*" || ExpectedFileCount == Files.Count().ToString();
+        public bool CorrectNumberOfFilesFound { get; private set; }
         public List<KeyValueAttribute>? Attributes { get; }
 
-        private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
+        private IFileSystemInfo[] GetFiles(IDirectoryInfo directory, string searchPattern)
         {
             try
             {
-                return directory.EnumerateFileSystemInfos(filePathName).ToList();
-
+                return directory.EnumerateFileSystemInfos(searchPattern).ToArray();
             }
             catch (Exception)
             {
-                return Enumerable.Empty<IFileSystemInfo>();
+                return Array.Empty<IFileSystemInfo>();
             }
         }
     }
