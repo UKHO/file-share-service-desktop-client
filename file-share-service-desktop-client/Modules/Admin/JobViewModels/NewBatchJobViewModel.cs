@@ -268,6 +268,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         ExecutionResult = GetErrors(createBatchResult,
                             $"File Share Service batch create failed with status: {createBatchResult.StatusCode}.");
 
+                        if (createBatchResult.StatusCode == (int)HttpStatusCode.Forbidden)
+                        {
+                            ExecutionResult += $"{Environment.NewLine}{BusinessUnitPermissionHint(buildBatchModel.BusinessUnit)}";
+                        }
+
                         logger.LogError("File Share Service batch create failed for displayName:{DisplayName} with error:{responseMessage}.",
                             DisplayName, ExecutionResult);
                     }
