@@ -31,7 +31,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(adminButton.Enabled);
 
             A.CallTo(() => fakeAuthProvider.IsLoggedIn).Returns(true);
-            A.CallTo(() => fakeAuthProvider.Roles).Returns(System.Array.Empty<string>());
+            A.CallTo(() => fakeAuthProvider.Roles).Returns(new [] { "IgnoreMe", "batchcreate", "BatchCreateMaritimeSafetyInformation" });
 
             adminButton.AssertPropertyChangedNotFired(nameof(adminButton.Enabled), FireAuthProviderPropertyChanged);
 
@@ -45,7 +45,20 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.IsFalse(adminButton.Enabled);
 
             A.CallTo(() => fakeAuthProvider.IsLoggedIn).Returns(true);
-            A.CallTo(() => fakeAuthProvider.Roles).Returns(new[] {"BatchCreate"});
+            A.CallTo(() => fakeAuthProvider.Roles).Returns(new[] { "IgnoreMe", "BatchCreate"});
+
+            adminButton.AssertPropertyChanged(nameof(adminButton.Enabled), FireAuthProviderPropertyChanged);
+
+            Assert.IsTrue(adminButton.Enabled);
+        }
+
+        [Test]
+        public void TestEnabledChangedWithBusinessUnitAdminRole()
+        {
+            Assert.IsFalse(adminButton.Enabled);
+
+            A.CallTo(() => fakeAuthProvider.IsLoggedIn).Returns(true);
+            A.CallTo(() => fakeAuthProvider.Roles).Returns(new[] { "IgnoreMe", "BatchCreate_MaritimeSafetyInformation" });
 
             adminButton.AssertPropertyChanged(nameof(adminButton.Enabled), FireAuthProviderPropertyChanged);
 

@@ -20,7 +20,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
 
         private void SetEnabled(IAuthProvider authProvider)
         {
-            Enabled = authProvider.IsLoggedIn && authProvider.Roles.Contains(BatchCreateRole);
+            //the API itself performs case (& culture) sensitive comparison, so we do the same here
+            Enabled = authProvider.IsLoggedIn && authProvider.Roles.Any(role => role == BatchCreateRole || role.StartsWith($"{BatchCreateRole}_"));
         }
 
         public string DisplayName => "Admin";
