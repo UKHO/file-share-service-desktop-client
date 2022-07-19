@@ -25,13 +25,16 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.AreEqual(NavigationTargets.Admin, adminButton.NavigationTarget);
         }
 
-        [Test]
-        public void TestEnabledChangedWithAuthWithoutAdminRole()
+        [TestCase("BATCH CREATE")]
+        [TestCase("BatchCreateMaritimeSafetyInformation")]
+        [TestCase("BatchCreate_")]
+        [TestCase(" BatchCreate_")]
+        public void TestEnabledChangedWithAuthWithoutAdminRole(string adminRole)
         {
             Assert.IsFalse(adminButton.Enabled);
 
             A.CallTo(() => fakeAuthProvider.IsLoggedIn).Returns(true);
-            A.CallTo(() => fakeAuthProvider.Roles).Returns(new [] { "IgnoreMe", "batchcreate", "BatchCreateMaritimeSafetyInformation" });
+            A.CallTo(() => fakeAuthProvider.Roles).Returns(new [] { "IgnoreMe", adminRole });
 
             adminButton.AssertPropertyChangedNotFired(nameof(adminButton.Enabled), FireAuthProviderPropertyChanged);
 
@@ -39,26 +42,21 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
         }
 
 
-        [Test]
-        public void TestEnabledChangedWithAuthAndAdminRole()
+        [TestCase("BatchCreate")]
+        [TestCase("Batchcreate")]
+        [TestCase("batchCreate")]
+        [TestCase(" batchcreate ")]
+        [TestCase("BATCHCREATE")]
+        [TestCase("BatchCreate_MaritimeSafetyInformation")]
+        [TestCase(" batchcreate_MaritimeSafetyInformation ")]
+        [TestCase("batchCreate_MaritimeSafetyInformation")]
+        [TestCase("BATCHCREATE_MaritimeSafetyInformation")]
+        public void TestEnabledChangedWithAuthAndAdminRole(string adminRole)
         {
             Assert.IsFalse(adminButton.Enabled);
 
             A.CallTo(() => fakeAuthProvider.IsLoggedIn).Returns(true);
-            A.CallTo(() => fakeAuthProvider.Roles).Returns(new[] { "IgnoreMe", "BatchCreate"});
-
-            adminButton.AssertPropertyChanged(nameof(adminButton.Enabled), FireAuthProviderPropertyChanged);
-
-            Assert.IsTrue(adminButton.Enabled);
-        }
-
-        [Test]
-        public void TestEnabledChangedWithBusinessUnitAdminRole()
-        {
-            Assert.IsFalse(adminButton.Enabled);
-
-            A.CallTo(() => fakeAuthProvider.IsLoggedIn).Returns(true);
-            A.CallTo(() => fakeAuthProvider.Roles).Returns(new[] { "IgnoreMe", "BatchCreate_MaritimeSafetyInformation" });
+            A.CallTo(() => fakeAuthProvider.Roles).Returns(new[] { "IgnoreMe", adminRole});
 
             adminButton.AssertPropertyChanged(nameof(adminButton.Enabled), FireAuthProviderPropertyChanged);
 
