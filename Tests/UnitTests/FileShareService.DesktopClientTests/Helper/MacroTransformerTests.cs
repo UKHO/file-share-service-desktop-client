@@ -99,21 +99,27 @@ namespace FileShareService.DesktopClientTests.Helper
         }
 
 
-        [TestCase("$(now)", "02/01/2022 00:00:00")]
+        [TestCase("$( now )", "02/01/2022 00:00:00")]
+        [TestCase("$( now.AddDays( 1 ) )", "02/02/2022 00:00:00")]
+        [TestCase("$( now.AddDays(-1) )", "01/31/2022 00:00:00")]
 
-        [TestCase("$(now.Day", "1")]
+        [TestCase("$(now.Day)", "1")]
         [TestCase("$( now.AddDays(7).Day )", "8")]
-        [TestCase("$( now.AddDays(28).Day )", "1")]
+        [TestCase("$( now.AddDays( 28).Day )", "1")]
+        [TestCase("$(now.AddDays(-22 ).Day)", "9")]
 
-        [TestCase("$(now.Day2", "01")]
-        [TestCase("$(now.AddDays(7).Day2)", "08")]
-        [TestCase("$(now.AddDays(28).Day2)", "01")]
+        [TestCase("$(now.Day2)", "01")]
+        [TestCase("$( now.AddDays(7).Day2 )", "08")]
+        [TestCase("$(now.AddDays( 28 ).Day2)", "01")]
+        [TestCase("$(now.AddDays(-22).Day2)", "09")]
 
-        [TestCase("$(now.Month", "2")]
+        [TestCase("$(now.Month)", "2")]
         [TestCase("$(now.AddDays(28).Month)", "3")]
+        [TestCase("$(now.AddDays(-1).Month)", "1")]
 
-        [TestCase("$(now.Month2", "02")]
-        [TestCase("$(now.AddDays(28).Month2)", "03")]
+        [TestCase("$(now.Month2)", "02")]
+        [TestCase("$( now.AddDays( 28).Month2 )", "03")]
+        [TestCase("$(now.AddDays(-1).Month2)", "01")]
 
         public void FebruaryTests(string input, string expected)
         {
