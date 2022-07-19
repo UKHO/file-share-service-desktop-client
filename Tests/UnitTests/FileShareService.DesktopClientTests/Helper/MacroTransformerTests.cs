@@ -85,8 +85,6 @@ namespace FileShareService.DesktopClientTests.Helper
         [TestCase("$(now.AddDays(-1))", "12/30/2022 00:00:00")]
         [TestCase("$(now.AddDays(-14))", "12/17/2022 00:00:00")]
         [TestCase("$(now.AddDays( - 1 ))", "12/30/2022 00:00:00")]
-
-        
         public void DecemberTests(string input, string expected)
         {
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
@@ -120,7 +118,6 @@ namespace FileShareService.DesktopClientTests.Helper
         [TestCase("$(now.Month2)", "02")]
         [TestCase("$( now.AddDays( 28).Month2 )", "03")]
         [TestCase("$(now.AddDays(-1).Month2)", "01")]
-
         public void FebruaryTests(string input, string expected)
         {
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
@@ -129,8 +126,53 @@ namespace FileShareService.DesktopClientTests.Helper
             var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
 
             Assert.AreEqual(expected, transformer.ExpandMacros(input));
-
         }
 
+        [TestCase(1, "$(now.MonthName)", "January")]
+        [TestCase(1, "$(now.MonthShortName)", "Jan")]
+        [TestCase(1, "$( now.AddDays( +31 ).MonthName )", "February")]
+        [TestCase(1, "$( now.AddDays(+31 ).MonthShortName )", "Feb")]
+        [TestCase(3, "$( now.MonthName)", "March")]
+        [TestCase(3, "$(now.MonthShortName )", "Mar")]
+        [TestCase(4, "$(now.MonthName )", "April")]
+        [TestCase(4, "$( now.MonthShortName )", "Apr")]
+        [TestCase(5, "$(now.MonthName )", "May")]
+        [TestCase(5, "$( now.MonthShortName )", "May")]
+        [TestCase(6, "$(now.MonthName )", "June")]
+        [TestCase(6, "$( now.MonthShortName )", "Jun")]
+        [TestCase(7, "$(now.MonthName)", "July")]
+        [TestCase(7, "$(now.MonthShortName)", "Jul")]
+        [TestCase(8, "$(now.MonthName)", "August")]
+        [TestCase(8, "$(now.MonthShortName)", "Aug")]
+        [TestCase(9, "$(now.MonthName)", "September")]
+        [TestCase(9, "$(now.MonthShortName)", "Sep")]
+        [TestCase(10, "$(now.MonthName)", "October")]
+        [TestCase(10, "$(now.MonthShortName)", "Oct")]
+        [TestCase(11, "$(now.MonthName)", "November")]
+        [TestCase(11, "$(now.MonthShortName)", "Nov")]
+        [TestCase(12, "$(now.MonthName)", "December")]
+        [TestCase(12, "$(now.MonthShortName)", "Dec")]
+        public void MonthNameTests(int month, string input, string expected)
+        {
+            A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
+                .Returns(new DateTime(2022, month, 01, 0, 0, 0, DateTimeKind.Utc));
+
+            var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
+
+            Assert.AreEqual(expected, transformer.ExpandMacros(input));
+        }
+
+        [TestCase("$(now.Month) $(now.MonthName)", "1 January")]
+        [TestCase("$(now.MonthName) $(now.Month)", "January 1")]
+        [TestCase("$(now.MonthName) $(now.Month) $(now.MonthName)", "January 1 January")]
+        public void MonthMatching(string input, string expected)
+        {
+            A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
+                .Returns(new DateTime(2022, 01, 01, 0, 0, 0, DateTimeKind.Utc));
+
+            var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
+
+            Assert.AreEqual(expected, transformer.ExpandMacros(input));
+        }
     }
 }

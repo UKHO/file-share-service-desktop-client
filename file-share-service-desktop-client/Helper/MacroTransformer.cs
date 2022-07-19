@@ -86,11 +86,28 @@ namespace UKHO.FileShareService.DesktopClient.Helper
             string now_Month(Match match)
                 => currentDateTimeProvider.CurrentDateTime.Month.ToString();
 
-
             string nowAddDays_Month(Match match)
             {
                 var dayOffset = offsetCapture(match);
                 return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).Month.ToString();
+            };
+
+            string now_MonthName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("MMMM");
+
+            string nowAddDays_MonthName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("MMMM");
+            };
+
+            string now_MonthShortName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("MMM");
+
+            string nowAddDays_MonthShortName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("MMM");
             };
 
             var replacementExpressions = new Dictionary<string, Func<Match, string>>
@@ -99,6 +116,23 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 {@"\$\(\s*now\.Year2\s*\)", (match) => now_Year(match).Substring(2,2) },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year\s*\)", nowAddDays_Year},
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year2\s*\)", (match) => nowAddDays_Year(match).Substring(2,2)},
+
+                {@"\$\(\s*now\.Month\s*\)", now_Month },
+                {@"\$\(\s*now\.Month2\s*\)", (match) => now_Month(match).PadLeft(2, '0') },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Month\s*\)", nowAddDays_Month},
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Month2\s*\)", (match) => nowAddDays_Month(match).PadLeft(2, '0')},
+
+                {@"\$\(\s*now\.Day\s*\)", now_Day },
+                {@"\$\(\s*now\.Day2\s*\)", (match) => now_Day(match).PadLeft(2, '0') },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Day\s*\)", nowAddDays_Day},
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Day2\s*\)", (match) => nowAddDays_Day(match).PadLeft(2, '0')},
+
+                {@"\$\(\s*now\.MonthName\s*\)", now_MonthName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).MonthName\s*\)", nowAddDays_MonthName},
+
+                {@"\$\(\s*now\.MonthShortName\s*\)", now_MonthShortName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).MonthShortName\s*\)", nowAddDays_MonthShortName},
+
                 {@"\$\(\s*now\.WeekNumber\s*\)",now_WeekNumber },
                 {@"\$\(\s*now\.WeekNumber2\s*\)",(match) => now_WeekNumber(match).PadLeft(2,'0')},
                 {@"\$\(\s*now\.WeekNumber\.Year\s*\)", now_WeekNumberYear },
@@ -111,16 +145,9 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber2\s*\)",(match) => nowAddDays_WeekNumber(match).PadLeft(2,'0')},
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year\s*\)", nowAddDays_WeekYear },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year2\s*\)", (match) => nowAddDays_WeekYear(match).Substring(2,2)},
+
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\)\s*\)", nowAddDays_Date },
                 {@"\$\(\s*now\s*\)", now_Date},
-                {@"\$\(\s*now\.Day\s*\)", now_Day },
-                {@"\$\(\s*now\.Day2\s*\)", (match) => now_Day(match).PadLeft(2, '0') },
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Day\s*\)", nowAddDays_Day},
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Day2\s*\)", (match) => nowAddDays_Day(match).PadLeft(2, '0')},
-                {@"\$\(\s*now\.Month\s*\)", now_Month },
-                {@"\$\(\s*now\.Month2\s*\)", (match) => now_Month(match).PadLeft(2, '0') },
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Month\s*\)", nowAddDays_Month},
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Month2\s*\)", (match) => nowAddDays_Month(match).PadLeft(2, '0')},
             };
 
             if (string.IsNullOrEmpty(value))
