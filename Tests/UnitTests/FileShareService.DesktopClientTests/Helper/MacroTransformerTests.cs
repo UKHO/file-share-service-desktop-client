@@ -174,5 +174,30 @@ namespace FileShareService.DesktopClientTests.Helper
 
             Assert.AreEqual(expected, transformer.ExpandMacros(input));
         }
+
+
+        [TestCase(4, "$(now.DayName)", "Monday")]
+        [TestCase(4, "$(now.DayShortName)", "Mon")]
+        [TestCase(4, "$( now.AddDays( +1).DayName )", "Tuesday")]
+        [TestCase(4, "$( now.AddDays(+1 ).DayShortName )", "Tue")]
+        [TestCase(4, "$( now.AddDays( 2 ).DayName)", "Wednesday")]
+        [TestCase(7, "$(now.AddDays( -1 ).DayShortName )", "Wed")]
+        [TestCase(7, "$(now.DayName)", "Thursday")]
+        [TestCase(7, "$( now.DayShortName )", "Thu")]
+        [TestCase(8, "$(now.DayName )", "Friday")]
+        [TestCase(8, "$( now.DayShortName )", "Fri")]
+        [TestCase(9, "$(now.DayName )", "Saturday")]
+        [TestCase(9, "$( now.DayShortName )", "Sat")]
+        [TestCase(10, "$(now.DayName )", "Sunday")]
+        [TestCase(10, "$( now.DayShortName )", "Sun")]
+        public void DayNameTests(int day, string input, string expected)
+        {
+            A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
+                .Returns(new DateTime(2022, 07, day, 0, 0, 0, DateTimeKind.Utc));
+
+            var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
+
+            Assert.AreEqual(expected, transformer.ExpandMacros(input));
+        }
     }
 }

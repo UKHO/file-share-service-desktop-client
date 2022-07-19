@@ -76,7 +76,6 @@ namespace UKHO.FileShareService.DesktopClient.Helper
             string now_Day(Match match)
                 => currentDateTimeProvider.CurrentDateTime.Day.ToString();
 
-
             string nowAddDays_Day(Match match)
             {
                 var dayOffset = offsetCapture(match);
@@ -110,6 +109,24 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("MMM");
             };
 
+            string now_DayName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("dddd");
+
+            string nowAddDays_DayName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("dddd");
+            };
+
+            string now_DayShortName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("ddd");
+
+            string nowAddDays_DayShortName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("ddd");
+            };
+
             var replacementExpressions = new Dictionary<string, Func<Match, string>>
             {
                 {@"\$\(\s*now\.Year\s*\)", now_Year},
@@ -133,6 +150,12 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 {@"\$\(\s*now\.MonthShortName\s*\)", now_MonthShortName },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).MonthShortName\s*\)", nowAddDays_MonthShortName},
 
+                {@"\$\(\s*now\.DayName\s*\)", now_DayName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).DayName\s*\)", nowAddDays_DayName},
+
+                {@"\$\(\s*now\.DayShortName\s*\)", now_DayShortName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).DayShortName\s*\)", nowAddDays_DayShortName},
+
                 {@"\$\(\s*now\.WeekNumber\s*\)",now_WeekNumber },
                 {@"\$\(\s*now\.WeekNumber2\s*\)",(match) => now_WeekNumber(match).PadLeft(2,'0')},
                 {@"\$\(\s*now\.WeekNumber\.Year\s*\)", now_WeekNumberYear },
@@ -141,6 +164,7 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 {@"\$\(\s*now\.WeekNumber2\s*([+-]\s*\d+)\)",(match) => now_WeekNumberPlusWeeks(match).PadLeft(2,'0')},
                 {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year\)", now_WeekNumberPlusWeeksYear},
                 {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year2\)", (match) => now_WeekNumberPlusWeeksYear(match).Substring(2,2) },
+
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\s*\)",nowAddDays_WeekNumber },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber2\s*\)",(match) => nowAddDays_WeekNumber(match).PadLeft(2,'0')},
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year\s*\)", nowAddDays_WeekYear },
