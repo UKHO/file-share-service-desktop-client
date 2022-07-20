@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Prism.Mvvm;
 using UKHO.FileShareService.DesktopClient.Core;
 
@@ -20,7 +21,20 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
 
         private void SetEnabled(IAuthProvider authProvider)
         {
-            Enabled = authProvider.IsLoggedIn && authProvider.Roles.Contains(BatchCreateRole);
+            //the API itself performs case insensitive comparison, so we do the same here
+
+            bool isBatchCreate(string role) => 0 == string.Compare(BatchCreateRole, role, StringComparison.OrdinalIgnoreCase);
+
+            bool isBuBatchCreate(string role) =>
+                role!.StartsWith($"{BatchCreateRole}_", StringComparison.OrdinalIgnoreCase)
+                && $"{BatchCreateRole}_".Length < role.Length;
+
+            var hasAdminRole = authProvider.Roles
+                .Select(role => role?.Trim())
+                .Where(role => !string.IsNullOrWhiteSpace(role))
+                .Any(role => isBatchCreate(role!) || isBuBatchCreate(role!));
+
+            Enabled = authProvider.IsLoggedIn && hasAdminRole;
         }
 
         public string DisplayName => "Admin";

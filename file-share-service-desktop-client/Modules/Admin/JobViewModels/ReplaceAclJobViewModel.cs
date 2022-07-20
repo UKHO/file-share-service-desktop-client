@@ -3,6 +3,7 @@ using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.FileShareAdminClient;
@@ -50,6 +51,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                     ExecutionResult = (result.Errors != null && result.Errors.Any()) ? 
                         string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)) :
                         $"File Share Service replace Access Control List failed for batch ID:{BatchId} with status: {result.StatusCode}.";
+
+                    if (result.StatusCode == (int)HttpStatusCode.Forbidden)
+                    {
+                        ExecutionResult += $"{Environment.NewLine}{BusinessUnitPermissionHint()}";
+                    }
 
                     logger.LogError("File Share Service replace Access Control List failed for displayName:{DisplayName} and batch ID:{BatchId} with error:{responseMessage}.",
                         DisplayName, BatchId, ExecutionResult);

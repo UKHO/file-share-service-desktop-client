@@ -124,5 +124,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         {
             return dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
         }
+
+        protected string BusinessUnitPermissionHint(string businessUnit) =>
+            $"Please ensure you have permission to manage batches for the '{businessUnit}' business unit";
+
+        protected string BusinessUnitPermissionHint() =>
+            $"Please ensure you have permission to manage batches for the business unit";
     }
 }
