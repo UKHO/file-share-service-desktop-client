@@ -68,8 +68,8 @@ namespace FileShareService.DesktopClientTests.Helper
 
         [TestCase("$(now.WeekNumber.Year)", "2022")]
         [TestCase("$(now.WeekNumber.Year2)", "22")]
-        [TestCase("$(now.AddDays(7).WeekNumber.Year)", "1")]
-        [TestCase("$(now.AddDays(7).WeekNumber.Year2)", "1")]
+        [TestCase("$(now.AddDays(7).WeekNumber.Year)", "2023")]
+        [TestCase("$(now.AddDays(7).WeekNumber.Year2)", "23")]
         [TestCase("$(now.WeekNumber +10.Year)", "2023")]
         [TestCase("$(now.WeekNumber +10.Year2)", "23")]
 
@@ -104,12 +104,12 @@ namespace FileShareService.DesktopClientTests.Helper
         [TestCase("$(now.Day)", "1")]
         [TestCase("$( now.AddDays(7).Day )", "8")]
         [TestCase("$( now.AddDays( 28).Day )", "1")]
-        [TestCase("$(now.AddDays(-22 ).Day)", "9")]
+        [TestCase("$(now.AddDays(-23 ).Day)", "9")]
 
         [TestCase("$(now.Day2)", "01")]
         [TestCase("$( now.AddDays(7).Day2 )", "08")]
         [TestCase("$(now.AddDays( 28 ).Day2)", "01")]
-        [TestCase("$(now.AddDays(-22).Day2)", "09")]
+        [TestCase("$(now.AddDays(-23).Day2)", "09")]
 
         [TestCase("$(now.Month)", "2")]
         [TestCase("$(now.AddDays(28).Month)", "3")]
