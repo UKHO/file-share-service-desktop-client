@@ -90,10 +90,8 @@ namespace FileShareService.DesktopClientTests.Helper
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
                 .Returns(new DateTime(2022, 12, 31, 0, 0, 0, DateTimeKind.Utc));
 
-            var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
+            RunTest(input, expected);
 
-            Assert.AreEqual(expected, transformer.ExpandMacros(input));
-            
         }
 
 
@@ -123,9 +121,7 @@ namespace FileShareService.DesktopClientTests.Helper
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
                 .Returns(new DateTime(2022, 02, 01, 0, 0, 0, DateTimeKind.Utc));
 
-            var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
-
-            Assert.AreEqual(expected, transformer.ExpandMacros(input));
+            RunTest(input, expected);
         }
 
         [TestCase(1, "$(now.MonthName)", "January")]
@@ -157,9 +153,7 @@ namespace FileShareService.DesktopClientTests.Helper
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
                 .Returns(new DateTime(2022, month, 01, 0, 0, 0, DateTimeKind.Utc));
 
-            var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
-
-            Assert.AreEqual(expected, transformer.ExpandMacros(input));
+            RunTest(input, expected);
         }
 
         [TestCase("$(now.Month) $(now.MonthName)", "1 January")]
@@ -170,11 +164,8 @@ namespace FileShareService.DesktopClientTests.Helper
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
                 .Returns(new DateTime(2022, 01, 01, 0, 0, 0, DateTimeKind.Utc));
 
-            var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
-
-            Assert.AreEqual(expected, transformer.ExpandMacros(input));
+            RunTest(input, expected);
         }
-
 
         [TestCase(4, "$(now.DayName)", "Monday")]
         [TestCase(4, "$(now.DayShortName)", "Mon")]
@@ -195,9 +186,24 @@ namespace FileShareService.DesktopClientTests.Helper
             A.CallTo(() => fakeCurrentDateTimeProvider.CurrentDateTime)
                 .Returns(new DateTime(2022, 07, day, 0, 0, 0, DateTimeKind.Utc));
 
+            RunTest(input, expected);
+        }
+
+        private void RunTest(string input, string expanded)
+        {
             var transformer = new MacroTransformer(fakeCurrentDateTimeProvider);
 
-            Assert.AreEqual(expected, transformer.ExpandMacros(input));
+            Assert.AreEqual(expanded, transformer.ExpandMacros(input));
+
+            var macroBetwix = $"\\\\ukho.business.data\\{input}\\files";
+            var expandedBetwix = $"\\\\ukho.business.data\\{expanded}\\files";
+
+            Assert.AreEqual(expandedBetwix, transformer.ExpandMacros(macroBetwix));
+
+            macroBetwix = $"| {input} |";
+            expandedBetwix = $"| {expanded} |";
+
+            Assert.AreEqual(expandedBetwix, transformer.ExpandMacros(macroBetwix));
         }
     }
 }
