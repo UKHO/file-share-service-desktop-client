@@ -268,6 +268,11 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         ExecutionResult = GetErrors(createBatchResult,
                             $"File Share Service batch create failed with status: {createBatchResult.StatusCode}.");
 
+                        if (createBatchResult.StatusCode == (int)HttpStatusCode.Forbidden)
+                        {
+                            ExecutionResult += $"{Environment.NewLine}{BusinessUnitPermissionHint(buildBatchModel.BusinessUnit)}";
+                        }
+
                         logger.LogError("File Share Service batch create failed for displayName:{DisplayName} with error:{responseMessage}.",
                             DisplayName, ExecutionResult);
                     }
@@ -429,9 +434,9 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         continue;
                     }
 
-                    if (file.ExpectedFileCount <= 0)
-                    {
-                        job.ErrorMessages.Add($"File expected count is missing or invalid in file path '{file.RawSearchPath}'");
+                    if (!file.ExpectedFileCountIsValid)
+                    {                        
+                        job.ErrorMessages.Add($"Expected file count value '{file.ExpectedFileCount}' is invalid for file path '{file.SearchPath}'. '*' or positive non-zero integer value allowed");
                         continue;
                     }
 
@@ -456,7 +461,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
                         job.ErrorMessages.Add(directoryNotFoundMessage);
                         continue;
                     }
-
+                                        
                     if (!file.CorrectNumberOfFilesFound)
                     {
                         string fileCountMismatchErrorMessage = $"Expected file count is {file.ExpectedFileCount}, actual file count is {file.Files?.Count()} in file path '{file.SearchPath}' (from raw: '{file.RawSearchPath}').";
@@ -576,36 +581,38 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             var searchFileInfo = string.IsNullOrWhiteSpace(SearchPath) ? null : fileSystem.FileInfo.FromFileName(SearchPath);
             var directory = searchFileInfo == null ? null : fileSystem.DirectoryInfo.FromDirectoryName(searchFileInfo.DirectoryName);
 
+            ExpectedFileCountIsValid = newBatchFile.ExpectedFileCount == "*" || (int.TryParse(newBatchFile.ExpectedFileCount, out var fileCount) && 0 < fileCount);
 
             Files = (directory != null && directory.Exists && searchFileInfo != null)
-            ? GetFiles(directory, searchFileInfo.Name)
-            : Enumerable.Empty<IFileSystemInfo>();
+                ? GetFiles(directory, searchFileInfo.Name)
+                : Array.Empty<IFileSystemInfo>();
+                        
+            CorrectNumberOfFilesFound = ("*" == newBatchFile.ExpectedFileCount && 0 < Files.Length) || Files.Length.ToString() == newBatchFile.ExpectedFileCount;
 
             Attributes = this.newBatchFile.Attributes?
-            .Where(att => att != null)?
-            .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
-            .ToList();
+                .Where(att => att != null)?
+                .Select(k => new KeyValueAttribute(k.Key, expandMacros(k.Value)))?
+                .ToList();
         }
 
         public string RawSearchPath => newBatchFile.SearchPath;
         public string SearchPath { get; }
-        public IEnumerable<IFileSystemInfo> Files { get; }
-        public int ExpectedFileCount => newBatchFile.ExpectedFileCount;
+        public IFileSystemInfo[] Files { get; }
+        public string ExpectedFileCount => newBatchFile.ExpectedFileCount;
+        public bool ExpectedFileCountIsValid { get; set; }
         public string MimeType => newBatchFile.MimeType;
-
-        public bool CorrectNumberOfFilesFound => ExpectedFileCount == Files.Count();
+        public bool CorrectNumberOfFilesFound { get; private set; }
         public List<KeyValueAttribute>? Attributes { get; }
 
-        private IEnumerable<IFileSystemInfo> GetFiles(IDirectoryInfo directory, string filePathName)
+        private IFileSystemInfo[] GetFiles(IDirectoryInfo directory, string searchPattern)
         {
             try
             {
-                return directory.EnumerateFileSystemInfos(filePathName);
-
+                return directory.EnumerateFileSystemInfos(searchPattern).ToArray();
             }
             catch (Exception)
             {
-                return Enumerable.Empty<IFileSystemInfo>();
+                return Array.Empty<IFileSystemInfo>();
             }
         }
     }
