@@ -1,0 +1,88 @@
+{
+  "jobs": [
+    {
+      "action": "newBatch",
+      "displayName": "Macro test",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "$(now.Day)/$(now.AddDays(7).Day)/$(now.AddDays(20).Day)",
+            "value": "$(now.Day)/$(now.AddDays(7).Day)/$(now.AddDays(20).Day)"
+          },
+          {
+            "key": "$(now.Day2)/$(now.AddDays(7).Day2)/$(now.AddDays(20).Day2)",
+            "value": "$(now.Day2)/$(now.AddDays(7).Day2)/$(now.AddDays(20).Day2)"
+          },
+          {
+            "key": "$(now.Month)/$(now.AddDays(28).Month)/$(now.AddDays(-1).Month)",
+            "value": "$(now.Month)/$(now.AddDays(28).Month)/$(now.AddDays(-1).Month)"
+          },
+          {
+            "key": "$(now.Month2)/$(now.AddDays(28).Month2)/$(now.AddDays(-1).Month2)",
+            "value": "$(now.Month2)/$(now.AddDays(28).Month2)/$(now.AddDays(-1).Month2)"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": []
+        },
+        "expiryDate": "$(now.AddDays(21))",
+        "files": [
+          {
+            "searchPath": "u:\\\\$(now.Day)\\$(now.AddDays(7).Day)\\$(now.AddDays(20).Day)\\$(now.Day2)\\$(now.AddDays(7).Day2)\\$(now.AddDays(20).Day2)",
+            "expectedFileCount": 1,
+            "mimeType": "application/test"
+          },
+          {
+            "searchPath": "u:\\\\$(now.Month)\\$(now.AddDays(28).Month)\\$(now.AddDays(-1).Month)\\$(now.Month2)\\$(now.AddDays(28).Month2)\\$(now.AddDays(-1).Month2)",
+            "expectedFileCount": 1,
+            "mimeType": "application/test"
+          }
+        ]
+      }
+    },
+    {
+      "action": "newBatch",
+      "displayName": "Macro test 2",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "$(now.MonthName)/$(now.MonthShortName)",
+            "value": "$(now.MonthName)/$(now.MonthShortName)"
+          },
+          {
+            "key": "$(now.AddDays(31).MonthName)/$(now.AddDays(31).MonthShortName)",
+            "value": "$(now.AddDays(31).MonthName)/$(now.AddDays(31).MonthShortName)"
+          },
+          {
+            "key": "$(now.DayName)/$(now.DayShortName)",
+            "value": "$(now.DayName)/$(now.DayShortName)"
+          },
+          {
+            "key": "$(now.AddDays(2).DayName)/$(now.AddDays(-2).DayShortName)",
+            "value": "$(now.AddDays(2).DayName)/$(now.AddDays(-2).DayShortName)"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": []
+        },
+        "expiryDate": "$(now.AddDays(21))",
+        "files": [
+          {
+            "searchPath": "u:\\\\$(now.MonthName)\\$(now.MonthShortName)\\$(now.AddDays(31).MonthName)\\$(now.AddDays(31).MonthShortName)",
+            "expectedFileCount": 1,
+            "mimeType": "application/test"
+          },
+          {
+            "searchPath": "u:\\\\$(now.DayName)\\$(now.DayShortName)\\$(now.AddDays(2).DayName)\\$(now.AddDays(-2).DayShortName)",
+            "expectedFileCount": 1,
+            "mimeType": "application/test"
+          }
+        ]
+      }
+    }
+  ]
+}

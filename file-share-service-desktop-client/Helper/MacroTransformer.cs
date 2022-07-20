@@ -19,67 +19,143 @@ namespace UKHO.FileShareService.DesktopClient.Helper
 
         public string ExpandMacros(string value)
         {
-            Func<Match, string> now_Year = (match) =>
-            {
-                return currentDateTimeProvider.CurrentDateTime.Year.ToString();
-            };
-            Func<Match, string> nowAddDays_Year = (match) =>
+            int offsetCapture(Match match)
             {
                 var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                return int.Parse(capturedNumber.Replace(" ", ""));
+            } 
+
+            string now_Year(Match match) 
+                => currentDateTimeProvider.CurrentDateTime.Year.ToString();
+
+            string nowAddDays_Year(Match match)
+            {
+                var dayOffset = offsetCapture(match);
                 return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).Year.ToString();
             };
-            Func<Match, string> now_WeekNumber = (match) =>
+
+            string now_WeekNumber(Match match) 
+                => WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Week.ToString();
+
+            string now_WeekNumberYear(Match match)
+                => WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Year.ToString();
+
+            string now_WeekNumberPlusWeeks(Match match)
             {
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Week.ToString();
-            };
-            Func<Match, string> now_WeekNumberYear = (match) =>
-            {
-                return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime).Year.ToString();
-            };
-            Func<Match, string> now_WeekNumberPlusWeeks = (match) =>
-            {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                var dayOffset = offsetCapture(match);
                 return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset * 7)).Week.ToString();
-            };
-            Func<Match, string> now_WeekNumberPlusWeeksYear = (match) =>
+            }
+
+            string now_WeekNumberPlusWeeksYear(Match match)
             {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                var dayOffset = offsetCapture(match);
                 return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset * 7)).Year.ToString();
             };
-            Func<Match, string> nowAddDays_Week = (match) =>
+
+            string nowAddDays_WeekNumber(Match match)
             {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                var dayOffset = offsetCapture(match);
                 return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)).Week.ToString();
             };
-            Func<Match, string> nowAddDays_WeekYear = (match) =>
+
+            string nowAddDays_WeekYear(Match match)
             {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
+                var dayOffset = offsetCapture(match);
                 return WeekNumber.GetUKHOWeekFromDateTime(currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)).Year.ToString();
             };
-            Func<Match, string> nowAddDays_Date = (match) =>
+
+            string nowAddDays_Date(Match match)
             {
-                var capturedNumber = match.Groups[1].Value;
-                var dayOffset = int.Parse(capturedNumber.Replace(" ", ""));
-                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset)
-                    .ToString(CultureInfo.InvariantCulture);
-            };
-            Func<Match, string> now_Date = (match) =>
-            {
-                return currentDateTimeProvider.CurrentDateTime.ToString(CultureInfo.InvariantCulture);
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString(CultureInfo.InvariantCulture);
             };
 
+            string now_Date(Match match) 
+                => currentDateTimeProvider.CurrentDateTime.ToString(CultureInfo.InvariantCulture);
+
+            string now_Day(Match match)
+                => currentDateTimeProvider.CurrentDateTime.Day.ToString();
+
+            string nowAddDays_Day(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).Day.ToString();
+            };
+
+            string now_Month(Match match)
+                => currentDateTimeProvider.CurrentDateTime.Month.ToString();
+
+            string nowAddDays_Month(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).Month.ToString();
+            };
+
+            string now_MonthName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("MMMM");
+
+            string nowAddDays_MonthName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("MMMM");
+            };
+
+            string now_MonthShortName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("MMM");
+
+            string nowAddDays_MonthShortName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("MMM");
+            };
+
+            string now_DayName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("dddd");
+
+            string nowAddDays_DayName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("dddd");
+            };
+
+            string now_DayShortName(Match match)
+                => currentDateTimeProvider.CurrentDateTime.ToString("ddd");
+
+            string nowAddDays_DayShortName(Match match)
+            {
+                var dayOffset = offsetCapture(match);
+                return currentDateTimeProvider.CurrentDateTime.AddDays(dayOffset).ToString("ddd");
+            };
 
             var replacementExpressions = new Dictionary<string, Func<Match, string>>
             {
-                {@"\$\(\s*now\.Year\s*\)", now_Year },
+                {@"\$\(\s*now\.Year\s*\)", now_Year},
                 {@"\$\(\s*now\.Year2\s*\)", (match) => now_Year(match).Substring(2,2) },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year\s*\)", nowAddDays_Year},
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Year2\s*\)", (match) => nowAddDays_Year(match).Substring(2,2)},
+
+                {@"\$\(\s*now\.Month\s*\)", now_Month },
+                {@"\$\(\s*now\.Month2\s*\)", (match) => now_Month(match).PadLeft(2, '0') },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Month\s*\)", nowAddDays_Month},
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Month2\s*\)", (match) => nowAddDays_Month(match).PadLeft(2, '0')},
+
+                {@"\$\(\s*now\.Day\s*\)", now_Day },
+                {@"\$\(\s*now\.Day2\s*\)", (match) => now_Day(match).PadLeft(2, '0') },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Day\s*\)", nowAddDays_Day},
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).Day2\s*\)", (match) => nowAddDays_Day(match).PadLeft(2, '0')},
+
+                {@"\$\(\s*now\.MonthName\s*\)", now_MonthName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).MonthName\s*\)", nowAddDays_MonthName},
+
+                {@"\$\(\s*now\.MonthShortName\s*\)", now_MonthShortName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).MonthShortName\s*\)", nowAddDays_MonthShortName},
+
+                {@"\$\(\s*now\.DayName\s*\)", now_DayName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).DayName\s*\)", nowAddDays_DayName},
+
+                {@"\$\(\s*now\.DayShortName\s*\)", now_DayShortName },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).DayShortName\s*\)", nowAddDays_DayShortName},
+
                 {@"\$\(\s*now\.WeekNumber\s*\)",now_WeekNumber },
                 {@"\$\(\s*now\.WeekNumber2\s*\)",(match) => now_WeekNumber(match).PadLeft(2,'0')},
                 {@"\$\(\s*now\.WeekNumber\.Year\s*\)", now_WeekNumberYear },
@@ -88,12 +164,14 @@ namespace UKHO.FileShareService.DesktopClient.Helper
                 {@"\$\(\s*now\.WeekNumber2\s*([+-]\s*\d+)\)",(match) => now_WeekNumberPlusWeeks(match).PadLeft(2,'0')},
                 {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year\)", now_WeekNumberPlusWeeksYear},
                 {@"\$\(\s*now\.WeekNumber\s*([+-]\s*\d+)\.Year2\)", (match) => now_WeekNumberPlusWeeksYear(match).Substring(2,2) },
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\s*\)",nowAddDays_Week },
-                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber2\s*\)",(match) => nowAddDays_Week(match).PadLeft(2,'0')},
+
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\s*\)",nowAddDays_WeekNumber },
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber2\s*\)",(match) => nowAddDays_WeekNumber(match).PadLeft(2,'0')},
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year\s*\)", nowAddDays_WeekYear },
                 {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\).WeekNumber\.Year2\s*\)", (match) => nowAddDays_WeekYear(match).Substring(2,2)},
-                {@"\$\(now.AddDays\(\s*([+-]?\s*\d+)\s*\)\)", nowAddDays_Date },
-                {@"\$\(now\)", now_Date}
+
+                {@"\$\(\s*now.AddDays\(\s*([+-]?\s*\d+)\s*\)\s*\)", nowAddDays_Date },
+                {@"\$\(\s*now\s*\)", now_Date},
             };
 
             if (string.IsNullOrEmpty(value))
