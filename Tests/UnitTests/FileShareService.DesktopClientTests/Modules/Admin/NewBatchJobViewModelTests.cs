@@ -86,7 +86,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName
                             }
@@ -151,7 +151,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName
                             }
@@ -214,7 +214,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName
                             }
@@ -267,7 +267,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName
                             }
@@ -322,7 +322,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName
                             }
@@ -364,7 +364,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                     {
                         new NewBatchFiles
                         {
-                            ExpectedFileCount = 1,
+                            ExpectedFileCount = "1",
                             MimeType = "text/plain",
                             SearchPath = file1FullFileName
                         }
@@ -406,13 +406,13 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName
                             },
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file2FullFileName
                             }
@@ -460,13 +460,13 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = filesA.macroFilePath
                             },
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = filesB.macroFilePath
                             }
@@ -511,13 +511,13 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = Path.Combine("c:\\data", directoryMacro, "f1.txt")
                             },
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = Path.Combine("c:\\data", directoryMacro, "f2.txt")
                             }
@@ -552,13 +552,13 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName
                             },
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file2FullFileName
                             }
@@ -593,7 +593,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
         }
@@ -633,7 +633,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -674,7 +674,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -711,7 +711,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName,
                                 Attributes = new List<KeyValueAttribute>
@@ -765,7 +765,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = "c:/abc/test1.txt"
                             }
@@ -853,7 +853,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -886,7 +886,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -918,7 +918,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -957,7 +957,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -999,7 +999,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 1,
+                                ExpectedFileCount = "1",
                                 MimeType = "text/plain",
                                 SearchPath = file1FullFileName,
                                 Attributes = new List<KeyValueAttribute>
@@ -1050,7 +1050,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -1086,7 +1086,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -1120,7 +1120,7 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
                         {
                             new NewBatchFiles
                             {
-                                ExpectedFileCount = 2,
+                                ExpectedFileCount = "2",
                                 MimeType = "text/plain",
                                 SearchPath = @"c:\data\files\f*.txt"
                             }
@@ -1140,6 +1140,55 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             var executeTask = vm.OnExecuteCommand();
             Assert.IsTrue(vm.IsCommitting);
             A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustHaveHappened();
+        }
+
+        [TestCase("*", 0, false, Description = "When expectedFileCount is * CanExecute is false when no files match search")]
+        [TestCase("*", 1, true, Description = "When expectedFileCount is * CanExecute is true when one file matches")]
+        [TestCase("*", 10, true, Description = "When expectedFileCount is * CanExecute is true when ten file matches")]
+        [TestCase("0", 0, false, Description = "When expectedFileCount is 0 CanExecute is false when no files match search")] //note: this is an unrealistic scenario
+        [TestCase("1", 1, true, Description = "When expectedFileCount is 1 CanExecute is true when one file matches")]
+        [TestCase("10", 10, true, Description = "When expectedFileCount is 10 CanExecute is true when ten file matches")]
+        public void ExpectedFileCountTests(string expectedFileCount, int actualFiles, bool expectedCanExecute)
+        {
+            fileSystem.AddDirectory("c:\\data\\files");
+
+            for (var fileId = 0; fileId < actualFiles; fileId++)
+            {
+                var fileName = $"c:\\data\\files\\f{fileId}.txt";
+                fileSystem.AddFile(fileName, new MockFileData($"File {fileId} content"));
+            }
+
+            var newBatchJob = new NewBatchJob
+            {
+                DisplayName = "AsteriskExpectedFileCountTests",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "ADDS",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = expectedFileCount,
+                                MimeType = "text/plain",
+                                SearchPath = @"c:\data\files\f*.txt"
+                            }
+                        }
+                }
+            };
+
+            var vm = new NewBatchJobViewModel(
+                newBatchJob,
+                fileSystem, 
+                fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, 
+                macroTransformer, 
+                dateTimeValidator, 
+                fakeMessageBoxService);
+
+            Assert.AreEqual(actualFiles, vm.Files[0].Files.Length);
+            Assert.AreEqual(expectedCanExecute, vm.ExcecuteJobCommand.CanExecute());
         }
     }
 }

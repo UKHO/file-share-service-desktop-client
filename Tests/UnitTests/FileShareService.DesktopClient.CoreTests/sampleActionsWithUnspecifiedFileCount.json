@@ -1,0 +1,54 @@
+{
+  "jobs": [
+    {
+      "action": "newBatch",
+      "displayName": "New batch with unspecified file count",
+      "actionParams": {
+        "businessUnit": "ADDS",
+        "attributes": [
+          {
+            "key": "Product Type",
+            "value": "AVCS"
+          }
+        ],
+        "acl": {
+          "readUsers": [],
+          "readGroups": []
+        },
+        "expiryDate": "$(now.AddDays(21))",
+        "files": [
+          {
+            "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": "*",
+            "mimeType": "text/plain",
+            "attributes": []
+          },
+          {
+            "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": "  *  ",
+            "mimeType": "text/plain",
+            "attributes": []
+          },
+          {
+            "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": "2",
+            "mimeType": "text/plain",
+            "attributes": []
+          },
+          {
+            "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": 2,
+            "mimeType": "text/plain",
+            "attributes": []
+          },
+          {
+            "searchPath": "c:\\temp\\*.txt",
+            "expectedFileCount": "  2  ",
+            "mimeType": "text/plain",
+            "attributes": []
+          }
+        ]
+      }
+    }
+  ]
+}
