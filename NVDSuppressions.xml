@@ -129,4 +129,22 @@
    ]]></notes>
    <cve>CVE-2021-33880</cve>
 </suppress>
+<suppress>
+		<notes>
+			<![CDATA[
+   file name: Serilog.Sinks.File:5.0.0
+   For details on these CVEs see:
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-2270
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3479
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3480
+		http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3487
+		This is a temporary suppression pending a fix being available.
+        Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_workitems/edit/60593
+   ]]>
+		</notes>
+		<cve>CVE-2014-2270</cve>
+	    <cve>CVE-2014-3479</cve>
+	    <cve>CVE-2014-3480</cve>
+	    <cve>CVE-2014-3487</cve>
+	</suppress>
 </suppressions>

@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Windows;
-using FakeItEasy;
+﻿using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Prism.Events;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Windows;
 using UKHO.FileShareAdminClient;
+using UKHO.FileShareAdminClient.Models;
+using UKHO.FileShareAdminClient.Models.Response;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient;
 using UKHO.FileShareService.DesktopClient.Core;
@@ -27,6 +31,8 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         private ISaveFileDialogService fakesaveFileDialogService = null!;
         private ILogger<SearchViewModel> fakeLoggerSearchVM = null!;
         private IFileShareApiAdminClient fakeFileShareApiAdminClient = null!;
+        private IEventAggregator fakeEventAggregator = null!;
+        
 
 
         [SetUp]
@@ -42,9 +48,11 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             fakesaveFileDialogService = A.Fake<ISaveFileDialogService>();
             fakeLoggerSearchVM = A.Fake<ILogger<SearchViewModel>>();
             fakeFileShareApiAdminClient = A.Fake<IFileShareApiAdminClient>();
+            fakeEventAggregator = A.Fake<IEventAggregator>();
+            
             searchViewModel =
                 new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
-                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService,fakesaveFileDialogService,fakeLoggerSearchVM);
+                    fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService, fakeFileService,fakesaveFileDialogService,fakeLoggerSearchVM, fakeEventAggregator);
         }
 
         [Test]
@@ -123,7 +131,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         {
             var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
                                                 fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
-                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
 
             var expectedResult = new BatchSearchResponse
             {
@@ -137,6 +145,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             };
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
             A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { Data = expectedResult, StatusCode = 200, IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<SetExpiryDateResponse> { StatusCode = 400, IsSuccess = false });
 
             searchVM.SearchCommand.Execute();
 
@@ -151,7 +160,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         {
             var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
                                                 fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
-                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
 
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
             A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { StatusCode = 400, IsSuccess = false });
@@ -166,7 +175,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         {
             var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
                                                 fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
-                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM);
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
 
             A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
             A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { StatusCode = 500, IsSuccess = false });
@@ -176,6 +185,29 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).MustHaveHappened();
         }
 
+        [Test]
+        [TestCase(HttpStatusCode.Forbidden, false, TestName = "WhenSetExpiryDateResponseIsForbiddenThenUserCanNotSetBatchExpiryDate")]
+        [TestCase(HttpStatusCode.BadRequest, true, TestName = "WhenSetExpiryDateResponseIsBadRequestThenUserCanSetBatchExpiryDate")]
+        public void TestExecuteSearchForSetExpiryDateResponseWithCancellation(HttpStatusCode setExpiryDateResponseStatusCode, bool expectedCanSetBatchExpiryDate)
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
 
+            var expectedResult = new BatchSearchResponse
+            {  
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1"), new BatchDetails("batch2")
+                }
+            };
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<BatchSearchResponse> { Data = expectedResult, StatusCode = 200, IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.SetExpiryDateAsync(A<string>.Ignored, A<BatchExpiryModel>.Ignored, A<CancellationToken>.Ignored)).Returns(new Result<SetExpiryDateResponse> { StatusCode = (int)setExpiryDateResponseStatusCode, IsSuccess = false });
+
+            searchVM.SearchCommand.Execute();
+
+            Assert.True(searchVM.BatchDetailsVM?.All(b => b.CanSetBatchExpiryDate == expectedCanSetBatchExpiryDate));
+        }       
     }
 }
