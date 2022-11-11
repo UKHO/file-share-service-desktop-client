@@ -142,7 +142,6 @@
         Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_workitems/edit/60593
    ]]>
 		</notes>
-		<packageUrl regex="true">^pkg:nuget/Serilog\.Sinks\.File@.*$</packageUrl>
 		<cve>CVE-2014-2270</cve>
 	    <cve>CVE-2014-3479</cve>
 	    <cve>CVE-2014-3480</cve>
