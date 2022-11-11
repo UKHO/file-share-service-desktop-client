@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Prism.Commands;
+using Prism.Events;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,11 +10,10 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Extensions.Logging;
-using Prism.Commands;
-using Prism.Mvvm;
+using UKHO.FileShareAdminClient.Models;
 using UKHO.FileShareClient.Models;
 using UKHO.FileShareService.DesktopClient.Core;
+using UKHO.FileShareService.DesktopClient.Events;
 
 namespace UKHO.FileShareService.DesktopClient.Modules.Search
 {
@@ -25,6 +28,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private readonly IFileService fileService;
         private readonly ISaveFileDialogService saveFileDialogService;
         private readonly ILogger<SearchViewModel> logger;
+        private readonly IEventAggregator eventAggregator;
         private string searchText = string.Empty;
         private string searchResultAsJson = string.Empty;
         private bool searchInProgress;
@@ -33,8 +37,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         private const int pageSize = 25;
         private const string NO_BATCH_FOUND = "No batches found.";
 
-        private List<BatchDetailsViewModel>? batchDetailsVM;
-        
+        private List<BatchDetailsViewModel>? batchDetailsVM;        
+
         public SearchViewModel(IAuthProvider authProvider,
             IFssSearchStringBuilder fssSearchStringBuilder,
             IFileShareApiAdminClientFactory fileShareApiAdminClientFactory,
@@ -43,13 +47,16 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             IMessageBoxService messageBoxService,
             IFileService fileService,
             ISaveFileDialogService saveFileDialogService,
-             ILogger<SearchViewModel> logger)
+            ILogger<SearchViewModel> logger,
+            IEventAggregator eventAggregator)
         {
             this.fileShareApiAdminClientFactory = fileShareApiAdminClientFactory;
             this.messageBoxService = messageBoxService;
             this.fileService = fileService;
             this.saveFileDialogService = saveFileDialogService;
             this.logger = logger;
+            this.eventAggregator = eventAggregator;
+
             SearchCriteria = new SearchCriteriaViewModel(fssSearchStringBuilder, fssUserAttributeListProvider, environmentsManager);
             SearchCommand = new DelegateCommand(async () => await OnSearch(),
                 () => authProvider.IsLoggedIn && !SearchInProgress);
@@ -59,13 +66,14 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 () => SearchResult != null && pageOffset + pageSize < SearchResult.Total);
             authProvider.PropertyChanged += (sender, args) => SearchCommand.RaiseCanExecuteChanged();
             SearchCriteria.PropertyChanged += OnSearchCriteriaPropertyChanged;
-           
-        }
 
+            this.eventAggregator.GetEvent<BatchExpiredEvent>().Subscribe(async () => await OnSearch(), ThreadOption.UIThread);         
+        }
+        
         private void OnSearchCriteriaPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             SearchText = SearchCriteria.GetSearchString();
-        }
+        }       
 
         private async Task OnSearch()
         {
@@ -95,6 +103,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
         {
             SearchInProgress = true;
             batchDetailsVM = new List<BatchDetailsViewModel>();
+            var canSetBatchExpiryDate = false;
             try
             {
                 logger.LogInformation("File Share Service search started for SearchText :{searchText}", searchText);
@@ -116,19 +125,29 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     return;
                 }
 
+                // call FSS api SetExpiryDate by passing empty guid to check whether user has permission to set batch expiry date
+                // Status code other than forbidden indicates user have permission.
+                var setExpiryDateResult = await fssClient.SetExpiryDateAsync(Guid.Empty.ToString(), new BatchExpiryModel { }, CancellationToken.None);
+                if (!setExpiryDateResult.IsSuccess && setExpiryDateResult.StatusCode != (int)HttpStatusCode.Forbidden)
+                { 
+                    canSetBatchExpiryDate = true;
+                }
+
                 SearchResultAsJson = result.Data.ToJson();
                 SearchResult = result.Data;
 
                 foreach (var entries in SearchResult.Entries)
                 {
-                    var bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService,saveFileDialogService)
+                    var bdvm = new BatchDetailsViewModel(fileShareApiAdminClientFactory, messageBoxService,fileService,saveFileDialogService, eventAggregator)
                     {
                         BatchId = entries.BatchId,
                         Attributes = entries.Attributes,
                         BatchPublishedDate = entries.BatchPublishedDate,
-                        Files = entries.Files
+                        Files = entries.Files,
+                        ExpiryDate = entries.ExpiryDate,
+                        CanSetBatchExpiryDate = canSetBatchExpiryDate
                     };
-                    batchDetailsVM.Add(bdvm);
+                    batchDetailsVM.Add(bdvm);                    
                 }
                 logger.LogInformation("File Share Service search result Found :{Total} record.", SearchResult.Total);
             }
