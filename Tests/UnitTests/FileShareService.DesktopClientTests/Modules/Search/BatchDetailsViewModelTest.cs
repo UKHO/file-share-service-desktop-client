@@ -104,7 +104,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         }
 
         [Test]
-        public void TestExpireBatchWhenUserAnswersNoToWarningMessage()
+        public void WhenUserAnswersNoToWarningMessageThenDoNotExpireBatch()
         {
             var batchId = Guid.NewGuid().ToString();
             var BatchDetailVM = new BatchDetailsViewModel(fakeFileShareApiAdminClientFactory, fakeMessageBoxService, fakeFileService, fakesaveFileDialogService, fakeEventAggregator);
@@ -119,9 +119,9 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         }
 
         [Test]
-        [TestCase(MessageBoxResult.Yes, true, HttpStatusCode.NoContent, null, TestName = "TestExpireBatchWithSuccess")]
-        [TestCase(MessageBoxResult.Yes, false, HttpStatusCode.BadRequest, null, TestName = "TestExpireBatchWithFailure")]
-        [TestCase(MessageBoxResult.Yes, false, HttpStatusCode.BadRequest, "test error description", TestName = "TestExpireBatchWithFailureAndError")]
+        [TestCase(MessageBoxResult.Yes, true, HttpStatusCode.NoContent, null, TestName = "WhenSetExpiryDateResponseIsSuccessThenPublishBatchExpiredEvent")]
+        [TestCase(MessageBoxResult.Yes, false, HttpStatusCode.BadRequest, null, TestName = "WhenSetExpiryDateResponseIsNotSuccessThenShowErrorMessage")]
+        [TestCase(MessageBoxResult.Yes, false, HttpStatusCode.BadRequest, "test error description", TestName = "WhenSetExpiryDateResponseIsNotSuccessThenShowErrorMessageOfResponse")]
         public void TestExpireBatch(MessageBoxResult expireBatchWarning, bool setExpiryDateSuccessResponse,
             HttpStatusCode responseCode, string errorDescription)
         {
@@ -164,7 +164,7 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         }
 
         [Test]
-        public void TestExpireBatchWithException()
+        public void WhenExceptionIsThrownThenShowErrorMessage()
         {
             var batchId = Guid.NewGuid().ToString();
             var exception = new Exception("test error message");

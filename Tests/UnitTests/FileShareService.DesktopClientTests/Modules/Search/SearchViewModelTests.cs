@@ -186,8 +186,8 @@ namespace FileShareService.DesktopClientTests.Modules.Search
         }
 
         [Test]
-        [TestCase(HttpStatusCode.Forbidden, false, TestName = "TestExecuteSearchForSetExpiryDateForbiddenResponseWithCancellation")]
-        [TestCase(HttpStatusCode.BadRequest, true, TestName = "TestExecuteSearchForSetExpiryDateBadRequestResponseWithCancellation")]
+        [TestCase(HttpStatusCode.Forbidden, false, TestName = "WhenSetExpiryDateResponseIsForbiddenThenUserCanNotSetBatchExpiryDate")]
+        [TestCase(HttpStatusCode.BadRequest, true, TestName = "WhenSetExpiryDateResponseIsBadRequestThenUserCanSetBatchExpiryDate")]
         public void TestExecuteSearchForSetExpiryDateResponseWithCancellation(HttpStatusCode setExpiryDateResponseStatusCode, bool expectedCanSetBatchExpiryDate)
         {
             var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
