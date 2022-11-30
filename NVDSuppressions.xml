@@ -147,4 +147,14 @@
 	    <cve>CVE-2014-3480</cve>
 	    <cve>CVE-2014-3487</cve>
 	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Microsoft.DiaSymReader.Native.amd64.dll
+   Bug to track the fix - https://dev.azure.com/ukhydro/Abzu/_boards/board/t/Abzu%20Delivery%20Team/Stories/?workitem=61953
+   ]]>
+		</notes>
+		<sha1>2e882ee6cccee6e5c0ee5e13eb40dae98e2b6f07</sha1>
+		<cve>CVE-2006-2453</cve>
+	</suppress>
 </suppressions>
