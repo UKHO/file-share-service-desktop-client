@@ -5,7 +5,7 @@
             <Component Id="cmp5331CA5F52193D033714FDDF20C463C5" Guid="{9064F926-A941-4D86-96A2-8A4E1B6A7923}">
               <File Id="filCB70EB97061F227F60A18AA79D1F1486" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\appsettings.json" />
             </Component>
-            <Component Id="cmp2E5EDA8D72F327AFF452AE2FE00CEA69" Guid="{B4A22AE5-A88C-4BA4-B7B8-AB767C3F07F7}">
+	        <!--<Component Id="cmp2E5EDA8D72F327AFF452AE2FE00CEA69" Guid="{B4A22AE5-A88C-4BA4-B7B8-AB767C3F07F7}">
                 <File Id="fil0AC151BF3F546CFD05E806D12E6A5768" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\clrcompression.dll" />
             </Component>
             <Component Id="cmp170DFF239B610B0ACA2229119DEA678E" Guid="{5264F8E7-3965-44AF-8B89-83FB2972236E}">
@@ -16,14 +16,14 @@
             </Component>
             <Component Id="cmp63C170ACC5D9139D96E32073358D1BE1" Guid="{193FAB1C-8B6E-4A57-BB95-A2A31142C892}">
                 <File Id="fil736C19A57049C32DF1C124E3518A0144" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\D3DCompiler_47_cor3.dll" />
-            </Component>
+            </Component>-->
             <Component Id="cmpE6212E4735B63A5E56062722629C6D86" Guid="{1C64DA96-A1D0-440D-8482-DF3C1B770DE6}">
                 <File Id="fil1EEA05DA6AA411D5ABD1C26ADD31C1E5" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\environments.json" />
             </Component>
             <Component Id="cmp1D69DEFD4118BF25119A85DDB22122EB" Guid="{E9C526B0-33A8-4119-AC3D-813DEF18CDF8}">
                 <File Id="fileFSSDesktopClientExe" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\FileShareService.DesktopClient.exe" />
             </Component>
-            <Component Id="cmpE35DDB3C925C83E74C7DAAE6FEA6C156" Guid="{FFB7C149-F865-4C7D-ABDA-926A8807788A}">
+            <!--<Component Id="cmpE35DDB3C925C83E74C7DAAE6FEA6C156" Guid="{FFB7C149-F865-4C7D-ABDA-926A8807788A}">
                 <File Id="filEAEAE1CB9E8AC1FF00B05453ABEE2ADF" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\mscordaccore.dll" />
             </Component>
             <Component Id="cmp2331B7D07912805FDD8E30EBA7274C0A" Guid="{5D370A24-7CDD-4CD6-B9A2-A693EEF00DE7}">
@@ -37,23 +37,23 @@
             </Component>
             <Component Id="cmpF115E4FEBD6E5B33656C807D055137BF" Guid="{3534935E-2305-4120-84BA-B2C691428E9A}">
                 <File Id="fil06589CA8F8E9A8611E0C0FD554762ED9" KeyPath="yes" Source="$(var.FileShareService.DesktopClient.TargetDir)\wpfgfx_cor3.dll" />
-            </Component>
+            </Component>-->
         </DirectoryRef>
     </Fragment>
     <Fragment>
         <ComponentGroup Id="ApplicationFilesComponentGroup">
             <ComponentRef Id="cmp5331CA5F52193D033714FDDF20C463C5" />
-            <ComponentRef Id="cmp2E5EDA8D72F327AFF452AE2FE00CEA69" />
-            <ComponentRef Id="cmp170DFF239B610B0ACA2229119DEA678E" />
-            <ComponentRef Id="cmp1FAC008E6AA14459AD5390EB28F23EFE" />
-            <ComponentRef Id="cmp63C170ACC5D9139D96E32073358D1BE1" />
+            <!--<ComponentRef Id="cmp2E5EDA8D72F327AFF452AE2FE00CEA69" />-->
+            <!--<ComponentRef Id="cmp170DFF239B610B0ACA2229119DEA678E" />-->
+            <!--<ComponentRef Id="cmp1FAC008E6AA14459AD5390EB28F23EFE" />-->
+            <!--<ComponentRef Id="cmp63C170ACC5D9139D96E32073358D1BE1" />-->
             <ComponentRef Id="cmpE6212E4735B63A5E56062722629C6D86" />
             <ComponentRef Id="cmp1D69DEFD4118BF25119A85DDB22122EB" />
-            <ComponentRef Id="cmpE35DDB3C925C83E74C7DAAE6FEA6C156" />
+            <!--<ComponentRef Id="cmpE35DDB3C925C83E74C7DAAE6FEA6C156" />
             <ComponentRef Id="cmp2331B7D07912805FDD8E30EBA7274C0A" />
             <ComponentRef Id="cmpAAD5497968A7B8FFCB626EB296EB0E32" />
             <ComponentRef Id="cmp1E4357D9F189E6D5B80BEE033AF7F3DB" />
-            <ComponentRef Id="cmpF115E4FEBD6E5B33656C807D055137BF" />
+            <ComponentRef Id="cmpF115E4FEBD6E5B33656C807D055137BF" />-->
         </ComponentGroup>
     </Fragment>
 </Wix>
