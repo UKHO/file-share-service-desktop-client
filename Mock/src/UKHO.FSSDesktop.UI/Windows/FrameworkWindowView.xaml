@@ -1,0 +1,26 @@
+﻿<Window x:Class="UKHO.FSSDesktop.UI.Windows.FrameworkWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UKHO.FSSDesktop.UI.Windows"
+        mc:Ignorable="d"
+        Title="File Share Service" Height="900" Width="1500"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        ResizeMode="CanResizeWithGrip">
+    <Grid>
+        
+        <ui:NavigationView x:Name="NavigationView" PaneDisplayMode="Left" IsTabStop="False"
+                           IsBackButtonVisible="Collapsed"
+                           PaneTitle="File Share Service" AlwaysShowHeader="True"
+                           IsPaneVisible="{Binding IsPaneVisible}"
+                           MenuItemsSource="{Binding NavigationItems}"
+                           SelectionChanged="OnNavigationSelectionChanged">
+
+            
+
+            <ui:Frame x:Name="NavigationFrame" />
+        </ui:NavigationView>
+    </Grid>
+</Window>
