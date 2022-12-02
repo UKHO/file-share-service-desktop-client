@@ -1,0 +1,1392 @@
+{
+  "count": 25,
+  "total": 45519,
+  "entries": [
+    {
+      "batchId": "67e09d03-6021-4a0e-ac3a-43c43a3a3d7f",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T14:59:53.017Z",
+      "expiryDate": "2022-11-30T14:59:47.427Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 346106,
+          "mimeType": "application/zip",
+          "hash": "zbw4++xdYA6cD8f0Zo5TOQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/67e09d03-6021-4a0e-ac3a-43c43a3a3d7f/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "5c57fac1-3046-4cdb-8aef-25d5c4feef66",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T14:57:10.473Z",
+      "expiryDate": "2022-11-30T14:57:01.353Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260111,
+          "mimeType": "application/zip",
+          "hash": "QEl/NSnD8inemX6izb2wZw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/5c57fac1-3046-4cdb-8aef-25d5c4feef66/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "ff9d0bf1-8784-495d-94f6-b3cc083d06b2",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T12:25:11.737Z",
+      "expiryDate": "2022-11-30T12:25:03.857Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260111,
+          "mimeType": "application/zip",
+          "hash": "hZQecztRgVqlrJGRikRqaA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/ff9d0bf1-8784-495d-94f6-b3cc083d06b2/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "57addb9c-b18c-44a6-a809-fdb7bdddd779",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T10:58:17.177Z",
+      "expiryDate": "2022-11-30T10:58:09.853Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260111,
+          "mimeType": "application/zip",
+          "hash": "exr3FzJN2A+beZna8yaWvw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/57addb9c-b18c-44a6-a809-fdb7bdddd779/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "88dd8b98-4d63-49eb-a2a5-8646285c8832",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T09:19:10.813Z",
+      "expiryDate": "2022-11-30T09:19:01.94Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260112,
+          "mimeType": "application/zip",
+          "hash": "KoWPepG3tI+AJDIeXlbmOg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/88dd8b98-4d63-49eb-a2a5-8646285c8832/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "d35cd487-39cd-47f3-88a1-bc36c438eee6",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T09:19:10.783Z",
+      "expiryDate": "2022-11-30T09:18:59.857Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260111,
+          "mimeType": "application/zip",
+          "hash": "lTv/dVE4Yq7dLg98kwzMsQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/d35cd487-39cd-47f3-88a1-bc36c438eee6/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "40be28a2-6386-4daa-8f16-6e8fdf1ad283",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T09:19:10.783Z",
+      "expiryDate": "2022-11-30T09:19:01.45Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260112,
+          "mimeType": "application/zip",
+          "hash": "6YEBSJCYUiDRqfs7eT2QgA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/40be28a2-6386-4daa-8f16-6e8fdf1ad283/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "6b24afa7-bd59-41d5-b6f9-cdc464474aa0",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-29T09:19:10.78Z",
+      "expiryDate": "2022-11-30T09:19:01.807Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260112,
+          "mimeType": "application/zip",
+          "hash": "1A7rJXI73q7afZlUlRRhbw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6b24afa7-bd59-41d5-b6f9-cdc464474aa0/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "2f7855cc-801b-4335-8931-ad94bedc5d13",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-28T15:31:27.623Z",
+      "expiryDate": "2022-11-29T15:31:20.073Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260111,
+          "mimeType": "application/zip",
+          "hash": "D9Xo04Gl70OWtWfb7GcB2A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/2f7855cc-801b-4335-8931-ad94bedc5d13/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "f5168a6b-808c-4aa8-a5c2-f87877770b4f",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB103579"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "d2f31eb5-e01f-47aa-ba09-e40627239366"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-11-28T15:31:02.81Z",
+      "files": [
+        {
+          "filename": "GBF3CXXX.TXT",
+          "fileSize": 105,
+          "mimeType": "text/plain",
+          "hash": "y1fop4mGyK79CfrUFb2++A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/f5168a6b-808c-4aa8-a5c2-f87877770b4f/files/GBF3CXXX.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBA12JXX.TXT",
+          "fileSize": 126,
+          "mimeType": "text/plain",
+          "hash": "jhqTKV5fHroXVq+xvzriRw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/f5168a6b-808c-4aa8-a5c2-f87877770b4f/files/GBA12JXX.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBN00127.TXT",
+          "fileSize": 573,
+          "mimeType": "text/plain",
+          "hash": "Y9ji4nM7R05wR8KIgosTxA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/f5168a6b-808c-4aa8-a5c2-f87877770b4f/files/GBN00127.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBI03579.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "g8mmw+ONSgt7qx2ySclyfw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/f5168a6b-808c-4aa8-a5c2-f87877770b4f/files/GBI03579.000"
+            }
+          }
+        },
+        {
+          "filename": "GB103579.000",
+          "fileSize": 390944,
+          "mimeType": "application/s63",
+          "hash": "9isw1JHiTVJOhg49t5I96g==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "0917FFC7"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/f5168a6b-808c-4aa8-a5c2-f87877770b4f/files/GB103579.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "b81df7dd-138e-438c-8743-985c08fff0ac",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-28T15:31:00.747Z",
+      "expiryDate": "2022-11-29T15:30:55.933Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260089,
+          "mimeType": "application/zip",
+          "hash": "3Id999t0pHpcq6HtBbENTQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/b81df7dd-138e-438c-8743-985c08fff0ac/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "a567af93-160e-4425-a249-9571f2fe2921",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-28T15:30:51.807Z",
+      "expiryDate": "2022-11-29T15:30:44.207Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260108,
+          "mimeType": "application/zip",
+          "hash": "Apyl/Qp4Z0kezNQwPDnKHg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a567af93-160e-4425-a249-9571f2fe2921/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "4c41cb9c-4a86-4fe0-ad26-fac4c93a8fa4",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE4NO13K"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "7447d75e-289d-436a-8690-e573a2594bba"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-11-28T15:30:48.43Z",
+      "files": [
+        {
+          "filename": "DELNO13K.001",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "2r3Ys7hSN7CB2I9Y6/NpzA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/4c41cb9c-4a86-4fe0-ad26-fac4c93a8fa4/files/DELNO13K.001"
+            }
+          }
+        },
+        {
+          "filename": "DE4NO13K.001",
+          "fileSize": 1192,
+          "mimeType": "application/s63",
+          "hash": "aPY9jXFldkPne6sa51rvIQ==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "4559DFF9"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/4c41cb9c-4a86-4fe0-ad26-fac4c93a8fa4/files/DE4NO13K.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "6f9b44eb-f008-4274-8c43-e1e54a3cbe9c",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-28T15:30:48.02Z",
+      "expiryDate": "2022-11-29T15:30:40.643Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260109,
+          "mimeType": "application/zip",
+          "hash": "ZisfGFimFs8BxQPMef4Xgg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6f9b44eb-f008-4274-8c43-e1e54a3cbe9c/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "435f5629-4397-4138-8f72-bdefe393972b",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        }
+      ],
+      "businessUnit": "AVCSCustomExchangeSets",
+      "batchPublishedDate": "2022-11-28T15:30:27.66Z",
+      "expiryDate": "2022-11-29T15:29:58.61Z",
+      "files": [
+        {
+          "filename": "V01X01.zip",
+          "fileSize": 260041,
+          "mimeType": "application/zip",
+          "hash": "druS0409CnQG7BjdVrSdvw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/435f5629-4397-4138-8f72-bdefe393972b/files/V01X01.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "ac889384-628e-4855-8d16-58a3dead2614",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB53496A"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "34"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "abc2a06d-699f-44f6-b70a-b70ddc20757b"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-11-28T15:30:26.36Z",
+      "files": [
+        {
+          "filename": "GBC7XXXX.TXT",
+          "fileSize": 86,
+          "mimeType": "text/plain",
+          "hash": "7vTZpyYyvTda02T+nCBsZQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/ac889384-628e-4855-8d16-58a3dead2614/files/GBC7XXXX.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB1B0169.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "F1/2MrqA9QETu1/L63jmjA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/ac889384-628e-4855-8d16-58a3dead2614/files/GB1B0169.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB1B0094.TXT",
+          "fileSize": 159,
+          "mimeType": "text/plain",
+          "hash": "i1rtJPZ+7XFWpmkfQNSnHQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/ac889384-628e-4855-8d16-58a3dead2614/files/GB1B0094.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB1B0098.TXT",
+          "fileSize": 288,
+          "mimeType": "text/plain",
+          "hash": "2iJAQl8+peJRWZ4OumOhBg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/ac889384-628e-4855-8d16-58a3dead2614/files/GB1B0098.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GB1B0099.TXT",
+          "fileSize": 337,
+          "mimeType": "text/plain",
+          "hash": "1dMyilRdISoA9jcZagfpNA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/ac889384-628e-4855-8d16-58a3dead2614/files/GB1B0099.TXT"
+            }
+          }
+        },
+        {
+          "filename": "GBM3496A.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "k3xC1CqmAbKaU0bAzdcGpw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/ac889384-628e-4855-8d16-58a3dead2614/files/GBM3496A.000"
+            }
+          }
+        },
+        {
+          "filename": "GB53496A.000",
+          "fileSize": 161640,
+          "mimeType": "application/s63",
+          "hash": "2JQEnjxGAL/w6Zc2q1CEHw==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "18781A07"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/ac889384-628e-4855-8d16-58a3dead2614/files/GB53496A.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "6872b337-fd92-4dde-b274-bb3eecd14d54",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "JP"
+        },
+        {
+          "key": "CellName",
+          "value": "JP5PCGRI"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "14"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "42eea25e-76da-407b-bca5-954b3b9c1432"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "3"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-11-28T15:30:23.187Z",
+      "files": [
+        {
+          "filename": "JPMPCGRI.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "fhLAlI10ZcriCccLo3qX4A==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6872b337-fd92-4dde-b274-bb3eecd14d54/files/JPMPCGRI.000"
+            }
+          }
+        },
+        {
+          "filename": "JPTKY00Z.TXT",
+          "fileSize": 8028,
+          "mimeType": "text/plain",
+          "hash": "C16ve1iqeJKJx865Bed74Q==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6872b337-fd92-4dde-b274-bb3eecd14d54/files/JPTKY00Z.TXT"
+            }
+          }
+        },
+        {
+          "filename": "JPTKY00Y.TXT",
+          "fileSize": 8695,
+          "mimeType": "text/plain",
+          "hash": "fhZT8iic5VVLWvh7eS7TBQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/6872b337-fd92-4dde-b274-bb3eecd14d54/files/JPTKY00Y.TXT"
+            }
+          }
+        },
+        {
+          "filename": "JP5PCGRI.000",
+          "fileSize": 341128,
+          "mimeType": "application/s63",
+          "hash": "rq6H7SHjI3sHQbFvPuAqpA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "D5FA30DF"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/6872b337-fd92-4dde-b274-bb3eecd14d54/files/JP5PCGRI.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "a6be0d4e-3bb2-4f6f-8635-3df6d21f60c9",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "DE"
+        },
+        {
+          "key": "CellName",
+          "value": "DE4NO13K"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "2"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "9cc0872f-f64f-4888-86cc-72857dbf2652"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "0"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-11-28T15:29:41.1Z",
+      "files": [
+        {
+          "filename": "DEWIN02D.TXT",
+          "fileSize": 112,
+          "mimeType": "text/plain",
+          "hash": "/W0cyvbUjB22VDb9TJryLA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a6be0d4e-3bb2-4f6f-8635-3df6d21f60c9/files/DEWIN02D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DEWIN02E.TXT",
+          "fileSize": 114,
+          "mimeType": "text/plain",
+          "hash": "yRNcWwL1k2KMCJHWlCZkIg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a6be0d4e-3bb2-4f6f-8635-3df6d21f60c9/files/DEWIN02E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG02D.TXT",
+          "fileSize": 277,
+          "mimeType": "text/plain",
+          "hash": "EKXEkQvLPsSctmBGFHbgXQ==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a6be0d4e-3bb2-4f6f-8635-3df6d21f60c9/files/DELTG02D.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELTG02E.TXT",
+          "fileSize": 280,
+          "mimeType": "text/plain",
+          "hash": "6NSa9NaaK+DbcOBAAa/J0w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a6be0d4e-3bb2-4f6f-8635-3df6d21f60c9/files/DELTG02E.TXT"
+            }
+          }
+        },
+        {
+          "filename": "DELNO13K.000",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "2T4pOl5t1Ktg2XyuPZmy2w==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a6be0d4e-3bb2-4f6f-8635-3df6d21f60c9/files/DELNO13K.000"
+            }
+          }
+        },
+        {
+          "filename": "DE4NO13K.000",
+          "fileSize": 9216,
+          "mimeType": "application/s63",
+          "hash": "xkRftcgOP/cabyhH4m7tpA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "21B2961A"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/a6be0d4e-3bb2-4f6f-8635-3df6d21f60c9/files/DE4NO13K.000"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "eec543ff-4c2c-4f14-99cd-705b5fd8e812",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Agency",
+          "value": "GB"
+        },
+        {
+          "key": "CellName",
+          "value": "GB52582D"
+        },
+        {
+          "key": "EditionNumber",
+          "value": "1"
+        },
+        {
+          "key": "ProductCode",
+          "value": "AVCS"
+        },
+        {
+          "key": "TraceId",
+          "value": "17bfc76f-1cd1-4999-b54c-ed8e841e728e"
+        },
+        {
+          "key": "UpdateNumber",
+          "value": "1"
+        }
+      ],
+      "businessUnit": "ADDS",
+      "batchPublishedDate": "2022-11-28T15:29:36.47Z",
+      "files": [
+        {
+          "filename": "GBM2582D.001",
+          "fileSize": 874,
+          "mimeType": "text/plain",
+          "hash": "/8rejKktFYbUtIQDT6yYUw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/eec543ff-4c2c-4f14-99cd-705b5fd8e812/files/GBM2582D.001"
+            }
+          }
+        },
+        {
+          "filename": "GB52582D.001",
+          "fileSize": 10744,
+          "mimeType": "application/s63",
+          "hash": "XW0x00mYEo9TqeaXC+BnOA==",
+          "attributes": [
+            {
+              "key": "s57-CRC",
+              "value": "F3AFB75E"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/eec543ff-4c2c-4f14-99cd-705b5fd8e812/files/GB52582D.001"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "77d0fc1f-07a0-4e5f-b430-2a15122012d0",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Chart Number",
+          "value": "BEN5184AIE"
+        },
+        {
+          "key": "Chart Title",
+          "value": "Test Non CARIS Lake Victoria Charts"
+        },
+        {
+          "key": "Chart Version Id",
+          "value": "105667"
+        },
+        {
+          "key": "Edition Date",
+          "value": "1895-08-31"
+        },
+        {
+          "key": "Edition Number",
+          "value": "4"
+        },
+        {
+          "key": "INT Number",
+          "value": "2"
+        },
+        {
+          "key": "Nm Number",
+          "value": "4024/20"
+        },
+        {
+          "key": "Paper Depth",
+          "value": "1270"
+        },
+        {
+          "key": "Paper Width",
+          "value": "1016"
+        },
+        {
+          "key": "Plan Type",
+          "value": "CC"
+        },
+        {
+          "key": "Product Type",
+          "value": "Paper Chart"
+        },
+        {
+          "key": "Publication Date",
+          "value": "1895-08-30"
+        }
+      ],
+      "businessUnit": "PrintToOrder",
+      "batchPublishedDate": "2022-11-28T14:42:32.64Z",
+      "files": [
+        {
+          "filename": "BEN5184AIE.pdf",
+          "fileSize": 4978,
+          "mimeType": "application/pdf",
+          "hash": "qr5ISWTD8DjBDnVYIcltww==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/77d0fc1f-07a0-4e5f-b430-2a15122012d0/files/BEN5184AIE.pdf"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "8ec7f689-ec4a-4a78-8ce1-3dee7e9fee77",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Base"
+        },
+        {
+          "key": "Media Type",
+          "value": "DVD"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        },
+        {
+          "key": "S63 Version",
+          "value": "1.2"
+        },
+        {
+          "key": "Week Number",
+          "value": "47"
+        },
+        {
+          "key": "Year",
+          "value": "2022"
+        },
+        {
+          "key": "Year / Week",
+          "value": "2022 / 47"
+        }
+      ],
+      "businessUnit": "AVCSData",
+      "batchPublishedDate": "2022-11-24T15:10:16.377Z",
+      "expiryDate": "2022-12-22T14:21:52Z",
+      "files": [
+        {
+          "filename": "AVCS_S631-1_REISSUE_DVD2_WK47_22.iso.sha1",
+          "fileSize": 40,
+          "mimeType": "text/plain",
+          "hash": "k86SqRporWXjjCoucW92Gw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8ec7f689-ec4a-4a78-8ce1-3dee7e9fee77/files/AVCS_S631-1_REISSUE_DVD2_WK47_22.iso.sha1"
+            }
+          }
+        },
+        {
+          "filename": "AVCS_S631-1_REISSUE_DVD1_WK47_22.iso.sha1",
+          "fileSize": 40,
+          "mimeType": "text/plain",
+          "hash": "N68N4HsFI3jjY4Vp9T72Fg==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8ec7f689-ec4a-4a78-8ce1-3dee7e9fee77/files/AVCS_S631-1_REISSUE_DVD1_WK47_22.iso.sha1"
+            }
+          }
+        },
+        {
+          "filename": "AVCS_S631-1_REISSUE_DVD2_WK47_22.iso",
+          "fileSize": 2714710016,
+          "mimeType": "application/x-raw-disk-image",
+          "hash": "7wOEZpqC206wiC6AQ/+2Vw==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8ec7f689-ec4a-4a78-8ce1-3dee7e9fee77/files/AVCS_S631-1_REISSUE_DVD2_WK47_22.iso"
+            }
+          }
+        },
+        {
+          "filename": "AVCS_S631-1_REISSUE_DVD1_WK47_22.iso",
+          "fileSize": 3452870656,
+          "mimeType": "application/x-raw-disk-image",
+          "hash": "MCthFKLU/gR8TdBOK4nwdA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/8ec7f689-ec4a-4a78-8ce1-3dee7e9fee77/files/AVCS_S631-1_REISSUE_DVD1_WK47_22.iso"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "ccb15680-9154-41af-8da7-0b0e8fe725a1",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        },
+        {
+          "key": "S63 Version",
+          "value": "1.2"
+        },
+        {
+          "key": "Week Number",
+          "value": "47"
+        },
+        {
+          "key": "Year",
+          "value": "2022"
+        },
+        {
+          "key": "Year / Week",
+          "value": "2022 / 47"
+        }
+      ],
+      "businessUnit": "ADDSSupport",
+      "batchPublishedDate": "2022-11-24T08:00:56.233Z",
+      "expiryDate": "2022-12-22T08:00:53.313Z",
+      "files": [
+        {
+          "filename": "AVCS_UPDATE_WK47_22_Only.zip",
+          "fileSize": 1178191,
+          "mimeType": "application/zip",
+          "hash": "Nl7FHxNzmlLKSodjmotT+A==",
+          "attributes": [
+            {
+              "key": "File Name",
+              "value": "AVCS_UPDATE_WK47_22_Only.zip"
+            },
+            {
+              "key": "Product Type",
+              "value": "AVCS"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/ccb15680-9154-41af-8da7-0b0e8fe725a1/files/AVCS_UPDATE_WK47_22_Only.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "b75e4e39-41f7-4600-ba7f-6b8a7497db88",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        },
+        {
+          "key": "S63 Version",
+          "value": "1.2"
+        },
+        {
+          "key": "Week Number",
+          "value": "47"
+        },
+        {
+          "key": "Year",
+          "value": "2022"
+        },
+        {
+          "key": "Year / Week",
+          "value": "2022 / 47"
+        }
+      ],
+      "businessUnit": "AVCSData",
+      "batchPublishedDate": "2022-11-24T08:00:52.563Z",
+      "expiryDate": "2022-12-22T08:00:47.183Z",
+      "files": [
+        {
+          "filename": "AVCS_UPDATE_WK47_22_Only.zip",
+          "fileSize": 1178192,
+          "mimeType": "application/zip",
+          "hash": "qCt5obRn5mx72oiQG3rnOA==",
+          "attributes": [
+            {
+              "key": "File Name",
+              "value": "AVCS_UPDATE_WK47_22_Only.zip"
+            },
+            {
+              "key": "Product Type",
+              "value": "AVCS"
+            }
+          ],
+          "links": {
+            "get": {
+              "href": "/batch/b75e4e39-41f7-4600-ba7f-6b8a7497db88/files/AVCS_UPDATE_WK47_22_Only.zip"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "f0ccad5b-39a2-4acb-938a-b8bd3bf4c5f8",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Exchange Set Type",
+          "value": "Update"
+        },
+        {
+          "key": "Media Type",
+          "value": "Zip"
+        },
+        {
+          "key": "Product Type",
+          "value": "AVCS"
+        },
+        {
+          "key": "S63 Version",
+          "value": "1.2"
+        },
+        {
+          "key": "Week Number",
+          "value": "47"
+        },
+        {
+          "key": "Year",
+          "value": "2022"
+        },
+        {
+          "key": "Year / Week",
+          "value": "2022 / 47"
+        }
+      ],
+      "businessUnit": "AVCSData",
+      "batchPublishedDate": "2022-11-23T16:34:00.177Z",
+      "expiryDate": "2022-12-21T16:16:39Z",
+      "files": [
+        {
+          "filename": "AVCS_S631-1_UPDATE_CD_WK47_22.ZIP",
+          "fileSize": 1268650158,
+          "mimeType": "application/zip",
+          "hash": "Mf1E8oquUu8JCyblpi8+ug==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/f0ccad5b-39a2-4acb-938a-b8bd3bf4c5f8/files/AVCS_S631-1_UPDATE_CD_WK47_22.ZIP"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "a0d97aac-feed-4a2d-8d4f-bfa7d66e73ad",
+      "status": "Committed",
+      "attributes": [
+        {
+          "key": "Chart Number",
+          "value": "FCS2223H"
+        },
+        {
+          "key": "Chart Title",
+          "value": "A new chart to test"
+        },
+        {
+          "key": "Edition Number",
+          "value": "3"
+        },
+        {
+          "key": "Product Type",
+          "value": "Paper Chart"
+        },
+        {
+          "key": "Publication Date",
+          "value": "2014-10-02"
+        }
+      ],
+      "businessUnit": "PrintToOrder",
+      "batchPublishedDate": "2022-11-21T10:30:16.527Z",
+      "expiryDate": "2027-04-09T10:29:03Z",
+      "files": [
+        {
+          "filename": "FCS2223H_1.tif",
+          "fileSize": 15683007,
+          "mimeType": "image/tif",
+          "hash": "cmDOtXl9yC/XHuYonznZxA==",
+          "attributes": [],
+          "links": {
+            "get": {
+              "href": "/batch/a0d97aac-feed-4a2d-8d4f-bfa7d66e73ad/files/FCS2223H_1.tif"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "/batch?limit=25&start=0"
+    },
+    "first": {
+      "href": "/batch?limit=25&start=0"
+    },
+    "next": {
+      "href": "/batch?limit=25&start=25"
+    },
+    "last": {
+      "href": "/batch?limit=25&start=45500"
+    }
+  }
+}

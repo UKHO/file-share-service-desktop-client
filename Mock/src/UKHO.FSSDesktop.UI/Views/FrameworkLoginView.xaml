@@ -1,0 +1,112 @@
+﻿<UserControl x:Class="UKHO.FSSDesktop.UI.Views.FrameworkLoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:assets="clr-namespace:UKHO.FSSDesktop.UI.Assets"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="LightGray">
+            <Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderThickness="0,0,1,0" BorderBrush="LightGray" Margin="12">
+                        <assets:AdmiraltyLogo Margin="0,12,12,12"/>
+                    </Border>
+
+                    <TextBlock Grid.Column="1" Text="File Share Service" FontSize="32" VerticalAlignment="Center" Margin="4"/>
+                </Grid>
+                
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Stretch="UniformToFill" StretchDirection="Both" Source="pack://application:,,,/UKHO.FSSDesktop.UI;component/Assets/UKHO-1400x240.jpg" />
+
+            <TextBlock Margin="3,32,3,3" Grid.Row="1" Grid.Column="1" FontSize="20" Text="The ADMIRALTY File Share Service allows you to search and download files"/>
+            <TextBlock Margin="3" Grid.Row="2" Grid.Column="1" FontSize="16" Text="Sign in to access your files"/>
+
+            <TextBlock Margin="3,16,3,3" Grid.Row="3" Grid.Column="1" FontSize="16" Text="Email Address"/>
+            <TextBlock Margin="3" Grid.Row="5" Grid.Column="1" FontSize="16" Text="Password"/>
+            <TextBlock Margin="3" Grid.Row="7" Grid.Column="1" FontSize="16" Text="Environment"/>
+
+            <TextBox Margin="3" Grid.Row="4" Grid.Column="1" FontSize="16" Text="{Binding EmailAddress, UpdateSourceTrigger=PropertyChanged}"/>
+            <PasswordBox Margin="3" Grid.Row="6" Grid.Column="1" FontSize="16" PasswordChanged="OnPasswordChanged"/>
+
+            <Grid Grid.Row="8" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0" Margin="3" FontSize="16" HorizontalAlignment="Stretch" 
+                          ItemsSource="{Binding Environments}"
+                          SelectedItem="{Binding SelectedEnvironment}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" FontSize="16" FontWeight="SemiBold" Text="{Binding Name}"/>
+                                <TextBlock Grid.Row="1" FontSize="16" Text="{Binding Description}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Grid.Column="1" Content="Sign in" Margin="3" Width="120" VerticalAlignment="Stretch" FontSize="16"
+                        IsDefault="True"
+                        Command="{Binding LoginCommand}"/>
+            </Grid>
+            
+
+        </Grid>
+
+        <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="LightGray">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <assets:UKHOLogo Grid.Column="0" Margin="12" />
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Margin="8" Text="© Crown Copyright 2022 UK Hydrographic Office" FontSize="16"/>
+                    <TextBlock Margin="8,0,8,8" Text="Version 1.0.0.0" HorizontalAlignment="Right" FontSize="16"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
