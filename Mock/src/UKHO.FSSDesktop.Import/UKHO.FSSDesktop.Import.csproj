@@ -18,6 +18,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Injection\" />
+	  <Folder Include="Views\" />
 	</ItemGroup>
 
 </Project>

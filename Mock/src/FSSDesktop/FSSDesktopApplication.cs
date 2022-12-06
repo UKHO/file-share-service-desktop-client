@@ -1,20 +1,16 @@
 ﻿namespace FSSDesktop
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.DirectoryServices;
     using System.Linq;
     using System.Windows;
     using Microsoft.Extensions.DependencyInjection;
     using ModernWpf;
     using ModernWpf.Controls;
     using Serilog;
-    using UKHO.FSSDesktop.Import.Injection;
     using UKHO.FSSDesktop.Infrastructure.Injection;
-    using UKHO.FSSDesktop.Search.Injection;
-    using UKHO.FSSDesktop.Security.Injection;
+    using UKHO.FSSDesktop.Modules.Injection;
     using UKHO.FSSDesktop.UI.Injection;
     using UKHO.FSSDesktop.UI.Modules;
     using UKHO.FSSDesktop.UI.Services;
@@ -66,9 +62,7 @@
             serviceCollection.AddInfrastructure();
             serviceCollection.AddFrameworkUI();
 
-            serviceCollection.AddImportModule();
-            serviceCollection.AddSearchModule();
-            serviceCollection.AddSecurityModule();
+            serviceCollection.AddModules();
 
             var provider = serviceCollection.BuildServiceProvider();
 

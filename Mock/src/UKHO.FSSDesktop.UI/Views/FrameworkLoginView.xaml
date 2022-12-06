@@ -25,7 +25,7 @@
                         <assets:AdmiraltyLogo Margin="0,12,12,12"/>
                     </Border>
 
-                    <TextBlock Grid.Column="1" Text="File Share Service" FontSize="32" VerticalAlignment="Center" Margin="4"/>
+                    <TextBlock Grid.Column="1" Text="ADDS Desktop" FontSize="32" VerticalAlignment="Center" Margin="4"/>
                 </Grid>
                 
             </Grid>
@@ -52,8 +52,8 @@
 
             <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Stretch="UniformToFill" StretchDirection="Both" Source="pack://application:,,,/UKHO.FSSDesktop.UI;component/Assets/UKHO-1400x240.jpg" />
 
-            <TextBlock Margin="3,32,3,3" Grid.Row="1" Grid.Column="1" FontSize="20" Text="The ADMIRALTY File Share Service allows you to search and download files"/>
-            <TextBlock Margin="3" Grid.Row="2" Grid.Column="1" FontSize="16" Text="Sign in to access your files"/>
+            <!--<TextBlock Margin="3,32,3,3" Grid.Row="1" Grid.Column="1" FontSize="20" Text="The ADMIRALTY ADDS Desktop allows you to "/>-->
+            <TextBlock Margin="3,32,3,3" Grid.Row="2" Grid.Column="1" FontSize="20" Text="Sign in to access your files"/>
 
             <TextBlock Margin="3,16,3,3" Grid.Row="3" Grid.Column="1" FontSize="16" Text="Email Address"/>
             <TextBlock Margin="3" Grid.Row="5" Grid.Column="1" FontSize="16" Text="Password"/>

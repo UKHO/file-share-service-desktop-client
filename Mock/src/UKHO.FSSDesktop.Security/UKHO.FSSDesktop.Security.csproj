@@ -16,4 +16,8 @@
 		<ProjectReference Include="..\UKHO.FSSDesktop.UI\UKHO.FSSDesktop.UI.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Views\" />
+	</ItemGroup>
+
 </Project>

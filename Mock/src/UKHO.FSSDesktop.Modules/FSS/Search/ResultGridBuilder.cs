@@ -1,9 +1,9 @@
-﻿namespace UKHO.FSSDesktop.Search.Views
+﻿namespace UKHO.FSSDesktop.Modules.FSS.Search
 {
-    using FileShareClient.Models;
     using System.Collections.Generic;
     using System.Linq;
     using System.Windows.Controls;
+    using UKHO.FileShareClient.Models;
 
     public class ResultGridBuilder
     {

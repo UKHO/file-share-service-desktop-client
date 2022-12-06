@@ -20,10 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UKHO.FSSDesktop.Import\UKHO.FSSDesktop.Import.csproj" />
     <ProjectReference Include="..\UKHO.FSSDesktop.Infrastructure\UKHO.FSSDesktop.Infrastructure.csproj" />
-    <ProjectReference Include="..\UKHO.FSSDesktop.Search\UKHO.FSSDesktop.Search.csproj" />
-    <ProjectReference Include="..\UKHO.FSSDesktop.Security\UKHO.FSSDesktop.Security.csproj" />
+    <ProjectReference Include="..\UKHO.FSSDesktop.Modules\UKHO.FSSDesktop.Modules.csproj" />
     <ProjectReference Include="..\UKHO.FSSDesktop.UI\UKHO.FSSDesktop.UI.csproj" />
   </ItemGroup>
 

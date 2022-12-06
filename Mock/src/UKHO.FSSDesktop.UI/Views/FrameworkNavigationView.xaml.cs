@@ -47,8 +47,10 @@
                 }
                 else
                 {
-                    var item = (INavigationItem) args.SelectedItem;
-                    NavigateTo(item);
+                    if (args.SelectedItem is INavigationItem item)
+                    {
+                        NavigateTo(item);
+                    }
                 }
             }
         }

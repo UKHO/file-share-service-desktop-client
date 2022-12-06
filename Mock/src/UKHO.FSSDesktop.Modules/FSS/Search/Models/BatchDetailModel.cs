@@ -1,9 +1,9 @@
-﻿namespace UKHO.FSSDesktop.Search.Views.Models
+﻿namespace UKHO.FSSDesktop.Modules.FSS.Search.Models
 {
     using System;
     using System.Linq;
-    using FileShareClient.Models;
-    using Security;
+    using UKHO.FileShareClient.Models;
+    using UKHO.FSSDesktop.Security;
 
     public class BatchDetailModel
     {

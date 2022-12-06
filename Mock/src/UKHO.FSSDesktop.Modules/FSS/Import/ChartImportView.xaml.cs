@@ -1,4 +1,4 @@
-﻿namespace UKHO.FSSDesktop.Import.Views
+﻿namespace UKHO.FSSDesktop.Modules.FSS.Import
 {
     using System.Windows.Controls;
 

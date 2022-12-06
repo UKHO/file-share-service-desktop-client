@@ -25,7 +25,7 @@
                     </Grid.RowDefinitions>
 
                     <assets:UKHOLogo Grid.Row="0" HorizontalAlignment="Left" Margin="4,-20,20,20" />
-                    <TextBlock Grid.Row="1" Text="File Share Service" FontSize="22" Margin="16,0,3,3" />
+                    <TextBlock Grid.Row="1" Text="ADDS Desktop" FontSize="22" Margin="16,0,3,3" />
                 </Grid>
             </controls:NavigationView.PaneCustomContent>
 

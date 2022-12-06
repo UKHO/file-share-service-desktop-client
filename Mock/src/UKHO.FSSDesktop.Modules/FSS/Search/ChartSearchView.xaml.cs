@@ -1,4 +1,4 @@
-﻿namespace UKHO.FSSDesktop.Search.Views
+﻿namespace UKHO.FSSDesktop.Modules.FSS.Search
 {
     using System.Windows.Controls;
 

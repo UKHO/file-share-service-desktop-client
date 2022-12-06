@@ -1,18 +1,12 @@
-﻿namespace UKHO.FSSDesktop.Search.Views
+﻿namespace UKHO.FSSDesktop.Modules.FSS.Search
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security.Cryptography.Pkcs;
     using System.Windows.Input;
-    using System.Windows.Markup;
     using CommunityToolkit.Mvvm.ComponentModel;
-    using CommunityToolkit.Mvvm.ComponentModel.__Internals;
     using CommunityToolkit.Mvvm.Input;
-    using CommunityToolkit.Mvvm.Messaging;
-    using FileShareClient.Models;
-    using Messages;
     using Models;
-    using Services;
+    using UKHO.FSSDesktop.Services;
 
     public class ChartSearch : ObservableObject
     {

@@ -1,4 +1,4 @@
-﻿namespace UKHO.FSSDesktop.Security.Views
+﻿namespace UKHO.FSSDesktop.Modules.FSS.Security
 {
     using CommunityToolkit.Mvvm.ComponentModel;
 
