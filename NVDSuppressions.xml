@@ -165,15 +165,7 @@
 		<notes>
 			<![CDATA[
 			file name: Microsoft.CSharp:4.0.1
-            ]]>
-		</notes>
-		<cve>CVE-2022-41064</cve>
-		<cve>CVE-2022-30184</cve>
-	</suppress>
-	<suppress>
-		<notes>
-			<![CDATA[
-            file name: Microsoft.CSharp:4.5.0
+			file name: Microsoft.CSharp:4.5.0
             ]]>
 		</notes>
 		<cve>CVE-2022-41064</cve>
