@@ -167,7 +167,6 @@
 			file name: Microsoft.CSharp:4.0.1
             ]]>
 		</notes>
-		<packageUrl regex="true">^pkg:nuget/Microsoft\.CSharp@.*$</packageUrl>
 		<cve>CVE-2022-41064</cve>
 		<cve>CVE-2022-30184</cve>
 	</suppress>
