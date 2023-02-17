@@ -157,4 +157,605 @@
 		<sha1>2e882ee6cccee6e5c0ee5e13eb40dae98e2b6f07</sha1>
 		<cve>CVE-2006-2453</cve>
 	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.CSharp:4.0.1
+            ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.CSharp@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.CSharp:4.5.0
+            ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.CSharp@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.DiaSymReader.Native.amd64.dll
+            ]]>
+		</notes>
+		<sha1>49413a485956444414d5b25e6af9024eaddd5be6</sha1>
+		<cve>CVE-2006-2453</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.Extensions.Configuration.Abstractions:5.0.0
+            ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Configuration\.Abstractions@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.Extensions.Configuration.Json:5.0.0
+             ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Configuration\.Json@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.Extensions.Configuration:5.0.0
+            ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Configuration@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.Extensions.DependencyInjection.Abstractions:5.0.0
+            ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.DependencyInjection\.Abstractions@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+            file name: Microsoft.Extensions.DependencyInjection:5.0.0
+            ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.DependencyInjection@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.FileProviders.Abstractions:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.FileProviders\.Abstractions@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.FileProviders.Physical:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.FileProviders\.Physical@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.FileSystemGlobbing:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.FileSystemGlobbing@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.Logging.Abstractions:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Logging\.Abstractions@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.Logging:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Logging@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.Options:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Options@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.Primitives:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Primitives@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Extensions.Primitives:5.0.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Extensions\.Primitives@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.NETCore.Platforms:1.0.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Platforms@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.NETCore.Platforms:1.1.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Platforms@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.NETCore.Platforms:1.1.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Platforms@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.NETCore.Platforms:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Platforms@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.NETCore.Targets:1.0.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Targets@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.NETCore.Targets:1.1.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Targets@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.NETCore.Targets:1.1.3
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.NETCore\.Targets@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Microsoft.Win32.Primitives:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/Microsoft\.Win32\.Primitives@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: NETStandard.Library:1.6.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/NETStandard\.Library@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+		<cve>CVE-2001-0152</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: Prism.Wpf.dll
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/Prism\.Wpf@.*$</packageUrl>
+		<cve>CVE-2002-0823</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.AppContext:4.1.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.AppContext@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			 file name: System.AppContext:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.AppContext@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Buffers:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Buffers@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Buffers:4.4.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Buffers@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Buffers:4.5.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Buffers@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Diagnostics.DiagnosticSource:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Diagnostics\.DiagnosticSource@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Diagnostics.Tools:4.0.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Diagnostics\.Tools@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Diagnostics.Tools:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Diagnostics\.Tools@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Private.DataContractSerialization:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Private\.DataContractSerialization@.*$</packageUrl>
+		<vulnerabilityName>CVE-2023-21538</vulnerabilityName>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Private.Uri:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Private\.Uri@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Private.Uri:4.3.2
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Private\.Uri@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Reflection.Emit.Lightweight:4.0.1
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Reflection\.Emit\.Lightweight@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Reflection.Emit.Lightweight:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Reflection\.Emit\.Lightweight@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Runtime.Serialization.Formatters:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Runtime\.Serialization\.Formatters@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Runtime.Serialization.Json:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Runtime\.Serialization\.Json@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Security.Cryptography.ProtectedData:5.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Security\.Cryptography\.ProtectedData@.*$</packageUrl>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: System.Text.Encodings.Web:4.5.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.Text\.Encodings\.Web@.*$</packageUrl>
+		<vulnerabilityName>CVE-2021-26701</vulnerabilityName>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: UKHO.WeekNumberUtils.dll
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/UKHO\.WeekNumberUtils@.*$</packageUrl>
+		<cve>CVE-2021-4277</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.any.System.Diagnostics.Tools:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.any\.System\.Diagnostics\.Tools@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.debian\.8\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.fedora\.23\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.fedora.24-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.fedora\.24\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.native.System.IO.Compression:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.native\.System\.IO\.Compression@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.native.System.Security.Cryptography.Apple:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.native\.System\.Security\.Cryptography\.Apple@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.native.System:4.0.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.native\.System@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.native.System:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.native\.System@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.opensuse\.13\.2\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.opensuse\.42\.1\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.Apple:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.osx\.10\.10\-x64\.runtime\.native\.System\.Security\.Cryptography\.Apple@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.osx\.10\.10\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.rhel.7-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.rhel\.7\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.ubuntu\.14\.04\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.ubuntu\.16\.04\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+			file name: runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl:4.3.0
+			]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/runtime\.ubuntu\.16\.10\-x64\.runtime\.native\.System\.Security\.Cryptography\.OpenSsl@.*$</packageUrl>
+		<cve>CVE-2022-41064</cve>
+		<cve>CVE-2022-30184</cve>
+	</suppress>
 </suppressions>
