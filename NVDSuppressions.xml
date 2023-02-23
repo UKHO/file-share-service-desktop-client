@@ -526,11 +526,4 @@
 		<cve>CVE-2022-41064</cve>
 		<cve>CVE-2022-30184</cve>
 	</suppress>
-	<suppress>
-	   <notes><![CDATA[
-	   file name: Microsoft.Bcl.AsyncInterfaces:1.1.0
-	   ]]></notes>
-	   <packageUrl regex="true">^pkg:nuget/Microsoft\.Bcl\.AsyncInterfaces@.*$</packageUrl>
-	   <cve>CVE-2021-43138</cve>
-	</suppress>
 </suppressions>
