@@ -28,8 +28,6 @@ variables:
   - name: coverityPool
     value: NautilusBuild
   - group: Covscan-vars
-  - name: DotNetSdkVersion #for tasks without global.json context
-    value: 6.0.x #consistent with rollForward:latestFeature in global.json (major.minor.feature.patch)
 
 resources:
   repositories:
