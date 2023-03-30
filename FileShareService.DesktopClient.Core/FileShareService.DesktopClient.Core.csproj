@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <RootNamespace>UKHO.FileShareService.DesktopClient.Core</RootNamespace>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>UKHO.FileShareService.DesktopClient.Core</RootNamespace>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JsonSubTypes" Version="1.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.31.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.0" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0" />
-    <PackageReference Include="UKHO.FileShareAdminClient" Version="1.1.20119.3" />
-    <PackageReference Include="UKHO.FileShareClient" Version="1.1.20119.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="JsonSubTypes" Version="1.8.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.31.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Prism.Core" Version="8.0.0.1909" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.0" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0" />
+		<PackageReference Include="UKHO.FileShareAdminClient" Version="1.6.20908.2" />
+		<PackageReference Include="UKHO.FileShareClient" Version="1.6.20908.2" />
+	</ItemGroup>
 
 </Project>
