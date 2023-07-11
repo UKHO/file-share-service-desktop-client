@@ -138,4 +138,13 @@
 		<packageUrl regex="true">^pkg:generic/Prism\.Wpf@.*$</packageUrl>
 		<cve>CVE-2002-0823</cve>
 	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: Microsoft.DiaSymReader.Native.amd64.dll
+   ]]>
+		</notes>
+		<sha1>0694cf963d60088161a4f1564cfc8790547d38c8</sha1>
+		<cve>CVE-2006-2453</cve>
+	</suppress>
 </suppressions>
