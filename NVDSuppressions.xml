@@ -286,4 +286,20 @@
     </notes>
     <vulnerabilityName>CVE-2023-38178</vulnerabilityName>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Web.WebView2:1.0.864.35
+   ]]>
+    </notes>
+    <cve>CVE-2017-11826</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+   file name: Microsoft.Identity.Client.NativeInterop.dll
+   ]]>
+    </notes>
+    <cve>CVE-2019-20138</cve>
+  </suppress>
 </suppressions>
