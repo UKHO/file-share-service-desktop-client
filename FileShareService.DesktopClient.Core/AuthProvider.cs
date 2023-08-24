@@ -63,7 +63,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
         [ExcludeFromCodeCoverage] // Can't unit test the login process as it is calling out to real AAD
         public async Task<string?> Login()
         {           
-            await GetToken();
+            await GetTokenAsync();
             IsLoggedIn = true;
             logger.LogInformation("User:{User} has signed into the application", authenticationResult?.Account?.Username);
             return CurrentAccessToken;           
@@ -76,7 +76,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
             ? jwtTokenParser.ParseRoles(authenticationResult.AccessToken)
             : Enumerable.Empty<string>();
 
-        public async  Task<string> GetToken()
+        public async  Task<string> GetTokenAsync()
         {          
             var tenantId = environmentsManager.CurrentEnvironment.TenantId;
             var scopes = new[] {$"{environmentsManager.CurrentEnvironment.ClientId}/.default" };
@@ -110,7 +110,12 @@ namespace UKHO.FileShareService.DesktopClient.Core
             }
            
             return authenticationResult.AccessToken;
+        }
 
+        //Obselete
+        public Task<string> GetToken()
+        {
+            return null;
         }
     }
 }
