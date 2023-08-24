@@ -14,8 +14,8 @@
 		<PackageReference Include="Prism.Core" Version="8.1.97" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.1" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="7.0.1" />
-		<PackageReference Include="UKHO.FileShareAdminClient" Version="1.6.20908.2" />
-		<PackageReference Include="UKHO.FileShareClient" Version="1.6.20908.2" />
+		<PackageReference Include="UKHO.FileShareAdminClient" Version="1.6.30104.1" />
+		<PackageReference Include="UKHO.FileShareClient" Version="1.6.30104.1" />
 	</ItemGroup>
 
 </Project>
