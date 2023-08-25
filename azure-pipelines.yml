@@ -73,7 +73,7 @@ stages:
       - job:
         workspace:
           clean: all # what to clean up before the job runs outputs | resources | all
-        displayName: "DependencyChecker Dotnet Build test publish"
+        displayName: "DependencyChecker"
 
         steps:
           - task: PowerShell@2
@@ -140,6 +140,11 @@ stages:
                 param($ReportLocation)
                 Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
+      - job:
+        workspace:
+          clean: all
+        displayName: "Dotnet Build test publish"
+
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore for test projects"
             inputs:
@@ -186,6 +191,11 @@ stages:
             inputs:
               path: $(Build.ArtifactStagingDirectory)/publish
               artifact: $(Build.DefinitionName)
+
+      - job:
+        workspace:
+          clean: all
+        displayName: "Build Installer"
 
           - task: VSBuild@1
             displayName: 'Build the Installer'
