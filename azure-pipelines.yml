@@ -144,7 +144,7 @@ stages:
         workspace:
           clean: all
         displayName: "Dotnet Build test publish"
-
+        steps:
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore for test projects"
             inputs:
@@ -196,7 +196,7 @@ stages:
         workspace:
           clean: all
         displayName: "Build Installer"
-
+        steps:
           - task: VSBuild@1
             displayName: 'Build the Installer'
             inputs:
