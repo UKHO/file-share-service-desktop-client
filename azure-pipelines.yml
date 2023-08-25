@@ -140,7 +140,7 @@ stages:
                 param($ReportLocation)
                 Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
-      - job:
+      - job: BuildAndTest
         displayName: "Dotnet Build test publish"
         steps:
           - task: UseDotNet@2
@@ -199,6 +199,8 @@ stages:
         workspace:
           clean: all
         displayName: "Build Installer"
+        dependsOn:
+        - BuildAndTest
         steps:
           - task: UseDotNet@2
             displayName: 'Use .NET Core sdk'
