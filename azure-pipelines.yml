@@ -144,11 +144,10 @@ stages:
         displayName: "Dotnet Build test publish"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET SDK'
+            displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
               useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.FileShareService.API'
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore for test projects"
             inputs:
@@ -202,11 +201,10 @@ stages:
         displayName: "Build Installer"
         steps:
           - task: UseDotNet@2
-            displayName: 'Use .NET SDK'
+            displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
               useGlobalJson: true
-              workingDirectory: '$(Build.SourcesDirectory)\UKHO.FileShareService.API'
           - task: VSBuild@1
             displayName: 'Build the Installer'
             inputs:
