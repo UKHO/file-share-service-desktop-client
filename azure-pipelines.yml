@@ -135,6 +135,11 @@ stages:
             inputs:
               packageType: sdk
               useGlobalJson: true
+
+          - task: NuGetToolInstaller@1
+            inputs:
+              versionSpec: 
+            
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore"
             inputs:
