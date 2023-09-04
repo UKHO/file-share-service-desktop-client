@@ -149,16 +149,17 @@ stages:
               packageType: sdk
               useGlobalJson: true
           - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore for test projects"
+            displayName: ".Net Core - NuGet restore"
             inputs:
               command: restore
               projects: |
-                **/*Tests.csproj
+                **/*.csproj
+                !**/*Tests.csproj
               feedsToUse: config
               noCache: true
               nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
               workingDirectory: '$(Build.SourcesDirectory)'
-              packagesDirectory: '$(Build.SourcesDirectory)\packagesForTests'
+              packagesDirectory: '$(Build.SourcesDirectory)\packages'
     
           - task: DotNetCoreCLI@2
             displayName: "dotnet build"
@@ -209,16 +210,17 @@ stages:
               useGlobalJson: true
 
           - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore for test projects"
+            displayName: ".Net Core - NuGet restore"
             inputs:
               command: restore
               projects: |
-                **/*Tests.csproj
+                **/*.csproj
+                !**/*Tests.csproj
               feedsToUse: config
               noCache: true
               nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
               workingDirectory: '$(Build.SourcesDirectory)'
-              packagesDirectory: '$(Build.SourcesDirectory)\packagesForTests'
+              packagesDirectory: '$(Build.SourcesDirectory)\packages'
     
           - task: DotNetCoreCLI@2
             displayName: "dotnet build"
