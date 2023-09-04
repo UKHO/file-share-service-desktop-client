@@ -202,11 +202,35 @@ stages:
         dependsOn:
         - BuildAndTest
         steps:
-          - task: UseDotNet@2
-            displayName: 'Use .NET Core sdk'
+          - task: DotNetCoreCLI@2
+            displayName: ".Net Core - NuGet restore for test projects"
             inputs:
-              packageType: sdk
-              useGlobalJson: true
+              command: restore
+              projects: |
+                **/*Tests.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)'
+              packagesDirectory: '$(Build.SourcesDirectory)\packagesForTests'
+    
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet build"
+            inputs:
+              command: "build"
+              projects: "**/*.csproj"
+              arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+          - task: DotNetCoreCLI@2
+            displayName: Publish Project
+            inputs:
+              command: publish
+              projects: |
+                **/FileShareService.DesktopClient.csproj
+              publishWebProjects: false
+              zipAfterPublish: false
+              arguments:  '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish /p:PublishSingleFile=true -r win-x64 '
+
           - task: VSBuild@1
             displayName: 'Build the Installer'
             inputs:
