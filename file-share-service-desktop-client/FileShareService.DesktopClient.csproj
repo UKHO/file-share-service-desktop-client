@@ -33,7 +33,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="7.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="System.IO.Abstractions" Version="19.2.64" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
     <PackageReference Include="UKHO.WeekNumberUtils" Version="1.5.22270.11" />
     <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="5.11.5" />
   </ItemGroup>
