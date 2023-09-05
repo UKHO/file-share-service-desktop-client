@@ -65,7 +65,7 @@ namespace FileShareService.DesktopClient.CoreTests
 
             Assert.AreEqual("Sample 3, change the Expiry Date later.", setExpiryDateJob.DisplayName);
             Assert.AreEqual("64c954fe-cb20-46e1-b990-51dfb9711fdc", setExpiryDateJob.ActionParams.BatchId);
-            Assert.AreEqual("2021-04-01T00:00:00Z", setExpiryDateJob.ActionParams.ExpiryDate);
+            Assert.AreEqual("04/01/2021 00:00:00", setExpiryDateJob.ActionParams.ExpiryDate);
         }
 
         [Test]

@@ -39,7 +39,7 @@ namespace FileShareService.DesktopClient.CoreTests
 
         public string GenerateToken(params string[] roles)
         {
-            var mySecret = "asdv234234^&%&^%&^hjsdfb2%%%";
+            var mySecret = "asdv234234^&%&^%&^hjsdfb2%%%%%%%%";
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(mySecret));
 
             var myIssuer = "http://mysite.com";

@@ -73,7 +73,7 @@ stages:
       - job:
         workspace:
           clean: all # what to clean up before the job runs outputs | resources | all
-        displayName: "DependencyChecker Dotnet Build test publish"
+        displayName: "DependencyChecker"
 
         steps:
           - task: PowerShell@2
@@ -106,19 +106,6 @@ stages:
               packageType: sdk
               useGlobalJson: true
 
-          - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore non-test projects"
-            inputs:
-              command: restore
-              projects: |
-                **/*.csproj
-                !**/*Tests.csproj
-              feedsToUse: config
-              noCache: true
-              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
-              workingDirectory: '$(Build.SourcesDirectory)'
-              packagesDirectory: '$(Build.SourcesDirectory)\packages'
-
           - task: CmdLine@1
             displayName: "Run OWASP Dependency Checker"
             inputs:
@@ -140,17 +127,30 @@ stages:
                 param($ReportLocation)
                 Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
+      - job: BuildAndTest
+        displayName: "Dotnet Build test publish"
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+
+          - task: NuGetToolInstaller@1
+            inputs:
+              versionSpec: 
+            
           - task: DotNetCoreCLI@2
-            displayName: ".Net Core - NuGet restore for test projects"
+            displayName: ".Net Core - NuGet restore"
             inputs:
               command: restore
               projects: |
-                **/*Tests.csproj
+                **/*.csproj
+                !**/*Tests.csproj
               feedsToUse: config
               noCache: true
               nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
               workingDirectory: '$(Build.SourcesDirectory)'
-              packagesDirectory: '$(Build.SourcesDirectory)\packagesForTests'
     
           - task: DotNetCoreCLI@2
             displayName: "dotnet build"
@@ -186,6 +186,29 @@ stages:
             inputs:
               path: $(Build.ArtifactStagingDirectory)/publish
               artifact: $(Build.DefinitionName)
+
+      - job:
+        workspace:
+          clean: all
+        displayName: "Build Installer"
+        dependsOn:
+        - BuildAndTest
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET Core sdk'
+            inputs:
+              packageType: sdk
+              useGlobalJson: true
+
+          - task: DotNetCoreCLI@2
+            displayName: Publish Project
+            inputs:
+              command: publish
+              projects: |
+                **/FileShareService.DesktopClient.csproj
+              publishWebProjects: false
+              zipAfterPublish: false
+              arguments:  '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish /p:PublishSingleFile=true -r win-x64 '
 
           - task: VSBuild@1
             displayName: 'Build the Installer'
