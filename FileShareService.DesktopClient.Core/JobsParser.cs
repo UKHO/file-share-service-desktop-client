@@ -44,6 +44,7 @@ namespace UKHO.FileShareService.DesktopClient.Core
 
                 var jsonSerializerSettings = new JsonSerializerSettings();
                 jsonSerializerSettings.Converters.Add(JsonSubtypesConverterBuilder.Of<IJob>("action")
+                    .RegisterSubtype<NewBatchWithUserInputJob>(NewBatchWithUserInputJob.JOB_ACTION)
                     .RegisterSubtype<NewBatchJob>(NewBatchJob.JOB_ACTION)
                     .RegisterSubtype<AppendAclJob>(AppendAclJob.JOB_ACTION)
                     .RegisterSubtype<SetExpiryDateJob>(SetExpiryDateJob.JOB_ACTION)

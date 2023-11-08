@@ -37,7 +37,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             Enabled = authProvider.IsLoggedIn && hasAdminRole;
         }
 
-        public string DisplayName => "Admin";
+        public virtual string DisplayName => "Admin";
 
         public bool Enabled
         {
@@ -52,6 +52,6 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin
             }
         }
 
-        public string NavigationTarget => NavigationTargets.Admin;
+        public virtual string NavigationTarget => NavigationTargets.Admin;
     }
 }

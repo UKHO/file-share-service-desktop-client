@@ -15,6 +15,7 @@ using Serilog;
 using UKHO.FileShareClient;
 using UKHO.FileShareService.DesktopClient.Core;
 using UKHO.FileShareService.DesktopClient.Helper;
+using UKHO.FileShareService.DesktopClient.Modules.AdHocUpload;
 using UKHO.FileShareService.DesktopClient.Modules.Admin;
 using UKHO.FileShareService.DesktopClient.Modules.Auth;
 using UKHO.FileShareService.DesktopClient.Modules.Search;
@@ -110,6 +111,7 @@ namespace UKHO.FileShareService.DesktopClient
             moduleCatalog.AddModule<AuthenticateUiModule>();
             moduleCatalog.AddModule<SearchUiModule>();
             moduleCatalog.AddModule<AdminUiModule>();
+            moduleCatalog.AddModule<AdHocUploadUiModule>();
         }
 
         private void SetupExceptionHandling(ILogger<App> logger)
