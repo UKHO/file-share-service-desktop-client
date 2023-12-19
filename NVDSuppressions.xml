@@ -170,4 +170,40 @@
     </notes>
     <cve>CVE-2019-20138</cve>
   </suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: LuxTasks.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/LuxTasks@.*$</packageUrl>
+		<cve>CVE-2020-22475</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: LuxTasks.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/LuxTasks@.*$</packageUrl>
+		<cve>CVE-2022-39349</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: WixTasks.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/WixTasks@.*$</packageUrl>
+		<cve>CVE-2020-22475</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: WixTasks.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/WixTasks@.*$</packageUrl>
+		<cve>CVE-2022-39349</cve>
+	</suppress>
 </suppressions>
