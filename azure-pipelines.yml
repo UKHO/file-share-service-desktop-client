@@ -125,20 +125,20 @@ stages:
           #    filename: 'dependency-check.bat'
           #    arguments: '--project "File-Share-Service-Desktop-Client - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Artifact: OWASP Dependency Checker Report"
-            inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)\DCReport'
-              ArtifactName: "OWASP Dependency Checker Report"
+          #- task: PublishBuildArtifacts@1
+          #  displayName: "Publish Artifact: OWASP Dependency Checker Report"
+          #  inputs:
+          #    PathtoPublish: '$(Build.SourcesDirectory)\DCReport'
+          #    ArtifactName: "OWASP Dependency Checker Report"
 
-          - task: PowerShell@1
-            displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
-            inputs:
-              scriptType: inlineScript
-              arguments: '-ReportLocation $(Build.SourcesDirectory)\DCReport\*'
-              inlineScript: |
-                param($ReportLocation)
-                Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
+          #- task: PowerShell@1
+          #  displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
+          #  inputs:
+          #    scriptType: inlineScript
+          #    arguments: '-ReportLocation $(Build.SourcesDirectory)\DCReport\*'
+          #    inlineScript: |
+          #      param($ReportLocation)
+          #      Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
           - task: DotNetCoreCLI@2
             displayName: ".Net Core - NuGet restore for test projects"
