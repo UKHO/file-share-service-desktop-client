@@ -332,4 +332,31 @@
 		<packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks@.*$</packageUrl>
 		<cve>CVE-2022-39349</cve>
 	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: System.Runtime.InteropServices.RuntimeInformation.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/System\.Runtime\.InteropServices\.RuntimeInformation@.*$</packageUrl>
+		<cve>CVE-2014-9152</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: System.Threading.Tasks.Parallel.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Parallel@.*$</packageUrl>
+		<cve>CVE-2020-22475</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: System.Threading.Tasks.Parallel.dll
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:generic/System\.Threading\.Tasks\.Parallel@.*$</packageUrl>
+		<cve>CVE-2022-39349</cve>
+	</suppress>
 </suppressions>
