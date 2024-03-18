@@ -138,38 +138,38 @@
 		<packageUrl regex="true">^pkg:generic/Prism\.Wpf@.*$</packageUrl>
 		<cve>CVE-2002-0823</cve>
 	</suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
+	<suppress>
+		<notes>
+			<![CDATA[
    file name: Microsoft.DiaSymReader.Native.amd64.dll
    ]]>
-    </notes>
-    <cve>CVE-2006-2453</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
+		</notes>
+		<cve>CVE-2006-2453</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
    file name: Microsoft.NETCore.App.Runtime.win-x64:6.0.21
    ]]>
-    </notes>
-    <vulnerabilityName>CVE-2023-38178</vulnerabilityName>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
+		</notes>
+		<vulnerabilityName>CVE-2023-38178</vulnerabilityName>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
    file name: Microsoft.Web.WebView2:1.0.864.35
    ]]>
-    </notes>
-    <cve>CVE-2017-11826</cve>
-  </suppress>
-  <suppress>
-    <notes>
-      <![CDATA[
+		</notes>
+		<cve>CVE-2017-11826</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
    file name: Microsoft.Identity.Client.NativeInterop.dll
    ]]>
-    </notes>
-    <cve>CVE-2019-20138</cve>
-  </suppress>
+		</notes>
+		<cve>CVE-2019-20138</cve>
+	</suppress>
 	<suppress>
 		<notes>
 			<![CDATA[
@@ -205,5 +205,14 @@
 		</notes>
 		<packageUrl regex="true">^pkg:generic/WixTasks@.*$</packageUrl>
 		<cve>CVE-2022-39349</cve>
+	</suppress>
+	<suppress>
+		<notes>
+			<![CDATA[
+   file name: System.IdentityModel.Tokens.Jwt:6.32.1
+   ]]>
+		</notes>
+		<packageUrl regex="true">^pkg:nuget/System\.IdentityModel\.Tokens\.Jwt@.*$</packageUrl>
+		<cve>CVE-2024-21319</cve>
 	</suppress>
 </suppressions>

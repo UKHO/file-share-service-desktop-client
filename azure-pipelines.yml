@@ -38,34 +38,6 @@ resources:
       ref: refs/heads/master
 
 stages:
-  - stage: CoverityScan
-    displayName: "Coverity Scan"
-    pool:
-      name: $(coverityPool)
-    jobs:
-    - job: Coverity
-      workspace:
-        clean: all
-      steps:
-        - checkout: self
-          submodules: recursive
-        - task: UseDotNet@2
-          displayName: 'Use .NET Core sdk'
-          inputs:
-            packageType: sdk
-            version: 6.0.x
-            installationPath: $(Agent.ToolsDirectory)/dotnet
-        - checkout: covscan
-        - template: dotnet-cov.yml@covScan
-          parameters:
-            CovHostUrl: "$(CovHostUrl)"
-            CovUser: "$(CovUser)"
-            CovPwd: "$(CovPwd)"
-            StreamName: "file-share-service-desktop-client"
-            BuildCommand: "$(Build.Repository.LocalPath)/file-share-service-desktop-client/file-share-service-desktop-client/FileShareService.DesktopClient.csproj"
-            StripPath: $(Build.Repository.LocalPath)/file-share-service-desktop-client
-            CoverityScanPath: $(Build.Repository.LocalPath)/coverityscan-buildtemplates
-
   - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
     displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
     dependsOn: []
@@ -76,30 +48,6 @@ stages:
         displayName: "DependencyChecker"
 
         steps:
-          - task: PowerShell@2
-            displayName: "Output Environment Variables"
-            inputs:
-              targetType: inline
-              script: |
-                gci env:
-                $CurrentYear = Get-Date -Format "yyyy"
-                $AssemblyCopyright = "Copyright © UK Hydrographic  Office $CurrentYear"
-                echo "##vso[task.setvariable variable=UKHOAssemblyCopyright]${AssemblyCopyright}"
-
-          - task: PowerShell@2
-            displayName: "Set assembly version numbers based on build ID"
-            inputs:
-              targetType: filePath
-              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
-              arguments: >
-                -buildNumber "$(Build.BuildNumber)" 
-                -solutionDirectory "$(Build.SourcesDirectory)\" 
-                -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" 
-                -UKHOAssemblyCopyright "$env:UKHOAssemblyCopyright" 
-                -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" 
-                -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"
-                -SourceRevisionId "$(Build.SourceVersion)" 
-          
           - task: UseDotNet@2
             displayName: 'Use .NET Core sdk'
             inputs:
@@ -128,8 +76,34 @@ stages:
                 Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
 
       - job: BuildAndTest
+        workspace:
+          clean: all
         displayName: "Dotnet Build test publish"
         steps:
+          - task: PowerShell@2
+            displayName: "Output Environment Variables"
+            inputs:
+              targetType: inline
+              script: |
+                gci env:
+                $CurrentYear = Get-Date -Format "yyyy"
+                $AssemblyCopyright = "Copyright © UK Hydrographic  Office $CurrentYear"
+                echo "##vso[task.setvariable variable=UKHOAssemblyCopyright]${AssemblyCopyright}"
+
+          - task: PowerShell@2
+            displayName: "Set assembly version numbers based on build ID"
+            inputs:
+              targetType: filePath
+              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
+              arguments: >
+                -buildNumber "$(Build.BuildNumber)" 
+                -solutionDirectory "$(Build.SourcesDirectory)\" 
+                -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" 
+                -UKHOAssemblyCopyright "$env:UKHOAssemblyCopyright" 
+                -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" 
+                -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"
+                -SourceRevisionId "$(Build.SourceVersion)" 
+
           - task: UseDotNet@2
             displayName: 'Use .NET Core sdk'
             inputs:
@@ -188,8 +162,6 @@ stages:
               artifact: $(Build.DefinitionName)
 
       - job:
-        workspace:
-          clean: all
         displayName: "Build Installer"
         dependsOn:
         - BuildAndTest
