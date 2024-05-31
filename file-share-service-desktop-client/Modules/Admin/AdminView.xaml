@@ -91,6 +91,7 @@
                                             <RowDefinition />
                                             <RowDefinition />
                                             <RowDefinition />
+                                            <RowDefinition />
                                         </Grid.RowDefinitions>
 
                                         <Grid.ColumnDefinitions>
@@ -231,8 +232,17 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
 
-                                        <TextBlock Grid.Row="8" Style="{StaticResource LabelTextBolckStyle}"   />
-                                        <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource LabelTextBolckStyle}" Name="lbl_ignoreduplicatecheck" Text="Ignore Duplicate Check:" />
+                                        <CheckBox Grid.Row="8"  Grid.Column="1"
+                                                  IsChecked="{Binding IgnoreDuplicateCheck, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"
+                                                  AutomationProperties.LabeledBy="{Binding ElementName=lbl_ignoreduplicatecheck}"
+                                                  Margin="20 0 0 0"
+                                                  Checked="CheckBoxChanged"/>
+
+
+                                        <TextBlock Grid.Row="9" Style="{StaticResource LabelTextBolckStyle}"   />
+                                        <StackPanel Grid.Row="9" Grid.Column="1" Orientation="Horizontal">
                                             <Button                                            
                                             Content="Execute Job"
                                             HorizontalAlignment="Left" 

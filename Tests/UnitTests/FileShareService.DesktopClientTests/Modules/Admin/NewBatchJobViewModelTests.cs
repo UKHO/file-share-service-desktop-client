@@ -1190,5 +1190,84 @@ namespace FileShareService.DesktopClientTests.Modules.Admin
             Assert.AreEqual(actualFiles, vm.Files[0].Files.Length);
             Assert.AreEqual(expectedCanExecute, vm.ExcecuteJobCommand.CanExecute());
         }
+
+        [Test]
+        public void TestExceuteNewBatchJobWhenIgnoreDuplicateIsTrueAndCancelResponse()
+        {
+            var file1FullFileName = @"c:/data/files/f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob(),
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+
+            vm.IgnoreDuplicateCheck = true;
+            
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.Cancel);
+
+            var executeTask = vm.OnExecuteCommand();
+            
+            Assert.AreEqual("File Share Service create new batch cancelled. ", vm.ExecutionResult);
+            Assert.IsFalse(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).MustNotHaveHappened();
+        }
+
+        [Test]
+        public async Task TestExceuteNewBatchJobWhenIgnoreDuplicateIsTrueAndOkResponse()
+        {
+            var file1FullFileName = @"c:/data/files/f1.txt";
+            fileSystem.AddFile(file1FullFileName, new MockFileData("File 1 contents"));
+
+            var vm = new NewBatchJobViewModel(new NewBatchJob
+            {
+                DisplayName = "Create new Batch 123",
+                ActionParams = new NewBatchJobParams
+                {
+                    BusinessUnit = "TestBU1",
+                    Attributes = new List<KeyValueAttribute> { new KeyValueAttribute("BatchAttribute1", "Value1") },
+                    Files =
+                        {
+                            new NewBatchFiles
+                            {
+                                ExpectedFileCount = "1",
+                                MimeType = "text/plain",
+                                SearchPath = file1FullFileName,
+                                Attributes = new List<KeyValueAttribute>
+                                            {
+                                            new KeyValueAttribute("Product Type","AVCS"),
+                                            new KeyValueAttribute("Exchange Set Type", "Base")
+                                            }
+                            }
+                        }
+                }
+            },
+                fileSystem, fakeLoggerNewBatchJobVM,
+                () => fakeFileShareApiAdminClient,
+                fakeCurrentDateTimeProvider, macroTransformer, dateTimeValidator, fakeMessageBoxService);
+            
+            vm.IgnoreDuplicateCheck = true;
+
+            Assert.AreEqual("Create new Batch 123", vm.DisplayName);
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox(A<string>.Ignored, A<string>.Ignored, MessageBoxButton.OKCancel, A<MessageBoxImage>.Ignored)).Returns(MessageBoxResult.OK);
+            A.CallTo(() => fakeFileShareApiAdminClient.CreateBatchAsync(A<BatchModel>.Ignored, CancellationToken.None)).Returns(new Result<IBatchHandle>() { IsSuccess = true, Data = fakeBatchHandle });
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, CancellationToken.None, A<KeyValuePair<string, string>>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.AddFileToBatch(A<IBatchHandle>.Ignored, A<Stream>.Ignored, A<string>.Ignored, A<string>.Ignored, A<Action<(int, int)>>.Ignored, A<CancellationToken>.Ignored, A<KeyValuePair<string, string>[]>.Ignored)).Returns(new Result<AddFileToBatchResponse> { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).Returns(new Result<CommitBatchResponse> { IsSuccess = true });
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).Returns(new BatchStatusResponse() { BatchId = "Ingnore", Status = BatchStatusResponse.StatusEnum.Committed });
+
+            var executeTask = vm.OnExecuteCommand();
+
+            await executeTask;
+            Assert.IsFalse(vm.IsExecuting);
+            Assert.IsTrue(vm.IsExecutingComplete);
+            Assert.IsFalse(vm.IsCommitting);
+            A.CallTo(() => fakeFileShareApiAdminClient.Search(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeFileShareApiAdminClient.CommitBatch(A<IBatchHandle>.Ignored, CancellationToken.None)).MustHaveHappened();
+            A.CallTo(() => fakeFileShareApiAdminClient.GetBatchStatusAsync(A<IBatchHandle>.Ignored)).MustHaveHappened();
+            vm.CloseExecutionCommand!.Execute();
+            Assert.IsFalse(vm.IsExecutingComplete);
+        }
     }
 }

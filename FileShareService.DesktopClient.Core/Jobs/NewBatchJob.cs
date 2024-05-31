@@ -166,6 +166,8 @@ namespace UKHO.FileShareService.DesktopClient.Core.Jobs
 
         public List<NewBatchFiles> Files { get; set; } = new List<NewBatchFiles>();
 
+        public bool IgnoreDuplicateCheck { get; set; }  
+
     }
 
     public class NewBatchFiles
