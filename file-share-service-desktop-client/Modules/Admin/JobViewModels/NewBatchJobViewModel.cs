@@ -36,6 +36,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         private readonly IDateTimeValidator dateTimeValidator;
         private readonly IMessageBoxService messageBoxService;
         public CancellationTokenSource? CancellationTokenSource;
+        private bool ignoreDuplicateCheck;
 
         public NewBatchJobViewModel(NewBatchJob job, IFileSystem fileSystem,
         ILogger<NewBatchJobViewModel> logger,
@@ -47,6 +48,7 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
         ) : base(job, logger)
         {
             CloseExecutionCommand = new DelegateCommand(OnCloseExecutionCommand);
+            
             this.job = job;
             this.fileSystem = fileSystem;
             this.fileShareClientFactory = fileShareClientFactory;
@@ -59,6 +61,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             : new List<NewBatchFilesViewModel>();
 
             CancelJobExecutionCommand = new DelegateCommand(OnCancelJobCommand, () => !IsCanceled);
+
+            ignoreDuplicateCheck = job.ActionParams.IgnoreDuplicateCheck;
         }
 
         public DelegateCommand CancelJobExecutionCommand { get; }
@@ -124,6 +128,19 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             }
         }
 
+        public bool IgnoreDuplicateCheck
+        {
+            get => ignoreDuplicateCheck;
+            set
+            {
+                if (ignoreDuplicateCheck != value)
+                {
+                    ignoreDuplicateCheck = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         public ObservableCollection<FileUploadProgressViewModel> FileUploadProgress { get; } = new();
 
         protected internal override async Task OnExecuteCommand()
@@ -136,14 +153,34 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Admin.JobViewModels
             try
             {
                 logger.LogInformation("Execute job started for Action : {Action} and displayName :{displayName} .", Action, DisplayName);
+                
                 var fileShareClient = fileShareClientFactory();
                 var buildBatchModel = BuildBatchModel();
-                BatchSearchResponse batchSearchResponse = await SearchBatch();
-                logger.LogInformation($"{ batchSearchResponse.Count} duplicate batches found for action: {Action} and displayName: {DisplayName}.");
-                if (batchSearchResponse.Total > 0 && messageBoxService.ShowMessageBox($"Confirmation for displayName: {DisplayName}", $"{batchSearchResponse.Count} duplicate batches found. Do you still want to continue to execute the job ?",
+                var duplicateBatchesCount = 0;
+
+                if (!IgnoreDuplicateCheck)
+                {
+                    BatchSearchResponse batchSearchResponse = await SearchBatch();
+                    duplicateBatchesCount = batchSearchResponse.Total ?? 0;
+                    logger.LogInformation($"{batchSearchResponse.Count} duplicate batches found for action: {Action} and displayName: {DisplayName}.");
+                }
+                else
+                {
+                    if (messageBoxService.ShowMessageBox($"Confirmation for displayName: {DisplayName}",
+                            $"Upload without checking for duplicates",
+                            MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.Cancel)
+                    {
+                        ExecutionResult = $"File Share Service create new batch cancelled. ";
+                        return;
+                    }
+
+                    logger.LogInformation($"Duplicate batches check is ignored");
+                }
+
+                if (duplicateBatchesCount > 0 && messageBoxService.ShowMessageBox($"Confirmation for displayName: {DisplayName}", $"{duplicateBatchesCount} duplicate batches found. Do you still want to continue to execute the job ?",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
-                    logger.LogInformation($"File Share Service create new batch cancelled for action: {Action} and displayName: {DisplayName}, because {batchSearchResponse.Count} duplicate batches found.");
+                    logger.LogInformation($"File Share Service create new batch cancelled for action: {Action} and displayName: {DisplayName}, because {duplicateBatchesCount} duplicate batches found.");
                     ExecutionResult = $"File Share Service create new batch cancelled. ";
                 }
                 else
