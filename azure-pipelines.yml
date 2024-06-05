@@ -80,29 +80,15 @@ stages:
           clean: all
         displayName: "Dotnet Build test publish"
         steps:
-          - task: PowerShell@2
-            displayName: "Output Environment Variables"
-            inputs:
-              targetType: inline
-              script: |
-                gci env:
-                $CurrentYear = Get-Date -Format "yyyy"
-                $AssemblyCopyright = "Copyright © UK Hydrographic  Office $CurrentYear"
-                echo "##vso[task.setvariable variable=UKHOAssemblyCopyright]${AssemblyCopyright}"
-
-          - task: PowerShell@2
-            displayName: "Set assembly version numbers based on build ID"
-            inputs:
-              targetType: filePath
-              filePath: '$(Build.SourcesDirectory)\Apply-AssemblyVersionAndDefaults.ps1'
-              arguments: >
-                -buildNumber "$(Build.BuildNumber)" 
-                -solutionDirectory "$(Build.SourcesDirectory)\" 
-                -UKHOAssemblyCompany "$env:UKHOAssemblyCompany" 
-                -UKHOAssemblyCopyright "$env:UKHOAssemblyCopyright" 
-                -UKHOAssemblyVersionPrefix "$env:UKHOAssemblyVersionPrefix" 
-                -UKHOAssemblyProduct "$env:UKHOAssemblyProduct"
-                -SourceRevisionId "$(Build.SourceVersion)" 
+          - template: ./Update-AssemblyProperties.yaml  
+            parameters:
+              buildNumber: $(Build.BuildNumber)
+              solutionDirectory: $(Build.SourcesDirectory)
+              UKHOAssemblyCompany: $(UKHOAssemblyCompany)
+              UKHOAssemblyCopyright: $(UKHOAssemblyCopyright)
+              UKHOAssemblyVersionPrefix: $(UKHOAssemblyVersionPrefix)
+              UKHOAssemblyProduct: $(UKHOAssemblyProduct)
+              SourceRevisionId: $(Build.SourceVersion)
 
           - task: UseDotNet@2
             displayName: 'Use .NET Core sdk'
@@ -166,6 +152,16 @@ stages:
         dependsOn:
         - BuildAndTest
         steps:
+          - template: ./Update-AssemblyProperties.yaml  
+            parameters:
+              buildNumber: $(Build.BuildNumber)
+              solutionDirectory: $(Build.SourcesDirectory)
+              UKHOAssemblyCompany: $(UKHOAssemblyCompany)
+              UKHOAssemblyCopyright: $(UKHOAssemblyCopyright)
+              UKHOAssemblyVersionPrefix: $(UKHOAssemblyVersionPrefix)
+              UKHOAssemblyProduct: $(UKHOAssemblyProduct)
+              SourceRevisionId: $(Build.SourceVersion)
+
           - task: UseDotNet@2
             displayName: 'Use .NET Core sdk'
             inputs:
