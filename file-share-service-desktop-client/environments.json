@@ -28,5 +28,17 @@
     "tenantId": "9134ca48-663d-4a05-968a-31a42f0aed3e",
     "clientId": "8be2c976-98b8-42d5-a7bb-f5d2309f912e",
     "baseUrl": "https://fss-vnextiat-webapp.azurewebsites.net"
+  },
+  {
+    "name": "IAT",
+    "tenantId": "9134ca48-663d-4a05-968a-31a42f0aed3e",
+    "clientId": "d9be7099-e588-486f-93ef-7be49b8c2daf",
+    "baseUrl": "https://fss-iat-webapp.azurewebsites.net"
+  },
+  {
+    "name": "PreProd",
+    "tenantId": "9134ca48-663d-4a05-968a-31a42f0aed3e",
+    "clientId": "e56acda0-eb47-4a6a-a2a1-238665425082",
+    "baseUrl": "https://fss-preprod-webapp.azurewebsites.net"
   }
 ]
