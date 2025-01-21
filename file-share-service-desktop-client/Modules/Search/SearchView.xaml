@@ -15,6 +15,9 @@
                 <Setter Property="Padding" Value="12 8" />
                 <Setter Property="Margin" Value="4 0" />
             </Style>
+            <Style x:Key="ExportButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Background" Value="Green" />
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -26,6 +29,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="0" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -50,7 +54,7 @@
                 Content="Search"
                 HorizontalAlignment="Right"
                 Margin="32 8" />
-
+            
             <ScrollViewer Grid.Row="4">
                 <TextBox IsReadOnly="True"
                 Text="{Binding SearchResultAsJson}"
@@ -67,14 +71,15 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
-            <StackPanel Grid.Row="6" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
+            <views:Spinner Grid.Row="6" Grid.RowSpan="1"
+                           Visibility="{Binding SearchInProgress, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <StackPanel Grid.Row="7" HorizontalAlignment="Right" Orientation="Horizontal" Margin="8 16">
+                <Button Content="Export To CSV" Command="{Binding ExportToCsvCommand}" FontSize="12" Style="{StaticResource ExportButtonStyle}"/>
+                <Button Content="Export All To CSV" Command="{Binding ExportAllToCsvCommand}" FontSize="12" Style="{StaticResource ExportButtonStyle}"/>
                 <Label Content="{Binding SearchCountSummary}" FontSize="24" />
                 <Button Command="{Binding PreviousPageCommand}" AutomationProperties.Name="Previous">&lt;</Button>
                 <Button Command="{Binding NextPageCommand}" AutomationProperties.Name="Next">&gt;</Button>
             </StackPanel>
-
-            <views:Spinner Grid.Row="5" Grid.RowSpan="2"
-                       Visibility="{Binding SearchInProgress, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <Label
             Content="Querying the File Share Service"
             Grid.Row="5"

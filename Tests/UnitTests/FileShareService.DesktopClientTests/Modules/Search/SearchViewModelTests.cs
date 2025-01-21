@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Prism.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -208,6 +209,184 @@ namespace FileShareService.DesktopClientTests.Modules.Search
             searchVM.SearchCommand.Execute();
 
             Assert.True(searchVM.BatchDetailsVM?.All(b => b.CanSetBatchExpiryDate == expectedCanSetBatchExpiryDate));
-        }       
+        }
+
+        [Test]
+        public void TestExportToCsvWhenSearchResultIsNullThenShowsErrorMessage()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
+
+            searchVM.ExportToCsvCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox("Error", "No search results to export.", MessageBoxButton.OK, MessageBoxImage.Error))
+                .MustHaveHappened();
+            A.CallTo(() => fakeFileService.WriteAllText(A<string>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExportToCsvWhenSaveFileDialogCancelledThenFileNotWritten()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
+
+            searchVM.SearchResult = new BatchSearchResponse
+            {
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1") { Attributes = new List<BatchDetailsAttributes>() }
+                }
+            };
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(string.Empty);
+
+            searchVM.ExportToCsvCommand.Execute();
+
+            A.CallTo(() => fakeFileService.WriteAllText(A<string>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox("Success", A<string>.Ignored, A<MessageBoxButton>.Ignored, A<MessageBoxImage>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExportToCsvSuccessfullyWritesCsvFile()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
+
+            searchVM.SearchResult = new BatchSearchResponse
+            {
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1") { Attributes = new List<BatchDetailsAttributes> { new BatchDetailsAttributes { Key = "CellKey", Value = "AU100800" } } },
+                    new BatchDetails("batch2") { Attributes = new List<BatchDetailsAttributes> { new BatchDetailsAttributes { Key = "CellKey", Value = "AU100900" } } }
+                }
+            };
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(@"C:\exports");
+
+            searchVM.ExportToCsvCommand.Execute();
+
+            A.CallTo(() => fakeFileService.WriteAllText(A<string>.Ignored, A<string>.Ignored))
+                .MustHaveHappened();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox("Success", A<string>.Ignored, MessageBoxButton.OK, MessageBoxImage.Information))
+                .MustHaveHappened();
+        }
+
+        [Test]
+        public void TestExportToCsvWhenWritingFileThrowsExceptionThenShowsErrorMessage()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
+
+            searchVM.SearchResult = new BatchSearchResponse
+            {
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1") { Attributes = new List<BatchDetailsAttributes>() }
+                }
+            };
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(@"C:\exports");
+            A.CallTo(() => fakeFileService.WriteAllText(A<string>.Ignored, A<string>.Ignored))
+                .Throws(new Exception("Write failed"));
+
+            searchVM.ExportToCsvCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox("Error", "Failed to export search results. Please try again.", MessageBoxButton.OK, MessageBoxImage.Error))
+                .MustHaveHappened();
+        }
+
+        [Test]
+        public void TestExportAllToCsvWhenSearchAsyncFailsThenShowsErrorMessage()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
+
+            searchVM.SearchResult = new BatchSearchResponse
+            {
+                Total = 10,
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1") { Attributes = new List<BatchDetailsAttributes>() }
+                }
+            };
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.SearchAsync(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(new Result<BatchSearchResponse> { StatusCode = 500, IsSuccess = false });
+
+            searchVM.ExportAllToCsvCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox("Error", "Failed to retrieve all results for export. Please try again.", MessageBoxButton.OK, MessageBoxImage.Error))
+                .MustHaveHappened();
+            A.CallTo(() => fakeFileService.WriteAllText(A<string>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExportAllToCsvWhenSearchAsyncReturnsEmptyEntriesThenShowsErrorMessage()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
+
+            searchVM.SearchResult = new BatchSearchResponse
+            {
+                Total = 10,
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1") { Attributes = new List<BatchDetailsAttributes>() }
+                }
+            };
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.SearchAsync(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(new Result<BatchSearchResponse> { Data = new BatchSearchResponse { Entries = new List<BatchDetails>() }, StatusCode = 200, IsSuccess = true });
+
+            searchVM.ExportAllToCsvCommand.Execute();
+
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox("Error", "No search results to export.", MessageBoxButton.OK, MessageBoxImage.Error))
+                .MustHaveHappened();
+            A.CallTo(() => fakeFileService.WriteAllText(A<string>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Test]
+        public void TestExportAllToCsvSuccessfullyWritesCsvFileWithAllResults()
+        {
+            var searchVM = new SearchViewModel(fakeAuthProvider, fakeFssSearchStringBuilder, fakeFileShareApiAdminClientFactory,
+                                                fakeFssUserAttributeListProvider, fakeEnvironmentsManager, fakeMessageBoxService,
+                                                fakeFileService, fakesaveFileDialogService, fakeLoggerSearchVM, fakeEventAggregator);
+
+            searchVM.SearchResult = new BatchSearchResponse
+            {
+                Total = 2,
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1") { Attributes = new List<BatchDetailsAttributes>() }
+                }
+            };
+            var allResultsResponse = new BatchSearchResponse
+            {
+                Entries = new List<BatchDetails>
+                {
+                    new BatchDetails("batch1") { Attributes = new List<BatchDetailsAttributes> { new BatchDetailsAttributes { Key = "CellKey", Value = "AU100800" } } },
+                    new BatchDetails("batch2") { Attributes = new List<BatchDetailsAttributes> { new BatchDetailsAttributes { Key = "CellKey", Value = "AU100900" } } }
+                }
+            };
+            A.CallTo(() => fakeFileShareApiAdminClientFactory.Build()).Returns(fakeFileShareApiAdminClient);
+            A.CallTo(() => fakeFileShareApiAdminClient.SearchAsync(A<string>.Ignored, A<int?>.Ignored, A<int?>.Ignored, A<CancellationToken>.Ignored))
+                .Returns(new Result<BatchSearchResponse> { Data = allResultsResponse, StatusCode = 200, IsSuccess = true });
+            A.CallTo(() => fakesaveFileDialogService.SaveFileDialog(A<string>.Ignored)).Returns(@"C:\exports");
+
+            searchVM.ExportAllToCsvCommand.Execute();
+
+            A.CallTo(() => fakeFileService.WriteAllText(A<string>.Ignored, A<string>.Ignored))
+                .MustHaveHappened();
+            A.CallTo(() => fakeMessageBoxService.ShowMessageBox("Success", A<string>.Ignored, MessageBoxButton.OK, MessageBoxImage.Information))
+                .MustHaveHappened();
+        }
     }
 }

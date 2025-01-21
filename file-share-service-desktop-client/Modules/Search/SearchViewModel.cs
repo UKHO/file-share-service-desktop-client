@@ -5,8 +5,10 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -66,6 +68,10 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                 () => SearchResult != null && pageOffset + pageSize < SearchResult.Total);
             authProvider.PropertyChanged += (sender, args) => SearchCommand.RaiseCanExecuteChanged();
             SearchCriteria.PropertyChanged += OnSearchCriteriaPropertyChanged;
+
+            ExportToCsvCommand = new DelegateCommand(async () => await ExportToCsv(false), () => SearchResult != null && SearchResult.Entries.Any());
+
+            ExportAllToCsvCommand = new DelegateCommand(async () => await ExportToCsv(true), () => SearchResult != null && SearchResult.Entries.Any());
 
             this.eventAggregator.GetEvent<BatchExpiredEvent>().Subscribe(async () => await OnSearch(), ThreadOption.UIThread);         
         }
@@ -166,6 +172,93 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
             }
         }
 
+        private async Task ExportToCsv(bool exportAll = false)
+        {
+            SearchInProgress = true;
+
+            try
+            {
+                logger.LogInformation("Export search result to CSV started :{searchText}", searchText);
+
+                if (SearchResult == null || !SearchResult.Entries.Any())
+                {
+                    messageBoxService.ShowMessageBox("Error", "No search results to export.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var fssSearchResult = SearchResult;
+
+                if (exportAll)
+                {
+                    var fssClient = fileShareApiAdminClientFactory.Build();
+                    var result = await fssClient.SearchAsync(searchText, SearchResult.Total, 0, CancellationToken.None);
+
+                    if (!result.IsSuccess)
+                    {
+                        logger.LogError("Failed to fetch all results for CSV export with status: {StatusCode}", result.StatusCode);
+                        messageBoxService.ShowMessageBox("Error", "Failed to retrieve all results for export. Please try again.", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    fssSearchResult = result.Data;
+
+                    if (fssSearchResult == null || !fssSearchResult.Entries.Any())
+                    {
+                        messageBoxService.ShowMessageBox("Error", "No search results to export.", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
+
+                var saveFilePath = saveFileDialogService.SaveFileDialog("SearchResults.csv");
+            
+                if (string.IsNullOrEmpty(saveFilePath))
+                    return;
+                
+                saveFilePath = Path.Combine(saveFilePath, $"SearchResults-{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
+                
+                var csvContent = new StringBuilder();
+
+                var header = "BatchId";
+                var attributeKeys = fssSearchResult.Entries
+                    .SelectMany(entry => entry.Attributes.Select(attr => attr.Key))
+                    .Distinct()
+                    .ToList();
+
+                header += "," + string.Join(",", attributeKeys.Select(EscapeCsvField));
+                csvContent.AppendLine(header);
+
+                foreach (var entry in fssSearchResult.Entries)
+                {
+                    var attributes = attributeKeys
+                            .Select(key =>
+                            {
+                                var value = entry.Attributes.FirstOrDefault(a => a.Key == key)?.Value ?? string.Empty;
+                                return EscapeCsvField(value);
+                            });
+                    csvContent.AppendLine($"{EscapeCsvField(entry.BatchId)},{string.Join(",", attributes)}");
+                }
+
+                fileService.WriteAllText(saveFilePath, csvContent.ToString());
+                messageBoxService.ShowMessageBox("Success", $"Search results exported successfully.{Environment.NewLine}{saveFilePath}", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Failed to export search results to CSV: {Message}", ex.Message);
+                messageBoxService.ShowMessageBox("Error", "Failed to export search results. Please try again.", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                SearchInProgress = false;
+            }
+        }
+
+        private static string EscapeCsvField(string value)
+        {
+            if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+                return $"\"{value.Replace("\"", "\"\"")}\"";
+            return value;
+        }
+
         public string SearchText
         {
             get => searchText;
@@ -191,11 +284,17 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     searchInProgress = value;
                     RaisePropertyChanged();
                     SearchCommand.RaiseCanExecuteChanged();
+                    ExportToCsvCommand.RaiseCanExecuteChanged();
+                    ExportAllToCsvCommand.RaiseCanExecuteChanged();
                 }
             }
         }
 
         public DelegateCommand SearchCommand { get; }
+
+        public DelegateCommand ExportToCsvCommand { get; }
+
+        public DelegateCommand ExportAllToCsvCommand { get; }
 
         public string SearchResultAsJson
         {
@@ -221,7 +320,8 @@ namespace UKHO.FileShareService.DesktopClient.Modules.Search
                     searchResult = value;
                     RaisePropertyChanged();
                     RaisePropertyChanged(nameof(SearchCountSummary));
-                   
+                    ExportToCsvCommand.RaiseCanExecuteChanged();
+                    ExportAllToCsvCommand.RaiseCanExecuteChanged();
                 }
             }
         }
