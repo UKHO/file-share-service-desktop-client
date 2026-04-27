@@ -4,11 +4,21 @@
 # https://aka.ms/yaml
 name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd).$(BuildCounter)
 
+parameters:
+  - name: SnykOnlyFailIfFixable
+    displayName: "Snyk - fail only if an issue has an available fix"
+    type: boolean
+    default: false
+  - name: SnykPassOnIssues
+    displayName: "Snyk - don't fail if issues found"
+    type: boolean
+    default: false
+
 trigger:
   - main
   - release/*
 
-pool: $(WindowPool)
+pool: $(WindowsPool1)
 
 variables:
   - name: BuildConfiguration
@@ -23,12 +33,72 @@ variables:
     value: "1.0."
   - name: UKHOAssemblyProduct
     value: "File Share Desktop Client"
-  - name: WindowPool
+  - name: WindowsPool1
     value: "NautilusBuild"
+  - name: WindowsPool2
+    value: "Mare Nubium"
   - name: coverityPool
     value: NautilusBuild
+  - name: snykAbzuOrganizationId
+    value: aeb7543b-8394-457c-8334-a31493d8910d
 
 stages:
+  - stage: VulnerabilityChecks
+    displayName: Vulnerability checks
+    dependsOn: []
+    jobs:
+      - job: Snyk
+        displayName: Run Snyk security scans
+        pool: $(WindowsPool2)
+        steps:
+        - task: UseDotNet@2
+          displayName: Use .NET SDK $(DotNetSdkVersion)
+          inputs:
+            packageType: sdk
+            version: $(DotNetSdkVersion)
+
+        - task: DotNetCoreCLI@2
+          displayName: .NET - NuGet restore
+          inputs:
+            command: restore
+            projects: |
+              **/*.csproj
+            feedsToUse: config
+            noCache: true
+            nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+            workingDirectory: '$(Build.SourcesDirectory)\UKHO.FileShareService.API'
+
+        - task: UkhoSnykScanTask@0
+          displayName: Snyk SAST scan
+          condition: succeededOrFailed()
+          inputs:
+            failOnIssues: ${{ not(parameters.SnykPassOnIssues) }}
+            failOnThreshold: high
+            organization: $(snykAbzuOrganizationId)
+            serviceConnectionEndpoint: Snyk
+            codeSeverityThreshold: low
+            testType: code
+            monitorwhen: never
+            ${{ if eq(parameters.SnykOnlyFailIfFixable, true) }}:
+              additionalArguments: --fail-on=all
+
+        - task: UkhoSnykScanTask@0
+          displayName: Snyk SCA scan
+          condition: succeededOrFailed()
+          inputs:
+            failOnIssues: ${{ not(parameters.SnykPassOnIssues) }}
+            failOnThreshold: high
+            organization: $(snykAbzuOrganizationId)
+            serviceConnectionEndpoint: Snyk
+            codeSeverityThreshold: low
+            testType: app
+            monitorwhen: never
+            severityThreshold: low
+            ${{ if eq(parameters.SnykOnlyFailIfFixable, true) }}:
+              additionalArguments: --all-projects --fail-on=all
+            ${{ else }}:
+              additionalArguments: --all-projects
+
   - stage: BuildTestPublish
     displayName: "Build, test and publish"
     dependsOn: []
