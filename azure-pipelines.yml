@@ -179,6 +179,10 @@ stages:
         displayName: "Build Installer"
         dependsOn:
         - BuildAndTest
+        pool: 
+          name: $(WindowsPool1)
+          demands:
+          - WIX
         steps:
           - template: ./Update-AssemblyProperties.yaml  
             parameters:
