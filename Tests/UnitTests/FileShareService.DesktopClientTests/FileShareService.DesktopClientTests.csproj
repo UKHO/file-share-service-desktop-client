@@ -1,27 +1,27 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
 
-    <IsPackable>false</IsPackable>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="7.4.0" />
-    <PackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.10" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="13.2.31" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FakeItEasy" Version="7.4.0" />
+		<PackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.26" />
+		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
+		<PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="13.2.31" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\file-share-service-desktop-client\FileShareService.DesktopClient.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\file-share-service-desktop-client\FileShareService.DesktopClient.csproj" />
+	</ItemGroup>
 
 </Project>

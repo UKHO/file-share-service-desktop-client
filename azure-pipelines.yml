@@ -41,6 +41,8 @@ variables:
     value: NautilusBuild
   - name: snykAbzuOrganizationId
     value: aeb7543b-8394-457c-8334-a31493d8910d
+  - name: SdkVersion
+    value: "8.x"
 
 stages:
   - stage: VulnerabilityChecks
@@ -55,7 +57,7 @@ stages:
             displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: .NET - NuGet restore
@@ -122,7 +124,7 @@ stages:
             displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
 
           - task: NuGetToolInstaller@1
             inputs:
@@ -198,7 +200,7 @@ stages:
             displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: Publish Project
