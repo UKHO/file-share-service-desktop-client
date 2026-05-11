@@ -1,13 +1,15 @@
-# .NET 8 Upgrade Progress
+# Migration Progress
 
-## Overview
-
-Upgrading WPF solution from .NET 6 to .NET 8.0 using All-At-Once strategy. All 5 projects (1 core library, 1 WPF app, 2 test projects, 1 WiX installer) will be upgraded simultaneously with security vulnerability fixes included.
-
-**Progress**: 0/3 tasks complete (0%) ![0%](https://progress-bar.xyz/0)
+**Progress**: 0/5 tasks complete (0%) ![0%](https://progress-bar.xyz/0)
+**Status**: In Progress - Task 01-prerequisites
 
 ## Tasks
 
 - 🔄 01-prerequisites: Validate Prerequisites
 - 🔲 02-atomic-upgrade: Upgrade All Projects to .NET 8
+   - 🔲 02.01-core-library: Upgrade Core library (foundation, no dependencies)
+   - 🔲 02.02-wpf-application: Upgrade WPF application (depends on Core)
+   - 🔲 02.03-test-projects: Upgrade test projects (depend on Core and WPF app)
 - 🔲 03-validation: Validate Upgrade
+
+**Legend**: ✅ Complete | 🔄 In Progress | 🔲 Pending | ⚠️ Blocked | ❌ Failed

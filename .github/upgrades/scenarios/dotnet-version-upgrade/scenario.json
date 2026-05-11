@@ -3,12 +3,16 @@
   "operationId": "35496df2-ace0-4ef7-becd-b544778b8b94",
   "description": "Upgrade .NET projects to newer .NET versions",
   "startTime": "2026-05-11T14:30:10.2058645Z",
-  "lastUpdateTime": "2026-05-11T15:00:20.1417446Z",
+  "lastUpdateTime": "2026-05-11T15:05:42.4056899Z",
   "stage": "Assessment",
   "properties": {
     "task:01-prerequisites:startedAt": "2026-05-11T15:00:19.9798824Z",
-    "currentTask": "01-prerequisites",
-    "UpgradeTargetFramework": "net8.0"
+    "task:02.02-wpf-application:startedAt": "2026-05-11T15:04:24.2696288Z",
+    "currentTask": "02.03-test-projects",
+    "task:02.01-core-library:startedAt": "2026-05-11T15:01:25.2146684Z",
+    "UpgradeTargetFramework": "net8.0",
+    "task:02-atomic-upgrade:startedAt": "2026-05-11T15:00:48.1541807Z",
+    "task:02.03-test-projects:startedAt": "2026-05-11T15:05:42.4056899Z"
   },
   "folderPath": ""
 }
