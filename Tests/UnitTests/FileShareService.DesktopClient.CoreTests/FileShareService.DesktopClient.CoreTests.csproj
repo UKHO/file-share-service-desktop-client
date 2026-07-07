@@ -1,49 +1,48 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
 
-    <IsPackable>false</IsPackable>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="sampleActions.json" />
-    <None Remove="sampleActionsWithDuplicateJobs.json" />
-    <None Remove="sampleActionsWithFileAttributes.json" />
-    <None Remove="sampleActionsWithInvalidFormat.json" />
-    <None Remove="sampleActionsWithUnspecifiedFileCount.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="sampleActions.json" />
+		<None Remove="sampleActionsWithDuplicateJobs.json" />
+		<None Remove="sampleActionsWithFileAttributes.json" />
+		<None Remove="sampleActionsWithInvalidFormat.json" />
+		<None Remove="sampleActionsWithUnspecifiedFileCount.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="sampleActionsWithUnspecifiedFileCount.json" />
-    <EmbeddedResource Include="sampleActionsWithFileAttributes.json" />
-    <EmbeddedResource Include="sampleActions.json" />
-    <EmbeddedResource Include="sampleActionsWithInvalidFormat.json" />
-    <EmbeddedResource Include="sampleActionsWithDuplicateJobs.json" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="sampleActionsWithUnspecifiedFileCount.json" />
+		<EmbeddedResource Include="sampleActionsWithFileAttributes.json" />
+		<EmbeddedResource Include="sampleActions.json" />
+		<EmbeddedResource Include="sampleActionsWithInvalidFormat.json" />
+		<EmbeddedResource Include="sampleActionsWithDuplicateJobs.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="7.4.0" />
-    <PackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FakeItEasy" Version="7.4.0" />
+		<PackageReference Include="FakeItEasy.Analyzer.CSharp" Version="6.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\FileShareService.DesktopClient.Core\FileShareService.DesktopClient.Core.csproj" />
-    <ProjectReference Include="..\FileShareService.DesktopClientTests\FileShareService.DesktopClientTests.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\FileShareService.DesktopClient.Core\FileShareService.DesktopClient.Core.csproj" />
+		<ProjectReference Include="..\FileShareService.DesktopClientTests\FileShareService.DesktopClientTests.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="environments.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="environments.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>

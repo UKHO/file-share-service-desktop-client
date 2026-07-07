@@ -4,11 +4,21 @@
 # https://aka.ms/yaml
 name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd).$(BuildCounter)
 
+parameters:
+  - name: SnykOnlyFailIfFixable
+    displayName: "Snyk - fail only if an issue has an available fix"
+    type: boolean
+    default: false
+  - name: SnykPassOnIssues
+    displayName: "Snyk - don't fail if issues found"
+    type: boolean
+    default: false
+
 trigger:
   - main
   - release/*
 
-pool: $(WindowPool)
+pool: $(WindowsPool1)
 
 variables:
   - name: BuildConfiguration
@@ -23,58 +33,78 @@ variables:
     value: "1.0."
   - name: UKHOAssemblyProduct
     value: "File Share Desktop Client"
-  - name: WindowPool
+  - name: WindowsPool1
     value: "NautilusBuild"
+  - name: WindowsPool2
+    value: "Mare Nubium"
   - name: coverityPool
     value: NautilusBuild
-  - group: Covscan-vars
-
-resources:
-  repositories:
-    - repository: covscan
-      type: github
-      name: UKHO/coverityscan-buildtemplates
-      endpoint: UKHO
-      ref: refs/heads/master
+  - name: snykAbzuOrganizationId
+    value: aeb7543b-8394-457c-8334-a31493d8910d
+  - name: SdkVersion
+    value: "8.x"
 
 stages:
-  - stage: PERFORM_DEPENDENCYCHECK_DOTNETBUILD_DOTNETTEST_AND_PUBLISH
-    displayName: "Build (inc DependencyChecker, Dotnet Build , dotnet test and publish artifact )"
+  - stage: VulnerabilityChecks
+    displayName: Vulnerability checks
     dependsOn: []
     jobs:
-      - job:
-        workspace:
-          clean: all # what to clean up before the job runs outputs | resources | all
-        displayName: "DependencyChecker"
-
+      - job: Snyk
+        displayName: Run Snyk security scans
+        pool: $(WindowsPool2)
         steps:
           - task: UseDotNet@2
             displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
 
-          - task: CmdLine@1
-            displayName: "Run OWASP Dependency Checker"
+          - task: DotNetCoreCLI@2
+            displayName: .NET - NuGet restore
             inputs:
-              filename: 'dependency-check.bat'
-              arguments: '--project "File-Share-Service-Desktop-Client - $(Build.SourceBranchName)" --scan "$(Build.SourcesDirectory)" --out "$(Build.SourcesDirectory)\DCReport" --suppression $(Build.SourcesDirectory)\NVDSuppressions.xml --noupdate'
+              command: restore
+              projects: |
+                **/*.csproj
+              feedsToUse: config
+              noCache: true
+              nugetConfigPath: '$(Build.SourcesDirectory)\BuildNuget.config'
+              workingDirectory: '$(Build.SourcesDirectory)'
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Artifact: OWASP Dependency Checker Report"
+          - task: UkhoSnykScanTask@0
+            displayName: Snyk SAST scan
+            condition: succeededOrFailed()
             inputs:
-              PathtoPublish: '$(Build.SourcesDirectory)\DCReport'
-              ArtifactName: "OWASP Dependency Checker Report"
+              failOnIssues: ${{ not(parameters.SnykPassOnIssues) }}
+              failOnThreshold: high
+              organization: $(snykAbzuOrganizationId)
+              serviceConnectionEndpoint: Snyk
+              codeSeverityThreshold: low
+              testType: code
+              monitorwhen: never
+              ${{ if eq(parameters.SnykOnlyFailIfFixable, true) }}:
+                additionalArguments: --fail-on=all
 
-          - task: PowerShell@1
-            displayName: "Fail Build if Dependency Check Finds Any Vulnerabilities"
+          - task: UkhoSnykScanTask@0
+            displayName: Snyk SCA scan
+            condition: succeededOrFailed()
             inputs:
-              scriptType: inlineScript
-              arguments: '-ReportLocation $(Build.SourcesDirectory)\DCReport\*'
-              inlineScript: |
-                param($ReportLocation)
-                Invoke-VulnerabilityCheck -ReportLocation $ReportLocation
+              failOnIssues: ${{ not(parameters.SnykPassOnIssues) }}
+              failOnThreshold: high
+              organization: $(snykAbzuOrganizationId)
+              serviceConnectionEndpoint: Snyk
+              codeSeverityThreshold: low
+              testType: app
+              monitorwhen: never
+              severityThreshold: low
+              ${{ if eq(parameters.SnykOnlyFailIfFixable, true) }}:
+                additionalArguments: --all-projects --fail-on=all
+              ${{ else }}:
+                additionalArguments: --all-projects
 
+  - stage: BuildTestPublish
+    displayName: "Build, test and publish"
+    dependsOn: []
+    jobs:
       - job: BuildAndTest
         workspace:
           clean: all
@@ -94,7 +124,7 @@ stages:
             displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
 
           - task: NuGetToolInstaller@1
             inputs:
@@ -151,6 +181,10 @@ stages:
         displayName: "Build Installer"
         dependsOn:
         - BuildAndTest
+        pool: 
+          name: $(WindowsPool1)
+          demands:
+          - WIX
         steps:
           - template: ./Update-AssemblyProperties.yaml  
             parameters:
@@ -166,7 +200,7 @@ stages:
             displayName: 'Use .NET Core sdk'
             inputs:
               packageType: sdk
-              useGlobalJson: true
+              version: $(SdkVersion)
 
           - task: DotNetCoreCLI@2
             displayName: Publish Project
