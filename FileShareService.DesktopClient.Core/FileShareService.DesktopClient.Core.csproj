@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<RootNamespace>UKHO.FileShareService.DesktopClient.Core</RootNamespace>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="JsonSubTypes" Version="2.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.84.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="Prism.Core" Version="8.1.97" />
@@ -16,8 +16,6 @@
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
 		<PackageReference Include="UKHO.FileShareAdminClient" Version="1.6.30104.1" />
 		<PackageReference Include="UKHO.FileShareClient" Version="1.6.30104.1" />
-		<PackageReference Include="System.Text.Json" Version="10.0.7" />
-		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 	</ItemGroup>
 
 </Project>
